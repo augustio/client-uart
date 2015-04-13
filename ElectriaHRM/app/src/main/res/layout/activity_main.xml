@@ -66,4 +66,81 @@
             android:text="Plot"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <ListView android:id="@+id/listMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true">
+        </ListView>
+
+    </LinearLayout>
+
+    <RelativeLayout android:id="@+id/RelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical">
+
+        <EditText android:id="@+id/sendText"
+            android:layout_width="102dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/sendButton"
+            android:ems="10" android:enabled="false"
+            android:fontFamily="1" android:lines="1"
+            android:maxLength="20" android:maxLines="1"
+            android:shadowRadius="1"/>
+
+        <Button android:id="@+id/sendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:enabled="false"
+            android:text="Send"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/RelativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/deviceLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/device" />
+
+        <TextView
+            android:id="@+id/deviceName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="18dp"
+            android:layout_toRightOf="@+id/deviceLabel"
+            android:text="@string/no_device"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/rssival"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/rssival"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
+
 </LinearLayout>
