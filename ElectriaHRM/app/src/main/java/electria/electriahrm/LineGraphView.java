@@ -7,7 +7,7 @@
  * Licensees are granted free, non-transferable use of the information. NO WARRANTY of ANY KIND is provided.
  * This heading must NOT be removed from the file.
  ******************************************************************************/
-package no.nordicsemi.android.nrftoolbox.hrs;
+package electria.electriahrm;
 
         import org.achartengine.ChartFactory;
         import org.achartengine.GraphicalView;
@@ -80,7 +80,7 @@ public class LineGraphView {
         renderer.setZoomEnabled(false, false);
         //set title to x-axis and y-axis
         renderer.setXTitle("    Time (seconds)");
-        renderer.setYTitle("               BPM");
+        //renderer.setYTitle("               BPM");
         renderer.addSeriesRenderer(mRenderer);
     }
 
