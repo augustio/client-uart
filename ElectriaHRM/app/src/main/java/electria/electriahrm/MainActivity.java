@@ -130,6 +130,14 @@ public class MainActivity extends Activity {
         tempView.setText("Temp: " + temp + "°C");
     }
 
+    private void resetGUI(){
+        clearLog();
+        clearGraph();
+        btnPause.setBackgroundColor(0X77FFFF00);
+        btnPause.setText("Pause");
+        batLevelView.setText(R.string.batteryLevel);
+        tempView.setText(R.string.temperature);
+    }
 
     //Prepare the initial GUI for graph
     private void setGUI() {
