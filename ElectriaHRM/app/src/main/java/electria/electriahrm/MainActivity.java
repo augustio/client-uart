@@ -103,6 +103,11 @@ public class MainActivity extends Activity {
         initFlags();
     }
 
+    private void updateTemp(double temp) {
+        temp = (temp/4.0);
+        tempView.setText("Temp: " + temp + "°C");
+    }
+
 
     //Prepare the initial GUI for graph
     private void setGUI() {
