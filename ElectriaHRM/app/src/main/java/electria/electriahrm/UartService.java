@@ -113,8 +113,18 @@ public class UartService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.w(TAG, "mBluetoothGatt = " + mBluetoothGatt);
-
+                Log.w(TAG, "mBluetoothGatt = " + mBluetoothGatt );
+                List<BluetoothGattService> services = gatt.getServices();
+                for (BluetoothGattService service : services) {
+                    if (service.getUuid().equals(UART_SERVICE_UUID)) {
+                        mRXCharacteristic = service.getCharacteristic(RX_CHAR_UUID);
+                        mTXCharacteristic = service.getCharacteristic(TX_CHAR_UUID);
+                    } else if (service.getUuid().equals(BATTERY_SERVICE_UUID)) {
+                        mBatteryCharacteristic = service.getCharacteristic(BATTERY_LEVEL_CHAR_UUID);
+                    }else if (service.getUuid().equals(HT_SERVICE_UUID)) {
+                        mTempCharacteristic = service.getCharacteristic(HT_MEASUREMENT_CHARACTERISTIC_UUID);
+                    }
+                }
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             } else {
                 Log.w(TAG, "onServicesDiscovered received: " + status);
