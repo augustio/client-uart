@@ -61,6 +61,17 @@ public class MainActivity extends Activity {
     private Button btnConnectDisconnect,btnPlot,btnPause,btnLog,btnSend;
     private ViewGroup mainLayout;
 
+    private int mCounter = 0;
+    private int hrmValue1 = 0;
+    private int hrmValue2 = 0;
+    private int batteryValue = 0;
+    private String mDeviceAddress = null;
+    private UartService mService = null;
+    private String mHRM = null;
+    private BluetoothDevice mDevice = null;
+    private BluetoothAdapter mBtAdapter = null;
+    private int mState = UART_PROFILE_DISCONNECTED;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
