@@ -44,6 +44,15 @@ public class MainActivity extends Activity {
     private static final int UART_PROFILE_DISCONNECTED = 21;
     private static final int X_RANGE = 500;
 
+    private boolean isGraphInProgress;
+    private boolean btnPlotClicked;
+    private boolean btnLogClicked;
+    private boolean startGraphUpdate;
+    private boolean onPause;
+    private boolean startLogging;
+    private boolean isLogging;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
