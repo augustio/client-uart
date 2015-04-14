@@ -369,6 +369,41 @@ public class MainActivity extends Activity {
         super.onConfigurationChanged(newConfig);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+
+            case REQUEST_SELECT_DEVICE:
+                //When the DeviceListActivity return, with the selected device address
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    String deviceAddress = data.getStringExtra(BluetoothDevice.EXTRA_DEVICE);
+                    mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
+
+                    Log.d(TAG, "... onActivityResultdevice.address==" + mDevice + "mserviceValue" + mService);
+                    ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - connecting");
+                    mService.connect(deviceAddress);
+                    mDeviceAddress = deviceAddress;
+
+                }
+                break;
+            case REQUEST_ENABLE_BT:
+                // When the request to enable Bluetooth returns
+                if (resultCode == Activity.RESULT_OK) {
+                    Toast.makeText(this, "Bluetooth has turned on ", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    // User did not enable Bluetooth or an error occurred
+                    Log.d(TAG, "BT not enabled");
+                    Toast.makeText(this, "Problem in BT Turning ON ", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
+            default:
+                Log.e(TAG, "wrong request code");
+                break;
+        }
+    }
+
     private void showMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 
