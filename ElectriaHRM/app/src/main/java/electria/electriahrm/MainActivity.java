@@ -82,6 +82,21 @@ public class MainActivity extends Activity {
             finish();
             return;
         }
+
+        btnConnectDisconnect=(Button) findViewById(R.id.btn_select);
+        btnConnectDisconnect.setBackgroundColor(0X7700FF00);
+        btnPlot=(Button) findViewById(R.id.btn_plot);
+        btnPlot.setBackgroundColor(0X770000FF);
+        btnPause=(Button) findViewById(R.id.btn_pause);
+        btnPause.setBackgroundColor(0X77FFFF00);
+        btnLog=(Button) findViewById(R.id.btn_log);
+        btnLog.setBackgroundColor(0X770000FF);
+        btnSend=(Button) findViewById(R.id.sendButton);
+        edtMessage=(EditText) findViewById(R.id.sendText);
+        messageListView = (ListView) findViewById(R.id.listMessage);
+        listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
+        batLevelView = (TextView) findViewById(R.id.bat_level);
+        tempView = (TextView) findViewById(R.id.temp);
     }
 
 
