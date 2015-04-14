@@ -411,6 +411,36 @@ public class MainActivity extends Activity {
         super.finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mState == UART_PROFILE_CONNECTED) {
+            finish();
+            /**Intent startMain = new Intent(Intent.ACTION_MAIN);
+             startMain.addCategory(Intent.CATEGORY_HOME);
+             startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+             startActivity(startMain);
+             showMessage("nRFUART's running in background.\n             Disconnect to exit");
+             */
+        }
+        else {
+            resetGUI();
+            initFlags();
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(R.string.popup_title)
+                    .setMessage(R.string.popup_message)
+                    .setPositiveButton(R.string.popup_yes, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton(R.string.popup_no, null)
+                    .show();
+        }
+    }
+
     private void showMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 
