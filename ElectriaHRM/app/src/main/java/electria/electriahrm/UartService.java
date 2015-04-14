@@ -140,6 +140,7 @@ public class UartService extends Service {
                         mBatteryCharacteristic.getUuid().equals(characteristic.getUuid())) {
                     batteryValue = characteristic.getValue()[0];
                     broadcastUpdate(BATTERY_VALUE_READ);
+                    enableRXNotification();
                 }
             }
         }
