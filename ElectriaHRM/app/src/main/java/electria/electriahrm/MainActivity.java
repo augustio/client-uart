@@ -234,4 +234,9 @@ public class MainActivity extends Activity {
         intentFilter.addAction(UartService.BATTERY_VALUE_READ);
         return intentFilter;
     }
+
+    private void showMessage(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
+    }
 }
