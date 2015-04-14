@@ -337,6 +337,14 @@ public class UartService extends Service {
         Log.d(TAG, "write TXchar - status=" + status);
     }
 
+    public int getBatteryValue(){
+        if(batteryValue > 0)
+            return batteryValue;
+        else
+            return 0;
+    }
+
+
     private void showMessage(String msg) {
         Log.e(TAG, msg);
     }
