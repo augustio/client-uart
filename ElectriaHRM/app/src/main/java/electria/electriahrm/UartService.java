@@ -147,7 +147,13 @@ public class UartService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+            if(mRXCharacteristic.getUuid().equals(characteristic.getUuid())) {
+                broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+                if (++timer % UPDATE_INTERVAL == 0) {
+                    timer = 0;
+                    readCharacteristic(mBatteryCharacteristic);
+                }
+            }
         }
     };
 
