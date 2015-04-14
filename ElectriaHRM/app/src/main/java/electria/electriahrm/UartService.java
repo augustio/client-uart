@@ -136,7 +136,11 @@ public class UartService extends Service {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+                if(mBatteryCharacteristic != null &&
+                        mBatteryCharacteristic.getUuid().equals(characteristic.getUuid())) {
+                    batteryValue = characteristic.getValue()[0];
+                    broadcastUpdate(BATTERY_VALUE_READ);
+                }
             }
         }
 
