@@ -110,4 +110,14 @@ public class MainActivity extends Activity {
         mGraphView = mLineGraph.getView(this);
         mainLayout = (ViewGroup) findViewById(R.id.linearLayout3);
     }
+
+    private void initFlags(){
+        isGraphInProgress = false;
+        btnPlotClicked = false;
+        btnLogClicked = false;
+        startGraphUpdate = false;
+        onPause = false;
+        startLogging = false;
+        isLogging = false;
+    }
 }
