@@ -52,6 +52,14 @@ public class MainActivity extends Activity {
     private boolean startLogging;
     private boolean isLogging;
 
+    private GraphicalView mGraphView;
+    private LineGraphView mLineGraph;
+    private ListView messageListView;
+    private ArrayAdapter<String> listAdapter;
+    private TextView batLevelView, tempView;
+    private EditText edtMessage;
+    private Button btnConnectDisconnect,btnPlot,btnPause,btnLog,btnSend;
+    private ViewGroup mainLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
