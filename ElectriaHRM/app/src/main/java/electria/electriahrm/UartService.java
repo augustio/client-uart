@@ -304,6 +304,26 @@ public class UartService extends Service {
             mBluetoothGatt.readCharacteristic(characteristic);
     }
 
+    /**
+     * Enable RXNotification
+     *
+     * @return
+     */
+    public void enableRXNotification()
+    {
+        if (mRXCharacteristic == null) {
+            showMessage("Charateristic not found!");
+            broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
+            return;
+        }
+        mBluetoothGatt.setCharacteristicNotification(mRXCharacteristic,true);
+
+        BluetoothGattDescriptor descriptor = mRXCharacteristic.getDescriptor(CCCD_UUID);
+        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+        mBluetoothGatt.writeDescriptor(descriptor);
+
+    }
+
     private void showMessage(String msg) {
         Log.e(TAG, msg);
     }
