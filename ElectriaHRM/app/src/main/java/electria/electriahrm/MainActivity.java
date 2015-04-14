@@ -37,6 +37,13 @@ import org.achartengine.GraphicalView;
 
 public class MainActivity extends Activity {
 
+    private static final int REQUEST_SELECT_DEVICE = 1;
+    private static final int REQUEST_ENABLE_BT = 2;
+    public static final String TAG = "nRFUART";
+    private static final int UART_PROFILE_CONNECTED = 20;
+    private static final int UART_PROFILE_DISCONNECTED = 21;
+    private static final int X_RANGE = 500;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
