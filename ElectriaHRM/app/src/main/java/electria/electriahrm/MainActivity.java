@@ -174,6 +174,25 @@ public class MainActivity extends Activity {
             }
         });
 
+        // Handle Log button
+        btnLog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!btnConnectDisconnect.getText().equals("Connect")) {
+                    if (!btnLogClicked && !onPause) {
+                        if (mState == UART_PROFILE_CONNECTED) {
+                            btnLogClicked = true;
+                            startLogging = true;
+                            isLogging = true;
+                            clearGraph();
+                            listAdapter.clear();
+                            messageListView.setAdapter(listAdapter);
+                            messageListView.setDivider(null);
+                        }
+                    }
+                }
+            }
+        });
 
         // Handle Pause Graph button
         btnPause.setOnClickListener(new View.OnClickListener() {
