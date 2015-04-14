@@ -56,7 +56,7 @@ public class LineGraphView {
         //set line chart color to Black
         mRenderer.setColor(Color.BLACK);
         //set line chart style to square points
-        mRenderer.setPointStyle(PointStyle.SQUARE);
+        //mRenderer.setPointStyle(PointStyle.SQUARE);
         mRenderer.setFillPoints(true);
 
         final XYMultipleSeriesRenderer renderer = mMultiRenderer;
@@ -75,12 +75,12 @@ public class LineGraphView {
         renderer.setXLabelsColor(Color.DKGRAY);
         renderer.setLabelsTextSize(20);
         renderer.setLegendTextSize(20);
-        //Disable zoom
-        renderer.setPanEnabled(false, false);
-        renderer.setZoomEnabled(false, false);
+        renderer.setInScroll(true);
+        renderer.setPanEnabled(true, true);
+        renderer.setZoomEnabled(true, true);
+        renderer.setZoomRate(5.0f);
         //set title to x-axis and y-axis
-        renderer.setXTitle("    Time (seconds)");
-        //renderer.setYTitle("               BPM");
+        renderer.setXTitle("    Time (milliseconds)");
         renderer.addSeriesRenderer(mRenderer);
     }
 
