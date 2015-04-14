@@ -153,7 +153,24 @@ public class MainActivity extends Activity {
                     // TODO Auto-generated catch block
                     Log.d(TAG, e.getMessage());
                 }
+            }
+        });
 
+        // Handle Plot Graph button
+        btnPlot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!btnConnectDisconnect.getText().equals("Connect")) {
+                    if (!btnPlotClicked && !onPause) {
+                        if (mState == UART_PROFILE_CONNECTED) {
+                            btnPlotClicked = true;
+                            startGraphUpdate = true;
+                            isGraphInProgress = true;
+                            clearLog();
+                            mainLayout.addView(mGraphView);
+                        }
+                    }
+                }
             }
         });
 
