@@ -106,4 +106,8 @@ public class LineGraphView {
         mSeries.clear();
     }
 
+    public void setRange(double minX, double maxX, double minY, double maxY){
+        mMultiRenderer.setRange(new double[]{minX, maxX, minY, maxY});
+    }
+
 }
