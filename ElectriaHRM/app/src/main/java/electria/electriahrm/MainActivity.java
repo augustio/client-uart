@@ -142,6 +142,15 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void clearLog(){
+        if(isLogging) {
+            isLogging = false;
+            startLogging = false;
+            btnLogClicked = false;
+            messageListView.setAdapter(null);
+        }
+    }
+
     private void resetGUI(){
         clearLog();
         clearGraph();
