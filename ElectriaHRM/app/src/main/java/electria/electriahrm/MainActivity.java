@@ -404,6 +404,13 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    public void finish() {
+        mService.close();
+        mDevice = null;
+        super.finish();
+    }
+
     private void showMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 
