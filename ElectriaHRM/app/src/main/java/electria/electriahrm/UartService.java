@@ -48,11 +48,18 @@ public class UartService extends Service {
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
+    private BluetoothGattCharacteristic mBatteryCharacteristic;
+    private BluetoothGattCharacteristic mRXCharacteristic;
+    private BluetoothGattCharacteristic mTXCharacteristic;
+    private BluetoothGattCharacteristic mTempCharacteristic;
     private int mConnectionState = STATE_DISCONNECTED;
+    private int timer = 0;
+    private int batteryValue = 0;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
+    private static final int UPDATE_INTERVAL = 100;
 
     public final static String ACTION_GATT_CONNECTED =
             "com.nordicsemi.nrfUART.ACTION_GATT_CONNECTED";
@@ -66,6 +73,8 @@ public class UartService extends Service {
             "com.nordicsemi.nrfUART.EXTRA_DATA";
     public final static String DEVICE_DOES_NOT_SUPPORT_UART =
             "com.nordicsemi.nrfUART.DEVICE_DOES_NOT_SUPPORT_UART";
+    public final static String BATTERY_VALUE_READ =
+            "com.nordicsemi.nrfUART.BATTERY_VALUE_READ";
 
     private final static UUID CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     private final static UUID UART_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
