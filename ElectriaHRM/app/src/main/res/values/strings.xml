@@ -16,4 +16,5 @@
     <string name="popup_message">Do you want to quit this Application?</string>
     <string name="popup_yes">YES</string>
     <string name="popup_no">NO</string>
+    <string name="action_settings">Settings</string>
     </resources>
