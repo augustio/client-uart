@@ -133,6 +133,41 @@ public class MainActivity extends Activity {
             }
         });
 
+        // Handle Pause Graph button
+        btnPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!btnConnectDisconnect.getText().equals("Connect")) {
+                    if (btnPlotClicked) {
+                        if (startGraphUpdate) {
+                            btnPause.setBackgroundColor(0X7700FF00);
+                            btnPause.setText("Resume");
+                            startGraphUpdate = false;
+                            onPause = true;
+                        } else {
+                            startGraphUpdate = true;
+                            onPause = false;
+                            btnPause.setBackgroundColor(0X77FFFF00);
+                            btnPause.setText("Pause");
+                        }
+                    }
+                    if (btnLogClicked) {
+                        if (startLogging) {
+                            btnPause.setBackgroundColor(0X7700FF00);
+                            btnPause.setText("Resume");
+                            startLogging = false;
+                            onPause = true;
+                        } else {
+                            startLogging = true;
+                            onPause = false;
+                            btnPause.setBackgroundColor(0X77FFFF00);
+                            btnPause.setText("Pause");
+                        }
+                    }
+                }
+            }
+        });
+
     }
 
 
