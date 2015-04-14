@@ -139,6 +139,84 @@ public class MainActivity extends Activity {
         }
     };
 
+    private final BroadcastReceiver UARTStatusChangeReceiver = new BroadcastReceiver() {
+
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (action.equals(UartService.ACTION_GATT_CONNECTED)) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Log.d(TAG, "UART_CONNECT_MSG");
+                        btnConnectDisconnect.setText("Disconnect");
+                        btnConnectDisconnect.setBackgroundColor(0X77FF0000);
+                        edtMessage.setEnabled(true);
+                        btnSend.setEnabled(true);
+                        ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - ready");
+                        mState = UART_PROFILE_CONNECTED;
+                    }
+                });
+            }
+
+            if (action.equals(UartService.ACTION_GATT_DISCONNECTED)) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Log.d(TAG, "UART_DISCONNECT_MSG");
+                        btnConnectDisconnect.setText("Connect");
+                        btnConnectDisconnect.setBackgroundColor(0X7700FF00);
+                        resetGUI();
+                        initFlags();
+                        ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
+                        if(mDeviceAddress != null)
+                            mService.connect(mDeviceAddress);
+                        else {
+                            mState = UART_PROFILE_DISCONNECTED;
+                            mService.close();
+                        }
+                    }
+                });
+            }
+
+            if (action.equals(UartService.ACTION_GATT_SERVICES_DISCOVERED)) {
+                mService.enableRXNotification();
+            }
+
+            if (action.equals(UartService.ACTION_DATA_AVAILABLE)) {
+                final byte[] rxValue = intent.getByteArrayExtra(UartService.EXTRA_DATA);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (rxValue != null){
+                            processRXData(rxValue);
+                            if (startGraphUpdate) {
+                                updateGraph();
+                            }
+                            if (startLogging) {
+                                logData();
+                            }
+                        }
+                    }
+                });
+
+            }
+
+            if(action.equals(UartService.BATTERY_VALUE_READ)){
+                final int batValue = mService.getBatteryValue();
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        updateBatteryLevel(batValue);
+                    }
+                });
+            }
+
+            if (action.equals(UartService.DEVICE_DOES_NOT_SUPPORT_UART)){
+                showMessage("Device doesn't support UART. Disconnecting");
+                mService.disconnect();
+            }
+
+
+        }
+    };
+
     private void service_init() {
         Intent bindIntent = new Intent(this, UartService.class);
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
