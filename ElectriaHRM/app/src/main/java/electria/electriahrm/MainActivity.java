@@ -213,7 +213,6 @@ public class MainActivity extends Activity {
                 mService.disconnect();
             }
 
-
         }
     };
 
@@ -222,6 +221,28 @@ public class MainActivity extends Activity {
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
+    }
+
+    private void processRXData(byte[] rxValue){
+        String[] str;
+        try {
+            String rxString = new String(rxValue, "UTF-8");
+            if(rxString.contains("-")){
+                str = rxString.split("-");
+                if(str.length == 3){//str will contain 3 strings if temp value is sent
+                    updateTemp(Integer.parseInt(str[0]));
+                    hrmValue1 = Integer.parseInt(str[1]);
+                    hrmValue2 = Integer.parseInt(str[2]);
+                }
+                else{
+                    hrmValue1 = Integer.parseInt(str[0]);
+                    hrmValue2 = Integer.parseInt(str[1]);
+                }
+                mHRM = hrmValue1+"\n"+hrmValue2;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
