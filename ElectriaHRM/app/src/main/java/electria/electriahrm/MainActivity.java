@@ -103,6 +103,11 @@ public class MainActivity extends Activity {
         initFlags();
     }
 
+    private void updateBatteryLevel(int level) {
+        batteryValue = level;
+        batLevelView.setText("Battery Level: " + batteryValue + "%");
+    }
+
     private void updateTemp(double temp) {
         temp = (temp/4.0);
         tempView.setText("Temp: " + temp + "°C");
