@@ -97,6 +97,10 @@ public class MainActivity extends Activity {
         listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
         batLevelView = (TextView) findViewById(R.id.bat_level);
         tempView = (TextView) findViewById(R.id.temp);
+
+        setGUI();
+        service_init();
+        initFlags();
     }
 
 
