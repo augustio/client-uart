@@ -324,6 +324,19 @@ public class UartService extends Service {
 
     }
 
+    public void writeTXCharacteristic(byte[] value)
+    {
+        if (mTXCharacteristic == null) {
+            showMessage("TX charateristic not found!");
+            broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
+            return;
+        }
+        mTXCharacteristic.setValue(value);
+        boolean status = mBluetoothGatt.writeCharacteristic(mTXCharacteristic);
+
+        Log.d(TAG, "write TXchar - status=" + status);
+    }
+
     private void showMessage(String msg) {
         Log.e(TAG, msg);
     }
