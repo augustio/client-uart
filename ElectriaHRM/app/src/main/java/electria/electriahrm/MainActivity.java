@@ -113,6 +113,13 @@ public class MainActivity extends Activity {
         mGraphView.repaint();
     }
 
+    //Display received ECG data on GUI
+    private void logData(){
+        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+        listAdapter.add('[' +currentDateTimeString+']'+ '\n' +mHRM);
+        messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+    }
+
     private void updateBatteryLevel(int level) {
         batteryValue = level;
         batLevelView.setText("Battery Level: " + batteryValue + "%");
