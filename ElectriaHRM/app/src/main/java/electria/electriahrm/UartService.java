@@ -304,4 +304,8 @@ public class UartService extends Service {
             mBluetoothGatt.readCharacteristic(characteristic);
     }
 
+    private void showMessage(String msg) {
+        Log.e(TAG, msg);
+    }
+
 }
