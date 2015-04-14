@@ -103,6 +103,16 @@ public class MainActivity extends Activity {
         initFlags();
     }
 
+    //Plot two new sets of values on the graph and present on the GUI
+    private void updateGraph() {
+        double maxX = mCounter+=10;
+        double minX =  (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+        mLineGraph.setRange(minX, (maxX), 0, 1023);
+        mLineGraph.addValue(new Point(mCounter, hrmValue1));
+        mLineGraph.addValue(new Point(mCounter, hrmValue2));
+        mGraphView.repaint();
+    }
+
     private void updateBatteryLevel(int level) {
         batteryValue = level;
         batLevelView.setText("Battery Level: " + batteryValue + "%");
