@@ -130,6 +130,18 @@ public class MainActivity extends Activity {
         tempView.setText("Temp: " + temp + "°C");
     }
 
+    private void clearGraph() {
+        if(isGraphInProgress) {
+            startGraphUpdate = false;
+            isGraphInProgress = false;
+            btnPlotClicked = false;
+            mLineGraph.clearGraph();
+            mGraphView.repaint();
+            mCounter = 0;
+            mainLayout.removeView(mGraphView);
+        }
+    }
+
     private void resetGUI(){
         clearLog();
         clearGraph();
