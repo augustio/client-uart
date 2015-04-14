@@ -113,7 +113,7 @@ public class UartService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.w(TAG, "mBluetoothGatt = " + mBluetoothGatt );
+                Log.w(TAG, "mBluetoothGatt = " + mBluetoothGatt);
                 List<BluetoothGattService> services = gatt.getServices();
                 for (BluetoothGattService service : services) {
                     if (service.getUuid().equals(UART_SERVICE_UUID)) {
@@ -121,7 +121,7 @@ public class UartService extends Service {
                         mTXCharacteristic = service.getCharacteristic(TX_CHAR_UUID);
                     } else if (service.getUuid().equals(BATTERY_SERVICE_UUID)) {
                         mBatteryCharacteristic = service.getCharacteristic(BATTERY_LEVEL_CHAR_UUID);
-                    }else if (service.getUuid().equals(HT_SERVICE_UUID)) {
+                    } else if (service.getUuid().equals(HT_SERVICE_UUID)) {
                         mTempCharacteristic = service.getCharacteristic(HT_MEASUREMENT_CHARACTERISTIC_UUID);
                     }
                 }
@@ -136,7 +136,7 @@ public class UartService extends Service {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                if(mBatteryCharacteristic != null &&
+                if (mBatteryCharacteristic != null &&
                         mBatteryCharacteristic.getUuid().equals(characteristic.getUuid())) {
                     batteryValue = characteristic.getValue()[0];
                     broadcastUpdate(BATTERY_VALUE_READ);
@@ -224,11 +224,10 @@ public class UartService extends Service {
      * Connects to the GATT server hosted on the Bluetooth LE device.
      *
      * @param address The device address of the destination device.
-     *
      * @return Return true if the connection is initiated successfully. The connection result
-     *         is reported asynchronously through the
-     *         {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
-     *         callback.
+     * is reported asynchronously through the
+     * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
+     * callback.
      */
     public boolean connect(final String address) {
         if (mBluetoothAdapter == null || address == null) {
@@ -261,3 +260,20 @@ public class UartService extends Service {
         mConnectionState = STATE_CONNECTING;
         return true;
     }
+
+    /**
+     * Disconnects an existing connection or cancel a pending connection. The disconnection result
+     * is reported asynchronously through the
+     * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
+     * callback.
+     */
+    public void disconnect() {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized");
+            return;
+        }
+        mBluetoothGatt.disconnect();
+    }
+
+
+}
