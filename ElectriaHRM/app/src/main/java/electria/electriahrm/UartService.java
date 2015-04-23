@@ -311,14 +311,13 @@ public class UartService extends Service {
         if (mRXCharacteristic == null) {
             showMessage("Charateristic not found!");
             broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
-            return;
         }
-        mBluetoothGatt.setCharacteristicNotification(mRXCharacteristic,true);
-
-        BluetoothGattDescriptor descriptor = mRXCharacteristic.getDescriptor(CCCD_UUID);
-        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-        mBluetoothGatt.writeDescriptor(descriptor);
-
+        else {
+            mBluetoothGatt.setCharacteristicNotification(mRXCharacteristic, true);
+            BluetoothGattDescriptor descriptor = mRXCharacteristic.getDescriptor(CCCD_UUID);
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(descriptor);
+        }
     }
 
     public void writeTXCharacteristic(byte[] value)
