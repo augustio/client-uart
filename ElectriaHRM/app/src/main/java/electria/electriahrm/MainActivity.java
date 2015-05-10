@@ -71,6 +71,7 @@ public class MainActivity extends Activity {
     private BluetoothDevice mDevice = null;
     private BluetoothAdapter mBtAdapter = null;
     private int mState = UART_PROFILE_DISCONNECTED;
+    private int packetNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -404,20 +405,27 @@ public class MainActivity extends Activity {
 
     private void processRXData(byte[] rxValue){
         String[] str;
+        int pNum;
+
         try {
             String rxString = new String(rxValue, "UTF-8");
-            if(rxString.contains("-")){
-                str = rxString.split("-");
-                if(str.length == 3){
-                    hrmValue1 = Integer.parseInt(str[1]);
-                    hrmValue2 = Integer.parseInt(str[2]);
-                }
-                else{
-                    hrmValue1 = Integer.parseInt(str[0]);
-                    hrmValue2 = Integer.parseInt(str[1]);
-                }
-                mHRM = hrmValue1+"\n"+hrmValue2;
+            str = rxString.split("-");
+            pNum = Integer.parseInt(str[3]);
+            if(packetNumber == 100)
+                packetNumber = 0;
+            else if(packetNumber == 0)
+                packetNumber = pNum;
+            else
+                packetNumber++;
+            if((pNum - packetNumber) >= 5) {
+                Log.w(TAG, "Lost Packets: " + (pNum - packetNumber));
+                return;
             }
+            Log.d(TAG, "Packets: " + packetNumber + "---" + pNum);
+            if(startGraphUpdate)
+                updateGraph(Integer.parseInt(str[1]),Integer.parseInt(str[2]));
+            if(startLogging)
+                logData(str[1]+"\n"+str[2]);
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
