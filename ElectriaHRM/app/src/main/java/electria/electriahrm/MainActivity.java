@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
     private int mCounter = 0;
     private int hrmValue1 = 0;
     private int hrmValue2 = 0;
-    private int batteryValue = 0;
+    private int lastBatLevel = 0;
     private String mDeviceAddress = null;
     private UartService mService = null;
     private String mHRM = null;
@@ -251,8 +251,9 @@ public class MainActivity extends Activity {
     }
 
     private void updateBatteryLevel(int level) {
-        batteryValue = level;
-        batLevelView.setText("Battery Level: " + batteryValue + "%");
+        if(lastBatLevel != level)
+            lastBatLevel = level;
+        batLevelView.setText("Battery Level: " + lastBatLevel + "%");
     }
 
     private void clearGraph() {
