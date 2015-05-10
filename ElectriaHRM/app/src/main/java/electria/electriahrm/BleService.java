@@ -152,12 +152,9 @@ public class BleService extends Service {
                                             BluetoothGattCharacteristic characteristic) {
             if(mRXCharacteristic.getUuid().equals(characteristic.getUuid())) {
                 broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic);
-                if (++timer % UPDATE_INTERVAL == 0) {
-                    timer = 0;
-                    readCharacteristic(mBatteryCharacteristic);
-                }
             }
         }
+
     };
 
     private void broadcastUpdate(final String action) {
