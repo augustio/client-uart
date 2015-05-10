@@ -301,7 +301,7 @@ public class MainActivity extends Activity {
                 mService.enableRXNotification();
             }
 
-            if (action.equals(BleService.ACTION_DATA_AVAILABLE)) {
+            if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
                 final byte[] rxValue = intent.getByteArrayExtra(BleService.EXTRA_DATA);
                 runOnUiThread(new Runnable() {
                     public void run() {
@@ -368,7 +368,8 @@ public class MainActivity extends Activity {
         intentFilter.addAction(BleService.ACTION_GATT_CONNECTED);
         intentFilter.addAction(BleService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BleService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(BleService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BleService.ACTION_RX_DATA_AVAILABLE);
+        intentFilter.addAction(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE);
         intentFilter.addAction(BleService.DEVICE_DOES_NOT_SUPPORT_UART);
         intentFilter.addAction(BleService.BATTERY_VALUE_READ);
         return intentFilter;
