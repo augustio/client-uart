@@ -90,8 +90,6 @@ public class MainActivity extends Activity {
         btnPause.setBackgroundColor(0X77FFFF00);
         btnSend=(Button) findViewById(R.id.sendButton);
         edtMessage=(EditText) findViewById(R.id.sendText);
-        messageListView = (ListView) findViewById(R.id.listMessage);
-        listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
         batLevelView = (TextView) findViewById(R.id.bat_level);
 
         setGUI();
