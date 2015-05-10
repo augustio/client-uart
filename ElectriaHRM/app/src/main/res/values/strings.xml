@@ -8,7 +8,6 @@
     <string name="cancel">Cancel</string>
     <string name="paired">paired</string>
     <string name="batteryLevel">Battery: N/A</string>
-    <string name="rssival">rssi: _</string>
     <string name="device">Device:</string>
     <string name="no_device">&lt;Select a device&gt;</string>
     <string name="popup_title">Quit nRF UART?</string>
