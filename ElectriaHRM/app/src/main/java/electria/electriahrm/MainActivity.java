@@ -234,10 +234,10 @@ public class MainActivity extends Activity {
 
 
     //Plot two new sets of values on the graph and present on the GUI
-    private void updateGraph() {
-        double maxX = mCounter+=10;
+    private void updateGraph(int hrmValue1, int hrmValue2) {
+        double maxX = mCounter+=5;
         double minX =  (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-        mLineGraph.setRange(minX, (maxX), 0, 1023);
+        mLineGraph.setRange(minX, maxX, 0, 1023);
         mLineGraph.addValue(new Point(mCounter, hrmValue1));
         mLineGraph.addValue(new Point(mCounter, hrmValue2));
         mGraphView.repaint();
