@@ -41,8 +41,8 @@ package electria.electriahrm;
  * Service for managing connection and data communication with a GATT server hosted on a
  * given Bluetooth LE device.
  */
-public class UartService extends Service {
-    private final static String TAG = UartService.class.getSimpleName();
+public class BleService extends Service {
+    private final static String TAG = BleService.class.getSimpleName();
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -171,8 +171,8 @@ public class UartService extends Service {
     }
 
     public class LocalBinder extends Binder {
-        UartService getService() {
-            return UartService.this;
+        BleService getService() {
+            return BleService.this;
         }
     }
 

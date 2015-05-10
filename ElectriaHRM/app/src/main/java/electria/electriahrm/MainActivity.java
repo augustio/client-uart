@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
     private int hrmValue2 = 0;
     private int lastBatLevel = 0;
     private String mDeviceAddress = null;
-    private UartService mService = null;
+    private BleService mService = null;
     private String mHRM = null;
     private BluetoothDevice mDevice = null;
     private BluetoothAdapter mBtAdapter = null;
@@ -244,7 +244,7 @@ public class MainActivity extends Activity {
     //UART service connected/disconnected
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder rawBinder) {
-            mService = ((UartService.LocalBinder) rawBinder).getService();
+            mService = ((BleService.LocalBinder) rawBinder).getService();
             Log.d(TAG, "onServiceConnected mService= " + mService);
             if (!mService.initialize()) {
                 Log.e(TAG, "Unable to initialize Bluetooth");
@@ -264,7 +264,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            if (action.equals(UartService.ACTION_GATT_CONNECTED)) {
+            if (action.equals(BleService.ACTION_GATT_CONNECTED)) {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         Log.d(TAG, "UART_CONNECT_MSG");
@@ -278,7 +278,7 @@ public class MainActivity extends Activity {
                 });
             }
 
-            if (action.equals(UartService.ACTION_GATT_DISCONNECTED)) {
+            if (action.equals(BleService.ACTION_GATT_DISCONNECTED)) {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         Log.d(TAG, "UART_DISCONNECT_MSG");
@@ -297,12 +297,12 @@ public class MainActivity extends Activity {
                 });
             }
 
-            if (action.equals(UartService.ACTION_GATT_SERVICES_DISCOVERED)) {
+            if (action.equals(BleService.ACTION_GATT_SERVICES_DISCOVERED)) {
                 mService.enableRXNotification();
             }
 
-            if (action.equals(UartService.ACTION_DATA_AVAILABLE)) {
-                final byte[] rxValue = intent.getByteArrayExtra(UartService.EXTRA_DATA);
+            if (action.equals(BleService.ACTION_DATA_AVAILABLE)) {
+                final byte[] rxValue = intent.getByteArrayExtra(BleService.EXTRA_DATA);
                 runOnUiThread(new Runnable() {
                     public void run() {
                         if (rxValue != null){
@@ -313,7 +313,7 @@ public class MainActivity extends Activity {
 
             }
 
-            if(action.equals(UartService.BATTERY_VALUE_READ)){
+            if(action.equals(BleService.BATTERY_VALUE_READ)){
                 final int batValue = mService.getBatteryValue();
                 runOnUiThread(new Runnable() {
                     public void run() {
@@ -322,7 +322,7 @@ public class MainActivity extends Activity {
                 });
             }
 
-            if (action.equals(UartService.DEVICE_DOES_NOT_SUPPORT_UART)){
+            if (action.equals(BleService.DEVICE_DOES_NOT_SUPPORT_UART)){
                 showMessage("Device doesn't support UART. Disconnecting");
                 mService.disconnect();
             }
@@ -331,7 +331,7 @@ public class MainActivity extends Activity {
     };
 
     private void service_init() {
-        Intent bindIntent = new Intent(this, UartService.class);
+        Intent bindIntent = new Intent(this, BleService.class);
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
@@ -365,12 +365,12 @@ public class MainActivity extends Activity {
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(UartService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(UartService.ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(UartService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(UartService.ACTION_DATA_AVAILABLE);
-        intentFilter.addAction(UartService.DEVICE_DOES_NOT_SUPPORT_UART);
-        intentFilter.addAction(UartService.BATTERY_VALUE_READ);
+        intentFilter.addAction(BleService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BleService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BleService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BleService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BleService.DEVICE_DOES_NOT_SUPPORT_UART);
+        intentFilter.addAction(BleService.BATTERY_VALUE_READ);
         return intentFilter;
     }
 
