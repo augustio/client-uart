@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
     private static final int UART_PROFILE_CONNECTED = 20;
     private static final int UART_PROFILE_DISCONNECTED = 21;
     private static final int X_RANGE = 500;
+    private static final int DEFAULT_BATTERY_LEVEL = 0;
 
     private boolean isGraphInProgress;
     private boolean btnPlotClicked;
@@ -313,15 +314,14 @@ public class MainActivity extends Activity {
 
             }
 
-            if(action.equals(BleService.BATTERY_VALUE_READ)){
-                final int batValue = mService.getBatteryValue();
+            else if(action.equals(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE)){
+                final int batValue = intent.getIntExtra(BleService.EXTRA_DATA, DEFAULT_BATTERY_LEVEL);
                 runOnUiThread(new Runnable() {
                     public void run() {
                         updateBatteryLevel(batValue);
                     }
                 });
             }
-
             if (action.equals(BleService.DEVICE_DOES_NOT_SUPPORT_UART)){
                 showMessage("Device doesn't support UART. Disconnecting");
                 mService.disconnect();
