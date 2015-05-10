@@ -309,9 +309,6 @@ public class MainActivity extends Activity {
                     public void run() {
                         if (rxValue != null){
                             processRXData(rxValue);
-                            if (startGraphUpdate) {
-                                updateGraph();
-                            }
                         }
                     }
                 });
