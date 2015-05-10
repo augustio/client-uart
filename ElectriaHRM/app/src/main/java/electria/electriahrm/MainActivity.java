@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
     private LineGraphView mLineGraph;
     private ListView messageListView;
     private ArrayAdapter<String> listAdapter;
-    private TextView batLevelView, tempView;
+    private TextView batLevelView;
     private EditText edtMessage;
     private Button btnConnectDisconnect,btnPlot,btnPause,btnLog,btnSend;
     private ViewGroup mainLayout;
@@ -96,7 +96,6 @@ public class MainActivity extends Activity {
         messageListView = (ListView) findViewById(R.id.listMessage);
         listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
         batLevelView = (TextView) findViewById(R.id.bat_level);
-        tempView = (TextView) findViewById(R.id.temp);
 
         setGUI();
         service_init();
@@ -255,11 +254,6 @@ public class MainActivity extends Activity {
         batLevelView.setText("Battery Level: " + batteryValue + "%");
     }
 
-    private void updateTemp(double temp) {
-        temp = (temp/4.0);
-        tempView.setText("Temp: " + temp + "°C");
-    }
-
     private void clearGraph() {
         if(isGraphInProgress) {
             startGraphUpdate = false;
@@ -287,7 +281,6 @@ public class MainActivity extends Activity {
         btnPause.setBackgroundColor(0X77FFFF00);
         btnPause.setText("Pause");
         batLevelView.setText(R.string.batteryLevel);
-        tempView.setText(R.string.temperature);
     }
 
     //Prepare the initial GUI for graph
@@ -415,8 +408,7 @@ public class MainActivity extends Activity {
             String rxString = new String(rxValue, "UTF-8");
             if(rxString.contains("-")){
                 str = rxString.split("-");
-                if(str.length == 3){//str will contain 3 strings if temp value is sent
-                    updateTemp(Integer.parseInt(str[0]));
+                if(str.length == 3){
                     hrmValue1 = Integer.parseInt(str[1]);
                     hrmValue2 = Integer.parseInt(str[2]);
                 }
