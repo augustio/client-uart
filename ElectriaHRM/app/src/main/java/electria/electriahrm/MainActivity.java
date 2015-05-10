@@ -49,8 +49,6 @@ public class MainActivity extends Activity {
     private boolean btnLogClicked;
     private boolean startGraphUpdate;
     private boolean onPause;
-    private boolean startLogging;
-    private boolean isLogging;
 
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
@@ -90,8 +88,6 @@ public class MainActivity extends Activity {
         btnPlot.setBackgroundColor(0X770000FF);
         btnPause=(Button) findViewById(R.id.btn_pause);
         btnPause.setBackgroundColor(0X77FFFF00);
-        btnLog=(Button) findViewById(R.id.btn_log);
-        btnLog.setBackgroundColor(0X770000FF);
         btnSend=(Button) findViewById(R.id.sendButton);
         edtMessage=(EditText) findViewById(R.id.sendText);
         messageListView = (ListView) findViewById(R.id.listMessage);
@@ -166,28 +162,7 @@ public class MainActivity extends Activity {
                             btnPlotClicked = true;
                             startGraphUpdate = true;
                             isGraphInProgress = true;
-                            clearLog();
                             mainLayout.addView(mGraphView);
-                        }
-                    }
-                }
-            }
-        });
-
-        // Handle Log button
-        btnLog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!btnConnectDisconnect.getText().equals("Connect")) {
-                    if (!btnLogClicked && !onPause) {
-                        if (mState == UART_PROFILE_CONNECTED) {
-                            btnLogClicked = true;
-                            startLogging = true;
-                            isLogging = true;
-                            clearGraph();
-                            listAdapter.clear();
-                            messageListView.setAdapter(listAdapter);
-                            messageListView.setDivider(null);
                         }
                     }
                 }
@@ -212,26 +187,11 @@ public class MainActivity extends Activity {
                             btnPause.setText("Pause");
                         }
                     }
-                    if (btnLogClicked) {
-                        if (startLogging) {
-                            btnPause.setBackgroundColor(0X7700FF00);
-                            btnPause.setText("Resume");
-                            startLogging = false;
-                            onPause = true;
-                        } else {
-                            startLogging = true;
-                            onPause = false;
-                            btnPause.setBackgroundColor(0X77FFFF00);
-                            btnPause.setText("Pause");
-                        }
-                    }
                 }
             }
         });
 
     }
-
-
 
     //Plot two new sets of values on the graph and present on the GUI
     private void updateGraph(int hrmValue1, int hrmValue2) {
@@ -241,13 +201,6 @@ public class MainActivity extends Activity {
         mLineGraph.addValue(new Point(mCounter, hrmValue1));
         mLineGraph.addValue(new Point(mCounter, hrmValue2));
         mGraphView.repaint();
-    }
-
-    //Display received ECG data on GUI
-    private void logData(){
-        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-        listAdapter.add('[' +currentDateTimeString+']'+ '\n' +mHRM);
-        messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
     }
 
     private void updateBatteryLevel(int level) {
@@ -268,17 +221,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void clearLog(){
-        if(isLogging) {
-            isLogging = false;
-            startLogging = false;
-            btnLogClicked = false;
-            messageListView.setAdapter(null);
-        }
-    }
-
     private void resetGUI(){
-        clearLog();
         clearGraph();
         btnPause.setBackgroundColor(0X77FFFF00);
         btnPause.setText("Pause");
@@ -298,8 +241,6 @@ public class MainActivity extends Activity {
         btnLogClicked = false;
         startGraphUpdate = false;
         onPause = false;
-        startLogging = false;
-        isLogging = false;
     }
 
     //UART service connected/disconnected
@@ -371,9 +312,6 @@ public class MainActivity extends Activity {
                             if (startGraphUpdate) {
                                 updateGraph();
                             }
-                            if (startLogging) {
-                                logData();
-                            }
                         }
                     }
                 });
@@ -425,8 +363,6 @@ public class MainActivity extends Activity {
             Log.d(TAG, "Packets: " + packetNumber + "---" + pNum);
             if(startGraphUpdate)
                 updateGraph(Integer.parseInt(str[1]),Integer.parseInt(str[2]));
-            if(startLogging)
-                logData(str[1]+"\n"+str[2]);
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
