@@ -30,6 +30,7 @@ package electria.electriahrm;
         import android.content.Context;
         import android.content.Intent;
         import android.os.Binder;
+        import android.os.Handler;
         import android.os.IBinder;
         import android.support.v4.content.LocalBroadcastManager;
         import android.util.Log;
@@ -53,13 +54,12 @@ public class BleService extends Service {
     private BluetoothGattCharacteristic mTXCharacteristic;
     private BluetoothGattCharacteristic mTempCharacteristic;
     private int mConnectionState = STATE_DISCONNECTED;
-    private int timer = 0;
-    private int batteryValue = 0;
+    private Handler mHandler = new Handler();
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
-    private static final int UPDATE_INTERVAL = 100;
+    private static final int BATTERY_LEVEL_READ_INTERVAL = 60000;
 
     public final static String ACTION_GATT_CONNECTED =
             "com.nordicsemi.nrfUART.ACTION_GATT_CONNECTED";
@@ -123,6 +123,8 @@ public class BleService extends Service {
                         mTXCharacteristic = service.getCharacteristic(TX_CHAR_UUID);
                     } else if (service.getUuid().equals(BATTERY_SERVICE_UUID)) {
                         mBatteryCharacteristic = service.getCharacteristic(BATTERY_LEVEL_CHAR_UUID);
+                        //Start reading battery characteristic every minute
+                        mReadBatteryLevel.run();
                     } else if (service.getUuid().equals(HT_SERVICE_UUID)) {
                         mTempCharacteristic = service.getCharacteristic(HT_MEASUREMENT_CHARACTERISTIC_UUID);
                     }
@@ -155,6 +157,16 @@ public class BleService extends Service {
             }
         }
 
+    };
+
+    private Runnable mReadBatteryLevel = new Runnable() {
+        @Override
+        public void run() {
+            if (mBluetoothGatt != null && mBatteryCharacteristic != null) {
+                mBluetoothGatt.readCharacteristic(mBatteryCharacteristic);
+                mHandler.postDelayed(mReadBatteryLevel, BATTERY_LEVEL_READ_INTERVAL);
+            }
+        }
     };
 
     private void broadcastUpdate(final String action) {
@@ -336,13 +348,6 @@ public class BleService extends Service {
             boolean status = mBluetoothGatt.writeCharacteristic(mTXCharacteristic);
             Log.d(TAG, "write TXchar - status=" + status);
         }
-    }
-
-    public int getBatteryValue(){
-        if(batteryValue > 0)
-            return batteryValue;
-        else
-            return 0;
     }
 
 
