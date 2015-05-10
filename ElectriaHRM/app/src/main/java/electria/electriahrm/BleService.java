@@ -140,8 +140,8 @@ public class BleService extends Service {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (mBatteryCharacteristic != null &&
                         mBatteryCharacteristic.getUuid().equals(characteristic.getUuid())) {
-                    batteryValue = characteristic.getValue()[0];
-                    broadcastUpdate(BATTERY_VALUE_READ);
+                    broadcastUpdate(ACTION_BATTERY_LEVEL_DATA_AVAILABLE,
+                            characteristic.getValue()[0]);
                     enableRXNotification();
                 }
             }
@@ -169,6 +169,12 @@ public class BleService extends Service {
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
         intent.putExtra(EXTRA_DATA, characteristic.getValue());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void broadcastUpdate(final String action, final int intValue){
+        final Intent intent = new Intent(action);
+        intent.putExtra(EXTRA_DATA, intValue);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
