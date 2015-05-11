@@ -71,6 +71,8 @@ public class BleService extends Service {
             "com.nordicsemi.nrfUART.ACTION_DATA_AVAILABLE";
     public final static String ACTION_BATTERY_LEVEL_DATA_AVAILABLE =
             "com.nordicsemi.nrfUART.ACTION_BATTERY_LEVEL_DATA_AVAILABLE";
+    public final static String ACTION_TX_CHAR_WRITE =
+            "com.nordicsemi.nrfUART.ACTION_TX_CHAR_WRITE";
     public final static String EXTRA_DATA =
             "com.nordicsemi.nrfUART.EXTRA_DATA";
     public final static String DEVICE_DOES_NOT_SUPPORT_UART =
@@ -157,6 +159,15 @@ public class BleService extends Service {
             }
         }
 
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt,
+                                          BluetoothGattCharacteristic characteristic,
+                                          int status) {
+            if(status == BluetoothGatt.GATT_SUCCESS){
+                if(mTXCharacteristic.getUuid().equals(characteristic.getUuid()))
+                    broadcastUpdate(ACTION_TX_CHAR_WRITE);
+            }
+        }
     };
 
     private Runnable mReadBatteryLevel = new Runnable() {
