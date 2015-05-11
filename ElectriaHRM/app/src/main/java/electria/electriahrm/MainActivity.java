@@ -23,10 +23,8 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.ViewGroup;
@@ -46,27 +44,19 @@ public class MainActivity extends Activity {
     private static final int X_RANGE = 500;
     private static final int DEFAULT_BATTERY_LEVEL = 0;
 
-    private boolean isGraphInProgress;
-    private boolean btnPlotClicked;
-    private boolean btnLogClicked;
-    private boolean startGraphUpdate;
-    private boolean onPause;
+    private boolean showGraph = false;
+    private boolean graphViewActive = false;
 
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
-    private ListView messageListView;
-    private ArrayAdapter<String> listAdapter;
     private TextView batLevelView;
     private EditText edtMessage;
-    private Button btnConnectDisconnect,btnPlot,btnPause,btnLog,btnSend;
+    private Button btnConnectDisconnect,btnShow,btnSend;
     private ViewGroup mainLayout;
 
     private int mCounter = 0;
-    private int hrmValue1 = 0;
-    private int hrmValue2 = 0;
     private int lastBatLevel = 0;
     private BleService mService = null;
-    private String mHRM = null;
     private BluetoothDevice mDevice = null;
     private BluetoothAdapter mBtAdapter = null;
     private int mState = DISCONNECTED;
@@ -83,19 +73,15 @@ public class MainActivity extends Activity {
             return;
         }
 
-        btnConnectDisconnect=(Button) findViewById(R.id.btn_select);
+        btnConnectDisconnect=(Button) findViewById(R.id.btn_connect);
         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
-        btnPlot=(Button) findViewById(R.id.btn_plot);
-        btnPlot.setBackgroundColor(getResources().getColor(R.color.blue));
-        btnPause=(Button) findViewById(R.id.btn_pause);
-        btnPause.setBackgroundColor(getResources().getColor(R.color.yellow));
+        btnShow=(Button) findViewById(R.id.btn_show);
+        btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
         btnSend=(Button) findViewById(R.id.sendButton);
         edtMessage=(EditText) findViewById(R.id.sendText);
         batLevelView = (TextView) findViewById(R.id.bat_level);
 
-        setGUI();
         service_init();
-        initFlags();
 
         // Handle Disconnect & Connect button
         btnConnectDisconnect.setOnClickListener(new View.OnClickListener() {
@@ -112,13 +98,10 @@ public class MainActivity extends Activity {
                         Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                         startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
                     } else {
-                        resetGUI();
-                        initFlags();
                         //Disconnect button pressed
                         if (mDevice!=null)
                         {
                             mService.disconnect();
-
                         }
                     }
                 }
@@ -144,44 +127,22 @@ public class MainActivity extends Activity {
         });
 
         // Handle Plot Graph button
-        btnPlot.setOnClickListener(new View.OnClickListener() {
+        btnShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!btnConnectDisconnect.getText().equals("Connect")) {
-                    if (!btnPlotClicked && !onPause) {
-                        if (mState == CONNECTED) {
-                            btnPlotClicked = true;
-                            startGraphUpdate = true;
-                            isGraphInProgress = true;
-                            mainLayout.addView(mGraphView);
-                        }
+                if (mState == CONNECTED) {
+                    if (showGraph) {
+                        showGraph = false;
+                        btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
+                        btnShow.setText("Show");
+                    }else{
+                        showGraph = true;
+                        btnShow.setBackgroundColor(getResources().getColor(R.color.yellow));
+                        btnShow.setText("Pause");
                     }
                 }
             }
         });
-
-        // Handle Pause Graph button
-        btnPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!btnConnectDisconnect.getText().equals("Connect")) {
-                    if (btnPlotClicked) {
-                        if (startGraphUpdate) {
-                            btnPause.setBackgroundColor(getResources().getColor(R.color.green));
-                            btnPause.setText("Resume");
-                            startGraphUpdate = false;
-                            onPause = true;
-                        } else {
-                            startGraphUpdate = true;
-                            onPause = false;
-                            btnPause.setBackgroundColor(getResources().getColor(R.color.yellow));
-                            btnPause.setText("Pause");
-                        }
-                    }
-                }
-            }
-        });
-
     }
 
     //Plot two new sets of values on the graph and present on the GUI
@@ -201,38 +162,26 @@ public class MainActivity extends Activity {
     }
 
     private void clearGraph() {
-        if(isGraphInProgress) {
-            startGraphUpdate = false;
-            isGraphInProgress = false;
-            btnPlotClicked = false;
+        if(graphViewActive) {
+            graphViewActive = false;
+            showGraph = false;
             mLineGraph.clearGraph();
-            mGraphView.repaint();
             mCounter = 0;
             mainLayout.removeView(mGraphView);
+            btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
+            btnShow.setText("Show");
         }
     }
 
-    private void resetGUI(){
-        clearGraph();
-        btnPause.setBackgroundColor(getResources().getColor(R.color.yellow));
-        btnPause.setText("Pause");
-        batLevelView.setText(R.string.batteryLevel);
-    }
-
     //Prepare the initial GUI for graph
-    private void setGUI() {
+    private void setGraphView() {
         mLineGraph = LineGraphView.getLineGraphView();
         mGraphView = mLineGraph.getView(this);
         mainLayout = (ViewGroup) findViewById(R.id.linearLayout3);
+        mainLayout.addView(mGraphView);
+        graphViewActive = true;
     }
 
-    private void initFlags(){
-        isGraphInProgress = false;
-        btnPlotClicked = false;
-        btnLogClicked = false;
-        startGraphUpdate = false;
-        onPause = false;
-    }
 
     //UART service connected/disconnected
     private ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -267,6 +216,7 @@ public class MainActivity extends Activity {
                         btnSend.setEnabled(true);
                         ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "-"+
                         R.string.device_connected);
+                        setGraphView();
                         mState = CONNECTED;
                     }
                 });
@@ -275,14 +225,15 @@ public class MainActivity extends Activity {
             if (action.equals(BleService.ACTION_GATT_DISCONNECTED)) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Log.d(TAG, "UART_DISCONNECT_MSG");
+                        Log.d(TAG, "DISCONNECT_MSG");
+                        mService.close();
                         btnConnectDisconnect.setText("Connect");
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
-                        resetGUI();
-                        initFlags();
+                        batLevelView.setText(R.string.batteryLevel);
+                        clearGraph();
                         ((TextView) findViewById(R.id.deviceName)).setText(R.string.not_connected);
                         mState = DISCONNECTED;
-                        mService.close();
+
                     }
                 });
             }
@@ -348,7 +299,7 @@ public class MainActivity extends Activity {
                 return;
             }
             Log.d(TAG, "Packets: " + packetNumber + "---" + pNum);
-            if(startGraphUpdate)
+            if(showGraph)
                 updateGraph(Integer.parseInt(str[1]),Integer.parseInt(str[2]));
         } catch (Exception e) {
             Log.e(TAG, e.toString());
@@ -386,8 +337,6 @@ public class MainActivity extends Activity {
         unbindService(mServiceConnection);
         mService.stopSelf();
         mService= null;
-        resetGUI();
-        initFlags();
     }
 
     @Override

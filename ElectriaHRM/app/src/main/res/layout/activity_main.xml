@@ -24,7 +24,7 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/btn_select"
+            android:id="@+id/btn_connect"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
@@ -32,7 +32,7 @@
             android:text="Connect" />
 
         <Button
-            android:id="@+id/btn_pause"
+            android:id="@+id/btn_store"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -40,7 +40,7 @@
             android:text="Pause" />
 
         <Button
-            android:id="@+id/btn_plot"
+            android:id="@+id/btn_show"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
