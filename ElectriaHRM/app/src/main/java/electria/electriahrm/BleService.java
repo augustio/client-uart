@@ -318,22 +318,16 @@ public class BleService extends Service {
             mBluetoothGatt.readCharacteristic(characteristic);
     }
 
-    /**
-     * Enable RXNotification
-     *
-     * @return
-     */
     public void enableRXNotification()
     {
-        if (mRXCharacteristic == null) {
-            showMessage("Charateristic not found!");
-            broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
-        }
-        else {
+        if (mRXCharacteristic != null && mConnectionState == STATE_CONNECTED) {
             mBluetoothGatt.setCharacteristicNotification(mRXCharacteristic, true);
             BluetoothGattDescriptor descriptor = mRXCharacteristic.getDescriptor(CCCD_UUID);
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
+        }else if(mRXCharacteristic == null){
+            showMessage("Charateristic not found!");
+            broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
         }
     }
 
