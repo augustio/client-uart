@@ -339,14 +339,14 @@ public class BleService extends Service {
 
     public void writeTXCharacteristic(byte[] value)
     {
-        if (mTXCharacteristic == null) {
-            showMessage("TX charateristic not found!");
-            broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
-        }
-        else {
+        if(mTXCharacteristic != null && mConnectionState == STATE_CONNECTED) {
             mTXCharacteristic.setValue(value);
             boolean status = mBluetoothGatt.writeCharacteristic(mTXCharacteristic);
             Log.d(TAG, "write TXchar - status=" + status);
+        }
+        else if(mTXCharacteristic == null){
+            showMessage("Charateristic not found!");
+            broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
         }
     }
 
