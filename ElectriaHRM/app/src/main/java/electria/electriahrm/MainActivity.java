@@ -40,8 +40,9 @@ public class MainActivity extends Activity {
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
     public static final String TAG = "nRFUART";
-    private static final int UART_PROFILE_CONNECTED = 20;
-    private static final int UART_PROFILE_DISCONNECTED = 21;
+    private static final int CONNECTED = 20;
+    private static final int DISCONNECTED = 21;
+    private static final int CONNECTING = 22;
     private static final int X_RANGE = 500;
     private static final int DEFAULT_BATTERY_LEVEL = 0;
 
@@ -68,7 +69,7 @@ public class MainActivity extends Activity {
     private String mHRM = null;
     private BluetoothDevice mDevice = null;
     private BluetoothAdapter mBtAdapter = null;
-    private int mState = UART_PROFILE_DISCONNECTED;
+    private int mState = DISCONNECTED;
     private int packetNumber;
 
     @Override
@@ -148,7 +149,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 if (!btnConnectDisconnect.getText().equals("Connect")) {
                     if (!btnPlotClicked && !onPause) {
-                        if (mState == UART_PROFILE_CONNECTED) {
+                        if (mState == CONNECTED) {
                             btnPlotClicked = true;
                             startGraphUpdate = true;
                             isGraphInProgress = true;
@@ -266,7 +267,7 @@ public class MainActivity extends Activity {
                         btnSend.setEnabled(true);
                         ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "-"+
                         R.string.device_connected);
-                        mState = UART_PROFILE_CONNECTED;
+                        mState = CONNECTED;
                     }
                 });
             }
@@ -280,7 +281,7 @@ public class MainActivity extends Activity {
                         resetGUI();
                         initFlags();
                         ((TextView) findViewById(R.id.deviceName)).setText(R.string.not_connected);
-                        mState = UART_PROFILE_DISCONNECTED;
+                        mState = DISCONNECTED;
                         mService.close();
                     }
                 });
