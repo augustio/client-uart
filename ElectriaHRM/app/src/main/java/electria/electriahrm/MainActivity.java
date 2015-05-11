@@ -83,11 +83,11 @@ public class MainActivity extends Activity {
         }
 
         btnConnectDisconnect=(Button) findViewById(R.id.btn_select);
-        btnConnectDisconnect.setBackgroundColor(0X7700FF00);
+        btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
         btnPlot=(Button) findViewById(R.id.btn_plot);
-        btnPlot.setBackgroundColor(0X770000FF);
+        btnPlot.setBackgroundColor(getResources().getColor(R.color.blue));
         btnPause=(Button) findViewById(R.id.btn_pause);
-        btnPause.setBackgroundColor(0X77FFFF00);
+        btnPause.setBackgroundColor(getResources().getColor(R.color.yellow));
         btnSend=(Button) findViewById(R.id.sendButton);
         edtMessage=(EditText) findViewById(R.id.sendText);
         batLevelView = (TextView) findViewById(R.id.bat_level);
@@ -171,14 +171,14 @@ public class MainActivity extends Activity {
                 if (!btnConnectDisconnect.getText().equals("Connect")) {
                     if (btnPlotClicked) {
                         if (startGraphUpdate) {
-                            btnPause.setBackgroundColor(0X7700FF00);
+                            btnPause.setBackgroundColor(getResources().getColor(R.color.green));
                             btnPause.setText("Resume");
                             startGraphUpdate = false;
                             onPause = true;
                         } else {
                             startGraphUpdate = true;
                             onPause = false;
-                            btnPause.setBackgroundColor(0X77FFFF00);
+                            btnPause.setBackgroundColor(getResources().getColor(R.color.yellow));
                             btnPause.setText("Pause");
                         }
                     }
@@ -218,7 +218,7 @@ public class MainActivity extends Activity {
 
     private void resetGUI(){
         clearGraph();
-        btnPause.setBackgroundColor(0X77FFFF00);
+        btnPause.setBackgroundColor(getResources().getColor(R.color.yellow));
         btnPause.setText("Pause");
         batLevelView.setText(R.string.batteryLevel);
     }
@@ -266,7 +266,7 @@ public class MainActivity extends Activity {
                     public void run() {
                         Log.d(TAG, "UART_CONNECT_MSG");
                         btnConnectDisconnect.setText("Disconnect");
-                        btnConnectDisconnect.setBackgroundColor(0X77FF0000);
+                        btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.red));
                         edtMessage.setEnabled(true);
                         btnSend.setEnabled(true);
                         ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - ready");
@@ -280,7 +280,7 @@ public class MainActivity extends Activity {
                     public void run() {
                         Log.d(TAG, "UART_DISCONNECT_MSG");
                         btnConnectDisconnect.setText("Connect");
-                        btnConnectDisconnect.setBackgroundColor(0X7700FF00);
+                        btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
                         resetGUI();
                         initFlags();
                         ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
