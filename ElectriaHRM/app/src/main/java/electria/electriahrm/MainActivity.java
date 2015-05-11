@@ -422,22 +422,24 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void finish() {
-        if(mState == CONNECTED)
-            mService.disconnect();
-        mService.close();
-        mDevice = null;
-        super.finish();
-    }
-
-    @Override
     public void onBackPressed() {
+        if(mState == CONNECTED){
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(R.string.popup_title)
-                    .setMessage(R.string.popup_message)
-                    .setPositiveButton(R.string.popup_yes, new DialogInterface.OnClickListener()
-                    {
+                    .setMessage(R.string.disconnect_message)
+                    .setPositiveButton(R.string.popup_ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .show();
+        }else {
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(R.string.popup_title)
+                    .setMessage(R.string.quit_message)
+                    .setPositiveButton(R.string.popup_yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             finish();
@@ -445,6 +447,7 @@ public class MainActivity extends Activity {
                     })
                     .setNegativeButton(R.string.popup_no, null)
                     .show();
+        }
     }
 
     private void showMessage(String msg) {
