@@ -297,10 +297,11 @@ public class BleService extends Service {
         if (mBluetoothGatt == null) {
             return;
         }
-        Log.w(TAG, "mBluetoothGatt closed");
-        mBluetoothDeviceAddress = null;
         mBluetoothGatt.close();
+        Log.w(TAG, "mBluetoothGatt closed");
         mBluetoothGatt = null;
+        mBluetoothDeviceAddress = null;
+        mHandler.removeCallbacks(mReadBatteryLevel);
     }
 
     /**
