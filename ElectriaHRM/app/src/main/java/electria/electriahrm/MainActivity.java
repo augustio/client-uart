@@ -423,6 +423,8 @@ public class MainActivity extends Activity {
 
     @Override
     public void finish() {
+        if(mState == CONNECTED)
+            mService.disconnect();
         mService.close();
         mDevice = null;
         super.finish();
