@@ -311,11 +311,14 @@ public class BleService extends Service {
      * @param characteristic The characteristic to read from.
      */
     public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
+        if(characteristic != null && mConnectionState == STATE_CONNECTED) {
+            boolean status = mBluetoothGatt.readCharacteristic(characteristic);
+            Log.d(TAG, "Read char - status=" + status);
         }
-        if(characteristic != null)
-            mBluetoothGatt.readCharacteristic(characteristic);
+        else if(characteristic == null){
+            showMessage("Charateristic not found!");
+            broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
+        }
     }
 
     public void enableRXNotification()
