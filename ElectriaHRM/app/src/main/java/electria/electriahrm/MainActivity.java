@@ -2,7 +2,9 @@ package electria.electriahrm;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 import android.app.Activity;
@@ -19,6 +21,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -44,24 +47,28 @@ public class MainActivity extends Activity {
     private static final int CONNECTING = 22;
     private static final int X_RANGE = 500;
     private static final int DEFAULT_BATTERY_LEVEL = 0;
+    private static final long DATA_SAVING_TIME = 30000;
 
-    private boolean showGraph = false;
-    private boolean graphViewActive = false;
+    private boolean showGraph;
+    private boolean graphViewActive;
+    private boolean startDataStorage;
 
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
     private TextView batLevelView;
     private EditText edtMessage;
-    private Button btnConnectDisconnect,btnShow,btnSend;
+    private Button btnConnectDisconnect,btnShow,btnSend,btnStore;
     private ViewGroup mainLayout;
+    private List<String> collection;
 
-    private int mCounter = 0;
-    private int lastBatLevel = 0;
-    private BleService mService = null;
-    private BluetoothDevice mDevice = null;
-    private BluetoothAdapter mBtAdapter = null;
-    private int mState = DISCONNECTED;
+    private int mCounter;
+    private int lastBatLevel;
+    private BleService mService;
+    private int mState;
+    private Handler mHandler;
     private int packetNumber;
+    private BluetoothDevice mDevice;
+    private BluetoothAdapter mBtAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +86,23 @@ public class MainActivity extends Activity {
         btnShow=(Button) findViewById(R.id.btn_show);
         btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
         btnSend=(Button) findViewById(R.id.sendButton);
+        btnStore = (Button)findViewById(R.id.btn_store);
+        btnStore.setBackgroundColor(getResources().getColor(R.color.green));
         edtMessage=(EditText) findViewById(R.id.sendText);
         batLevelView = (TextView) findViewById(R.id.bat_level);
+        collection = new ArrayList<String>();
+
+        startDataStorage = false;
+        showGraph = false;
+        graphViewActive = false;
+
+        collection = new ArrayList<String>();
+        mCounter = 0;
+        lastBatLevel = 0;
+        mService = null;
+        mDevice = null;
+        mState = DISCONNECTED;
+        mHandler = new Handler();
 
         service_init();
 
@@ -157,6 +179,23 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
+        // Handle Store button
+        btnStore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mState == CONNECTED) {
+                    if(startDataStorage){
+                        stopSavingData();
+                    }
+                    else{
+                        startDataStorage = true;
+                        btnStore.setText("Stop");
+                        mHandler.postDelayed(mDataSavingTimer, DATA_SAVING_TIME);
+                    }
+                }
+            }
+        });
     }
 
     //Plot two new sets of values on the graph and present on the GUI
@@ -182,9 +221,27 @@ public class MainActivity extends Activity {
             mLineGraph.clearGraph();
             mCounter = 0;
             mainLayout.removeView(mGraphView);
-            btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
-            btnShow.setText("Show");
         }
+    }
+
+    private void resetGUIComponents(){
+        btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
+        btnShow.setText("Show");
+        btnStore.setText("Store");
+        btnConnectDisconnect.setText("Connect");
+        btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
+        edtMessage.setHint("");
+        edtMessage.setEnabled(false);
+        btnShow.setEnabled(false);
+        btnStore.setEnabled(false);
+        batLevelView.setText(R.string.batteryLevel);
+        ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
+    }
+
+    private void stopSavingData(){
+        startDataStorage = false;
+        btnStore.setText("Store");
+        mHandler.removeCallbacks(mDataSavingTimer);
     }
 
     //Prepare the initial GUI for graph
@@ -227,6 +284,8 @@ public class MainActivity extends Activity {
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.red));
                         edtMessage.setHint(R.string.text_hint);
                         edtMessage.setEnabled(true);
+                        btnShow.setEnabled(true);
+                        btnStore.setEnabled(true);
                         ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "- Connected");
                         setGraphView();
                         mState = CONNECTED;
@@ -239,15 +298,10 @@ public class MainActivity extends Activity {
                     public void run() {
                         Log.d(TAG, "DISCONNECT_MSG");
                         mService.close();
-                        btnConnectDisconnect.setText("Connect");
-                        btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
-                        edtMessage.setHint("");
-                        edtMessage.setEnabled(false);
-                        batLevelView.setText(R.string.batteryLevel);
-                        ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
                         clearGraph();
+                        resetGUIComponents();
+                        stopSavingData();
                         mState = DISCONNECTED;
-
                     }
                 });
             }
@@ -319,6 +373,15 @@ public class MainActivity extends Activity {
             Log.e(TAG, e.toString());
         }
     }
+
+    private Runnable mDataSavingTimer = new Runnable() {
+        @Override
+        public void run() {
+            startDataStorage = false;
+            btnStore.setText("Store");
+        }
+    };
+
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();

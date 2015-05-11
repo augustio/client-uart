@@ -32,20 +32,20 @@
             android:text="Connect" />
 
         <Button
-            android:id="@+id/btn_store"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:padding="5dp"
-            android:text="Pause" />
-
-        <Button
             android:id="@+id/btn_show"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="2dp"
             android:text="Plot"/>
+
+        <Button
+            android:id="@+id/btn_store"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:padding="5dp"
+            android:text="Store" />
     </LinearLayout>
 
     <LinearLayout
