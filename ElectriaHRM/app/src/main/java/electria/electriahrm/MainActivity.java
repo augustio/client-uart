@@ -64,7 +64,6 @@ public class MainActivity extends Activity {
     private int hrmValue1 = 0;
     private int hrmValue2 = 0;
     private int lastBatLevel = 0;
-    private String mDeviceAddress = null;
     private BleService mService = null;
     private String mHRM = null;
     private BluetoothDevice mDevice = null;
@@ -108,15 +107,12 @@ public class MainActivity extends Activity {
                 }
                 else {
                     if (btnConnectDisconnect.getText().equals("Connect")){
-                        if(mDeviceAddress == null) {
-                            //Connect button pressed, open DeviceListActivity class, with popup windows that scan for devices
-                            Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-                            startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
-                        }
+                        //Connect button pressed, open DeviceListActivity class, with popup windows that scan for devices
+                        Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+                        startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
                     } else {
                         resetGUI();
                         initFlags();
-                        mDeviceAddress = null;
                         //Disconnect button pressed
                         if (mDevice!=null)
                         {
@@ -288,12 +284,8 @@ public class MainActivity extends Activity {
                         resetGUI();
                         initFlags();
                         ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
-                        if(mDeviceAddress != null)
-                            mService.connect(mDeviceAddress);
-                        else {
-                            mState = UART_PROFILE_DISCONNECTED;
-                            mService.close();
-                        }
+                        mState = UART_PROFILE_DISCONNECTED;
+                        mService.close();
                     }
                 });
             }
@@ -445,8 +437,6 @@ public class MainActivity extends Activity {
                     Log.d(TAG, "... onActivityResultdevice.address==" + mDevice + "mserviceValue" + mService);
                     ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - connecting");
                     mService.connect(deviceAddress);
-                    mDeviceAddress = deviceAddress;
-
                 }
                 break;
             case REQUEST_ENABLE_BT:
