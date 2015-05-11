@@ -301,7 +301,7 @@ public class MainActivity extends Activity {
 
             }
 
-            else if(action.equals(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE)){
+            if (action.equals(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE)){
                 final int batValue = intent.getIntExtra(BleService.EXTRA_DATA, DEFAULT_BATTERY_LEVEL);
                 runOnUiThread(new Runnable() {
                     public void run() {
@@ -312,6 +312,9 @@ public class MainActivity extends Activity {
             if (action.equals(BleService.DEVICE_DOES_NOT_SUPPORT_UART)){
                 showMessage("Device doesn't support UART. Disconnecting");
                 mService.disconnect();
+            }
+            if(action.equals(BleService.ACTION_TX_CHAR_WRITE)){
+                Log.d(TAG, "Write RX done");
             }
 
         }
