@@ -108,12 +108,18 @@ public class MainActivity extends Activity {
             }
         });
 
+        edtMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               btnSend.setEnabled(true);
+            }
+        });
+
         // Handle Send button
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText editText = (EditText) findViewById(R.id.sendText);
-                String message = editText.getText().toString();
+                String message = edtMessage.getText().toString();
                 byte[] value;
                 try {
                     //send data to service
@@ -192,7 +198,6 @@ public class MainActivity extends Activity {
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
             }
-
         }
 
         public void onServiceDisconnected(ComponentName classname) {
@@ -213,9 +218,7 @@ public class MainActivity extends Activity {
                         btnConnectDisconnect.setText("Disconnect");
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.red));
                         edtMessage.setEnabled(true);
-                        btnSend.setEnabled(true);
-                        ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "-"+
-                        R.string.device_connected);
+                        ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "- Connected");
                         setGraphView();
                         mState = CONNECTED;
                     }
@@ -230,8 +233,8 @@ public class MainActivity extends Activity {
                         btnConnectDisconnect.setText("Connect");
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
                         batLevelView.setText(R.string.batteryLevel);
+                        ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
                         clearGraph();
-                        ((TextView) findViewById(R.id.deviceName)).setText(R.string.not_connected);
                         mState = DISCONNECTED;
 
                     }
