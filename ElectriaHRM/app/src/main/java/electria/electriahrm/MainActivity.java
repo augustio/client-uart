@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
 
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
-    public static final String TAG = "nRFUART";
+    public static final String TAG = "ElectriaHRM";
     private static final int CONNECTED = 20;
     private static final int DISCONNECTED = 21;
     private static final int CONNECTING = 22;
