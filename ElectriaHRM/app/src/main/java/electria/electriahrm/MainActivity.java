@@ -264,7 +264,8 @@ public class MainActivity extends Activity {
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.red));
                         edtMessage.setEnabled(true);
                         btnSend.setEnabled(true);
-                        ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - ready");
+                        ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "-"+
+                        R.string.device_connected);
                         mState = UART_PROFILE_CONNECTED;
                     }
                 });
@@ -278,7 +279,7 @@ public class MainActivity extends Activity {
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
                         resetGUI();
                         initFlags();
-                        ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
+                        ((TextView) findViewById(R.id.deviceName)).setText(R.string.not_connected);
                         mState = UART_PROFILE_DISCONNECTED;
                         mService.close();
                     }
