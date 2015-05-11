@@ -23,6 +23,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -111,7 +112,8 @@ public class MainActivity extends Activity {
         edtMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               btnSend.setEnabled(true);
+                btnSend.setEnabled(true);
+                edtMessage.setHint("");
             }
         });
 
@@ -124,11 +126,17 @@ public class MainActivity extends Activity {
                 try {
                     //send data to service
                     value = message.getBytes("UTF-8");
-                    mService.writeTXCharacteristic(value);
-                    edtMessage.setText("");
+                    if(value != null)
+                        mService.writeTXCharacteristic(value);
                 } catch (UnsupportedEncodingException e) {
                     Log.d(TAG, e.getMessage());
                 }
+                edtMessage.setText("");
+                btnSend.setEnabled(false);
+                edtMessage.setHint(R.string.text_hint);
+                //Close keyboard
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(edtMessage.getWindowToken(), 0);
             }
         });
 
@@ -217,6 +225,7 @@ public class MainActivity extends Activity {
                         Log.d(TAG, "UART_CONNECT_MSG");
                         btnConnectDisconnect.setText("Disconnect");
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.red));
+                        edtMessage.setHint(R.string.text_hint);
                         edtMessage.setEnabled(true);
                         ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "- Connected");
                         setGraphView();
@@ -232,6 +241,8 @@ public class MainActivity extends Activity {
                         mService.close();
                         btnConnectDisconnect.setText("Connect");
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
+                        edtMessage.setHint("");
+                        edtMessage.setEnabled(false);
                         batLevelView.setText(R.string.batteryLevel);
                         ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
                         clearGraph();
