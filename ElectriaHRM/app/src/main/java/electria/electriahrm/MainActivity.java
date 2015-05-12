@@ -357,7 +357,7 @@ public class MainActivity extends Activity {
         try {
             String rxString = new String(rxValue, "UTF-8");
             str = rxString.split("-");
-            pNum = Integer.parseInt(str[3]);
+            pNum = Integer.parseInt(str[2]);
             if(packetNumber == 100)
                 packetNumber = 0;
             else if(packetNumber == 0)
@@ -370,7 +370,7 @@ public class MainActivity extends Activity {
             }
             Log.d(TAG, "Packets: " + packetNumber + "---" + pNum);
             if(showGraph)
-                updateGraph(Integer.parseInt(str[1]),Integer.parseInt(str[2]));
+                updateGraph(Integer.parseInt(str[0]),Integer.parseInt(str[1]));
             if(startDataStorage) {
                 collection.add(str[1]);
                 collection.add(str[2]);
