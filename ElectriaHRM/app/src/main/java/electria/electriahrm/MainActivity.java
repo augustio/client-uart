@@ -1,5 +1,10 @@
 package electria.electriahrm;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -21,6 +26,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -65,6 +71,7 @@ public class MainActivity extends Activity {
     private int lastBatLevel;
     private BleService mService;
     private int mState;
+    private int fileCounter;
     private Handler mHandler;
     private int packetNumber;
     private BluetoothDevice mDevice;
@@ -99,6 +106,7 @@ public class MainActivity extends Activity {
         collection = new ArrayList<String>();
         mCounter = 0;
         lastBatLevel = 0;
+        fileCounter = 0;
         mService = null;
         mDevice = null;
         mState = DISCONNECTED;
@@ -198,6 +206,15 @@ public class MainActivity extends Activity {
         });
     }
 
+    //Prepare the initial GUI for graph
+    private void setGraphView() {
+        mLineGraph = LineGraphView.getLineGraphView();
+        mGraphView = mLineGraph.getView(this);
+        mainLayout = (ViewGroup) findViewById(R.id.linearLayout3);
+        mainLayout.addView(mGraphView);
+        graphViewActive = true;
+    }
+
     //Plot two new sets of values on the graph and present on the GUI
     private void updateGraph(int hrmValue1, int hrmValue2) {
         double maxX = mCounter+=5;
@@ -237,22 +254,6 @@ public class MainActivity extends Activity {
         batLevelView.setText(R.string.batteryLevel);
         ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
     }
-
-    private void stopSavingData(){
-        startDataStorage = false;
-        btnStore.setText("Store");
-        mHandler.removeCallbacks(mDataSavingTimer);
-    }
-
-    //Prepare the initial GUI for graph
-    private void setGraphView() {
-        mLineGraph = LineGraphView.getLineGraphView();
-        mGraphView = mLineGraph.getView(this);
-        mainLayout = (ViewGroup) findViewById(R.id.linearLayout3);
-        mainLayout.addView(mGraphView);
-        graphViewActive = true;
-    }
-
 
     //UART service connected/disconnected
     private ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -300,7 +301,8 @@ public class MainActivity extends Activity {
                         mService.close();
                         clearGraph();
                         resetGUIComponents();
-                        stopSavingData();
+                        if(startDataStorage)
+                            stopSavingData();
                         mState = DISCONNECTED;
                     }
                 });
@@ -369,6 +371,10 @@ public class MainActivity extends Activity {
             Log.d(TAG, "Packets: " + packetNumber + "---" + pNum);
             if(showGraph)
                 updateGraph(Integer.parseInt(str[1]),Integer.parseInt(str[2]));
+            if(startDataStorage) {
+                collection.add(str[1]);
+                collection.add(str[2]);
+            }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
@@ -377,10 +383,70 @@ public class MainActivity extends Activity {
     private Runnable mDataSavingTimer = new Runnable() {
         @Override
         public void run() {
-            startDataStorage = false;
-            btnStore.setText("Store");
+            stopSavingData();
         }
     };
+
+    private void stopSavingData(){
+        startDataStorage = false;
+        btnStore.setText("Store");
+        mHandler.removeCallbacks(mDataSavingTimer);
+        saveToDisk();
+        collection.clear();
+    }
+
+    private void saveToDisk(){
+        if(isExternalStorageWritable()){
+            if(fileCounter == 100)
+                fileCounter = 0;
+            fileCounter++;
+            String fileName = "hrm"+ fileCounter;
+            File root = android.os.Environment.getExternalStorageDirectory();
+            File dir = new File (root.getAbsolutePath() + "/ECGDATA");
+            if(!dir.isDirectory())
+                dir.mkdirs();
+            File file = new File(dir, fileName);
+            try {
+                FileOutputStream os = new FileOutputStream(file);
+                PrintWriter pw = new PrintWriter(os);
+                for(String item : collection) {
+                    pw.append(item.toString()+";");
+                    pw.flush();
+                }
+                pw.close();
+                os.close();
+                Log.i(TAG, "Data saved");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Log.i(TAG, "******* File not found. Did you" +
+                        " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+            Log.w(TAG, "External storage not writable");
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
 
 
     private static IntentFilter makeGattUpdateIntentFilter() {
