@@ -2,13 +2,11 @@ package electria.electriahrm;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -54,7 +52,9 @@ public class MainActivity extends Activity {
     private static final int CONNECTING = 22;
     private static final int X_RANGE = 500;
     private static final int DEFAULT_BATTERY_LEVEL = 0;
-    private static final long DATA_SAVING_TIME = 30000;
+    private static final long DATA_COLLECTION_TIME = 3600000;//One hour
+    private static final int MAX_COLLECTION_SIZE = 60000;
+    private static final long MAX_COUNTER = 30000;
 
     private boolean showGraph;
     private boolean graphViewActive;
@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
     private int lastBatLevel;
     private BleService mService;
     private int mState;
-    private int fileCounter;
+    private String fileName;
     private Handler mHandler;
     private int packetNumber;
     private BluetoothDevice mDevice;
@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
         collection = new ArrayList<String>();
         mCounter = 0;
         lastBatLevel = 0;
-        fileCounter = 0;
+        fileName = null;
         mService = null;
         mDevice = null;
         mState = DISCONNECTED;
@@ -200,7 +200,7 @@ public class MainActivity extends Activity {
                     else{
                         startDataStorage = true;
                         btnStore.setText("Stop");
-                        mHandler.postDelayed(mDataSavingTimer, DATA_SAVING_TIME);
+                        mHandler.postDelayed(mDataSavingTimer, DATA_COLLECTION_TIME);
                     }
                 }
             }
@@ -218,6 +218,8 @@ public class MainActivity extends Activity {
 
     //Plot two new sets of values on the graph and present on the GUI
     private void updateGraph(int hrmValue1, int hrmValue2) {
+        if(mCounter >= MAX_COUNTER)
+            mCounter = 0;
         double maxX = mCounter+=10;
         double minX =  (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setRange(minX, maxX, 0, 1023);
@@ -373,8 +375,13 @@ public class MainActivity extends Activity {
             if(showGraph)
                 updateGraph(Integer.parseInt(str[0]),Integer.parseInt(str[1]));
             if(startDataStorage) {
+                collection.add(str[0]);
                 collection.add(str[1]);
-                collection.add(str[2]);
+                if (collection.size() >= MAX_COLLECTION_SIZE){
+                    saveToDisk(fileName);
+                    collection.clear();
+                }
+
             }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
@@ -385,6 +392,7 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             stopSavingData();
+            fileName = null;
         }
     };
 
@@ -392,30 +400,37 @@ public class MainActivity extends Activity {
         startDataStorage = false;
         btnStore.setText("Store");
         mHandler.removeCallbacks(mDataSavingTimer);
-        saveToDisk();
+        saveToDisk(fileName);
         collection.clear();
     }
 
-    private void saveToDisk(){
+    private void saveToDisk(String fName){
         if(isExternalStorageWritable()){
             File root = android.os.Environment.getExternalStorageDirectory();
             File dir = new File (root.getAbsolutePath() + "/ECGDATA");
             if(!dir.isDirectory())
                 dir.mkdirs();
             File file;
-            do{
-                file = new File(dir, getFileName());
-            }while(file.exists());
+            if(fName == null) {//Get a unique fileName
+                do {
+                    fName = getFileName();
+                    file = new File(dir, fName);
+                } while (file.exists());
+                fileName = fName;
+            }
+            else{
+                file = new File(dir, fName);
+            }
             try {
-                FileOutputStream os = new FileOutputStream(file);
-                PrintWriter pw = new PrintWriter(os);
-                for(String item : collection) {
-                    pw.append(item.toString()+";");
-                    pw.flush();
-                }
-                pw.close();
-                os.close();
-                Log.i(TAG, "Data saved");
+                FileWriter fw = new FileWriter(file, true);
+                String str = Arrays.toString(collection.toArray(new String[collection.size()]));
+                str = str.substring(1, str.length()-1).replaceAll(",", "");
+                fw.append(str);
+                fw.flush();
+                fw.append(" ");
+                fw.flush();
+                fw.close();
+                Log.i(TAG, "Data saved, size: "+collection.size());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 Log.i(TAG, "******* File not found. Did you" +
