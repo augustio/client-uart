@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 
 import android.app.Activity;
@@ -397,15 +398,14 @@ public class MainActivity extends Activity {
 
     private void saveToDisk(){
         if(isExternalStorageWritable()){
-            if(fileCounter == 100)
-                fileCounter = 0;
-            fileCounter++;
-            String fileName = "hrm"+ fileCounter;
             File root = android.os.Environment.getExternalStorageDirectory();
             File dir = new File (root.getAbsolutePath() + "/ECGDATA");
             if(!dir.isDirectory())
                 dir.mkdirs();
-            File file = new File(dir, fileName);
+            File file;
+            do{
+                file = new File(dir, getFileName());
+            }while(file.exists());
             try {
                 FileOutputStream os = new FileOutputStream(file);
                 PrintWriter pw = new PrintWriter(os);
@@ -447,7 +447,12 @@ public class MainActivity extends Activity {
         return false;
     }
 
-
+    private String getFileName(){
+        String fN;
+        Random rand = new Random(System.currentTimeMillis());
+        fN = "ECG_"+rand.nextInt(1000);
+        return fN;
+    }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
