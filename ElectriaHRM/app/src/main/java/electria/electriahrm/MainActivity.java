@@ -222,14 +222,12 @@ public class MainActivity extends Activity {
         final int ecg = value;
         runOnUiThread(new Runnable() {
             public void run() {
-                if(mCounter >= MAX_COUNTER)
-                    mCounter = 0;
                 double maxX = mCounter;
                 double minX =  (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
                 mLineGraph.setRange(minX, maxX, 0, 1023);
                 mLineGraph.addValue(new Point(mCounter, ecg));
                 mGraphView.repaint();
-                mCounter+=10;
+                mCounter+=5;
             }
         });
     }
