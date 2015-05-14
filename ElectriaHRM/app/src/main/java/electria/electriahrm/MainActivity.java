@@ -216,8 +216,8 @@ public class MainActivity extends Activity {
     }
 
     //Plot two new sets of values on the graph and present on the GUI
-    private void updateGraph(int ecg1, int ecg2) {
-        final int value1 = ecg1, value2 = ecg2;
+    private void updateGraph(int value) {
+        final int ecg = value;
         runOnUiThread(new Runnable() {
             public void run() {
                 if(mCounter >= MAX_COUNTER)
@@ -225,8 +225,7 @@ public class MainActivity extends Activity {
                 double maxX = mCounter;
                 double minX =  (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
                 mLineGraph.setRange(minX, maxX, 0, 1023);
-                mLineGraph.addValue(new Point(mCounter, value1));
-                mLineGraph.addValue(new Point(mCounter, value2));
+                mLineGraph.addValue(new Point(mCounter, ecg));
                 mGraphView.repaint();
                 mCounter+=10;
             }
@@ -322,17 +321,21 @@ public class MainActivity extends Activity {
 
             if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
                 final String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
-                /*runOnUiThread(new Runnable() {
-                    public void run() {
-                        if (rxString != null){
-                            processRXData(rxString);
-                        }
-                    }
-                });*/
                 new Thread(new Runnable() {
                     public void run() {
                         if (rxString != null){
-                            processRXData(rxString);
+                            String str[] = rxString.split("-");
+                            Log.d(TAG, "Packet Recieved: " + str[0]+"---"+str[1] );
+                            if(startDataStorage) {
+                                collection.add(str[0]);
+                                collection.add(str[1]);
+                                if (collection.size() >= MAX_COLLECTION_SIZE)
+                                    saveToDisk(fileName);
+                            }
+                            if(showGraph) {
+                                updateGraph(Integer.parseInt(str[0]));
+                                updateGraph(Integer.parseInt(str[1]));
+                            }
                         }
                     }
                 }).start();
@@ -364,19 +367,6 @@ public class MainActivity extends Activity {
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
-    }
-
-    private void processRXData(String rxString){
-        String str[] = rxString.split("-");
-        Log.d(TAG, "Packet Recieved: " + str[0]+"---"+str[1] );
-        if(showGraph)
-            updateGraph(Integer.parseInt(str[0]),Integer.parseInt(str[1]));
-        if(startDataStorage) {
-            collection.add(str[0]);
-            collection.add(str[1]);
-            if (collection.size() >= MAX_COLLECTION_SIZE)
-                saveToDisk(fileName);
-        }
     }
 
     private Runnable mDataSavingTimer = new Runnable() {
