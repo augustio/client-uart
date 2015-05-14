@@ -464,7 +464,6 @@ public class MainActivity extends Activity {
         intentFilter.addAction(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE);
         intentFilter.addAction(BleService.DEVICE_DOES_NOT_SUPPORT_UART);
         intentFilter.addAction(BleService.ACTION_TX_CHAR_WRITE);
-        intentFilter.addAction(BleService.BATTERY_VALUE_READ);
         return intentFilter;
     }
 

@@ -63,23 +63,21 @@ public class BleService extends Service {
     private static final int BATTERY_LEVEL_READ_INTERVAL = 60000;
 
     public final static String ACTION_GATT_CONNECTED =
-            "com.nordicsemi.nrfUART.ACTION_GATT_CONNECTED";
+            "electria.electriahrm.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED =
-            "com.nordicsemi.nrfUART.ACTION_GATT_DISCONNECTED";
+            "electria.electriahrm.ACTION_GATT_DISCONNECTED";
     public final static String ACTION_GATT_SERVICES_DISCOVERED =
-            "com.nordicsemi.nrfUART.ACTION_GATT_SERVICES_DISCOVERED";
+            "electria.electriahrm.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_RX_DATA_AVAILABLE =
-            "com.nordicsemi.nrfUART.ACTION_DATA_AVAILABLE";
+            "electria.electriahrm.ACTION_DATA_AVAILABLE";
     public final static String ACTION_BATTERY_LEVEL_DATA_AVAILABLE =
-            "com.nordicsemi.nrfUART.ACTION_BATTERY_LEVEL_DATA_AVAILABLE";
+            "electria.electriahrm.ACTION_BATTERY_LEVEL_DATA_AVAILABLE";
     public final static String ACTION_TX_CHAR_WRITE =
-            "com.nordicsemi.nrfUART.ACTION_TX_CHAR_WRITE";
+            "electria.electriahrm.ACTION_TX_CHAR_WRITE";
     public final static String EXTRA_DATA =
-            "com.nordicsemi.nrfUART.EXTRA_DATA";
+            "electria.electriahrm.EXTRA_DATA";
     public final static String DEVICE_DOES_NOT_SUPPORT_UART =
-            "com.nordicsemi.nrfUART.DEVICE_DOES_NOT_SUPPORT_UART";
-    public final static String BATTERY_VALUE_READ =
-            "com.nordicsemi.nrfUART.BATTERY_VALUE_READ";
+            "electria.electriahrm.DEVICE_DOES_NOT_SUPPORT_UART";
 
     private final static UUID CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     private final static UUID UART_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
