@@ -316,11 +316,11 @@ public class MainActivity extends Activity {
             }
 
             if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
-                final byte[] rxValue = intent.getByteArrayExtra(BleService.EXTRA_DATA);
+                final String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        if (rxValue != null){
-                            processRXData(rxValue);
+                        if (rxString != null){
+                            processRXData(rxString);
                         }
                     }
                 });
@@ -353,36 +353,16 @@ public class MainActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
-    private void processRXData(byte[] rxValue){
-        String[] str;
-        int pNum;
-
-        try {
-            String rxString = new String(rxValue, "UTF-8");
-            str = rxString.split("-");
-            pNum = Integer.parseInt(str[2]);
-            if(packetNumber == 100)
-                packetNumber = 0;
-            else if(packetNumber == 0)
-                packetNumber = pNum;
-            else
-                packetNumber++;
-            if((pNum - packetNumber) >= 5) {
-                Log.w(TAG, "Lost Packets: " + (pNum - packetNumber));
-                return;
-            }
-            Log.d(TAG, "Packets: " + packetNumber + "---" + pNum);
-            if(showGraph)
-                updateGraph(Integer.parseInt(str[0]),Integer.parseInt(str[1]));
-            if(startDataStorage) {
-                collection.add(str[0]);
-                collection.add(str[1]);
-                if (collection.size() >= MAX_COLLECTION_SIZE){
-                    saveToDisk(fileName);
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, e.toString());
+    private void processRXData(String rxString){
+        String str[] = rxString.split("-");
+        Log.d(TAG, "Packet Recieved: " + str[2] );
+        if(showGraph)
+            updateGraph(Integer.parseInt(str[0]),Integer.parseInt(str[1]));
+        if(startDataStorage) {
+            collection.add(str[0]);
+            collection.add(str[1]);
+            if (collection.size() >= MAX_COLLECTION_SIZE)
+                saveToDisk(fileName);
         }
     }
 
