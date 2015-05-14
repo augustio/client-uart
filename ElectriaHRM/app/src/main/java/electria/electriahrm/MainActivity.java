@@ -53,7 +53,7 @@ public class MainActivity extends Activity {
     private static final int X_RANGE = 500;
     private static final int DEFAULT_BATTERY_LEVEL = 0;
     private static final long DATA_COLLECTION_TIME = 3600000;//One hour
-    private static final int MAX_COLLECTION_SIZE = 60000;
+    private static final int MAX_COLLECTION_SIZE = 6000;
     private static final long MAX_COUNTER = 30000;
 
     private boolean showGraph;
@@ -379,9 +379,7 @@ public class MainActivity extends Activity {
                 collection.add(str[1]);
                 if (collection.size() >= MAX_COLLECTION_SIZE){
                     saveToDisk(fileName);
-                    collection.clear();
                 }
-
             }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
@@ -401,7 +399,6 @@ public class MainActivity extends Activity {
         btnStore.setText("Store");
         mHandler.removeCallbacks(mDataSavingTimer);
         saveToDisk(fileName);
-        collection.clear();
     }
 
     private void saveToDisk(String fName){
@@ -431,6 +428,7 @@ public class MainActivity extends Activity {
                 fw.flush();
                 fw.close();
                 Log.i(TAG, "Data saved, size: "+collection.size());
+                collection.clear();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 Log.i(TAG, "******* File not found. Did you" +
