@@ -344,8 +344,6 @@ public class MainActivity extends Activity {
                         }
                     }
                 }).start();
-
-
             }
 
             if (action.equals(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE)){
