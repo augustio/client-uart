@@ -189,7 +189,7 @@ public class BleService extends Service {
     private void broadcastUpdate(final String action,
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-        intent.putExtra(EXTRA_DATA, byteToString(characteristic.getValue()));
+        intent.putExtra(EXTRA_DATA, characteristic.getValue());
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -359,18 +359,6 @@ public class BleService extends Service {
             broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
         }
     }
-
-    private String byteToString(byte[] value){
-        String str;
-        try{
-            str = new String(value, "UTF-8");
-            return str;
-        }catch(UnsupportedEncodingException e){
-            Log.e(TAG, e.getMessage());
-            return null;
-        }
-    }
-
 
     private void showMessage(String msg) {
         Log.e(TAG, msg);

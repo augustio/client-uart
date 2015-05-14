@@ -73,6 +73,8 @@ public class MainActivity extends Activity {
     private BleService mService;
     private int mState;
     private String fileName;
+    private String ECGString;
+    private String [] ECGArray;
     private Handler mHandler;
     private BluetoothDevice mDevice;
     private BluetoothAdapter mBtAdapter = null;
@@ -320,21 +322,26 @@ public class MainActivity extends Activity {
             }
 
             if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
-                final String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
+                final byte[] rxValue = intent.getByteArrayExtra(BleService.EXTRA_DATA);
                 new Thread(new Runnable() {
                     public void run() {
-                        if (rxString != null){
-                            String str[] = rxString.split("-");
-                            Log.d(TAG, "Packet Recieved: " + str[0]+"---"+str[1] );
+                        if (rxValue != null){
+                            try{
+                                ECGString = new String(rxValue, "UTF-8");
+                            }catch(UnsupportedEncodingException e){
+                                Log.e(TAG, e.getMessage());
+                            }
+                            ECGArray = ECGString.split("-");
+                            Log.d(TAG, "Packet Recieved: " + ECGArray[0] + "---" + ECGArray[1]);
                             if(startDataStorage) {
-                                collection.add(str[0]);
-                                collection.add(str[1]);
+                                collection.add(ECGArray[0]);
+                                collection.add(ECGArray[1]);
                                 if (collection.size() >= MAX_COLLECTION_SIZE)
                                     saveToDisk(fileName);
                             }
                             if(showGraph) {
-                                updateGraph(Integer.parseInt(str[0]));
-                                updateGraph(Integer.parseInt(str[1]));
+                                updateGraph(Integer.parseInt(ECGArray[0]));
+                                updateGraph(Integer.parseInt(ECGArray[1]));
                             }
                         }
                     }
