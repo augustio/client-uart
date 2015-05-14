@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
 
     private boolean showGraph;
     private boolean graphViewActive;
-    private boolean startDataStorage;
+    private boolean dataRecording;
 
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
         batLevelView = (TextView) findViewById(R.id.bat_level);
         collection = new ArrayList<String>();
 
-        startDataStorage = false;
+        dataRecording = false;
         showGraph = false;
         graphViewActive = false;
 
@@ -195,11 +195,11 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (mState == CONNECTED) {
-                    if(startDataStorage){
-                        stopSavingData();
+                    if(dataRecording){
+                        stopRecordingData();
                     }
                     else{
-                        startDataStorage = true;
+                        dataRecording = true;
                         btnStore.setText("Stop");
                         mHandler.postDelayed(mDataSavingTimer, DATA_COLLECTION_TIME);
                     }
@@ -308,8 +308,8 @@ public class MainActivity extends Activity {
                         mService.close();
                         clearGraph();
                         resetGUIComponents();
-                        if(startDataStorage)
-                            stopSavingData();
+                        if(dataRecording)
+                            stopRecordingData();
                         mState = DISCONNECTED;
                     }
                 });
@@ -331,7 +331,7 @@ public class MainActivity extends Activity {
                             }
                             ECGArray = ECGString.split("-");
                             Log.d(TAG, "Packet Recieved: " + ECGArray[0] + "---" + ECGArray[1]);
-                            if(startDataStorage) {
+                            if(dataRecording) {
                                 collection.add(ECGArray[0]);
                                 collection.add(ECGArray[1]);
                                 if (collection.size() >= MAX_COLLECTION_SIZE)
@@ -377,16 +377,18 @@ public class MainActivity extends Activity {
     private Runnable mDataSavingTimer = new Runnable() {
         @Override
         public void run() {
-            stopSavingData();
-            fileName = null;
+            stopRecordingData();
         }
     };
 
-    private void stopSavingData(){
-        startDataStorage = false;
-        btnStore.setText("Store");
-        mHandler.removeCallbacks(mDataSavingTimer);
-        saveToDisk(fileName);
+    private void stopRecordingData(){
+        if(dataRecording) {
+            saveToDisk(fileName);
+            dataRecording = false;
+            btnStore.setText("Store");
+            mHandler.removeCallbacks(mDataSavingTimer);
+            fileName = null;
+        }
     }
 
     private void saveToDisk(String fName){
@@ -477,7 +479,6 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy()");
-
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(UARTStatusChangeReceiver);
         } catch (Exception ignore) {
@@ -486,6 +487,7 @@ public class MainActivity extends Activity {
         unbindService(mServiceConnection);
         mService.stopSelf();
         mService= null;
+        stopRecordingData();
     }
 
     @Override
