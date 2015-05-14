@@ -74,7 +74,6 @@ public class MainActivity extends Activity {
     private int mState;
     private String fileName;
     private Handler mHandler;
-    private int packetNumber;
     private BluetoothDevice mDevice;
     private BluetoothAdapter mBtAdapter = null;
 
@@ -217,15 +216,16 @@ public class MainActivity extends Activity {
     }
 
     //Plot two new sets of values on the graph and present on the GUI
-    private void updateGraph(int hrmValue1, int hrmValue2) {
+    private void updateGraph(int ecg1, int ecg2) {
         if(mCounter >= MAX_COUNTER)
             mCounter = 0;
-        double maxX = mCounter+=10;
+        double maxX = mCounter;
         double minX =  (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setRange(minX, maxX, 0, 1023);
-        mLineGraph.addValue(new Point(mCounter, hrmValue1));
-        mLineGraph.addValue(new Point(mCounter, hrmValue2));
+        mLineGraph.addValue(new Point(mCounter, ecg1));
+        mLineGraph.addValue(new Point(mCounter, ecg2));
         mGraphView.repaint();
+        mCounter+=10;
     }
 
     private void updateBatteryLevel(int level) {
