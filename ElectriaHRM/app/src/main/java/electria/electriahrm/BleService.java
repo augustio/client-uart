@@ -35,6 +35,7 @@ package electria.electriahrm;
         import android.support.v4.content.LocalBroadcastManager;
         import android.util.Log;
 
+        import java.io.UnsupportedEncodingException;
         import java.util.List;
         import java.util.UUID;
 
@@ -188,7 +189,7 @@ public class BleService extends Service {
     private void broadcastUpdate(final String action,
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-        intent.putExtra(EXTRA_DATA, characteristic.getValue());
+        intent.putExtra(EXTRA_DATA, byteToString(characteristic.getValue()));
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -356,6 +357,17 @@ public class BleService extends Service {
         else if(mTXCharacteristic == null){
             showMessage("Charateristic not found!");
             broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
+        }
+    }
+
+    private String byteToString(byte[] value){
+        String str;
+        try{
+            str = new String(value, "UTF-8");
+            return str;
+        }catch(UnsupportedEncodingException e){
+            Log.e(TAG, e.getMessage());
+            return null;
         }
     }
 
