@@ -217,15 +217,20 @@ public class MainActivity extends Activity {
 
     //Plot two new sets of values on the graph and present on the GUI
     private void updateGraph(int ecg1, int ecg2) {
-        if(mCounter >= MAX_COUNTER)
-            mCounter = 0;
-        double maxX = mCounter;
-        double minX =  (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-        mLineGraph.setRange(minX, maxX, 0, 1023);
-        mLineGraph.addValue(new Point(mCounter, ecg1));
-        mLineGraph.addValue(new Point(mCounter, ecg2));
-        mGraphView.repaint();
-        mCounter+=10;
+        final int value1 = ecg1, value2 = ecg2;
+        runOnUiThread(new Runnable() {
+            public void run() {
+                if(mCounter >= MAX_COUNTER)
+                    mCounter = 0;
+                double maxX = mCounter;
+                double minX =  (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+                mLineGraph.setRange(minX, maxX, 0, 1023);
+                mLineGraph.addValue(new Point(mCounter, value1));
+                mLineGraph.addValue(new Point(mCounter, value2));
+                mGraphView.repaint();
+                mCounter+=10;
+            }
+        });
     }
 
     private void updateBatteryLevel(int level) {
@@ -317,13 +322,21 @@ public class MainActivity extends Activity {
 
             if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
                 final String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
-                runOnUiThread(new Runnable() {
+                /*runOnUiThread(new Runnable() {
                     public void run() {
                         if (rxString != null){
                             processRXData(rxString);
                         }
                     }
-                });
+                });*/
+                new Thread(new Runnable() {
+                    public void run() {
+                        if (rxString != null){
+                            processRXData(rxString);
+                        }
+                    }
+                }).start();
+
 
             }
 
@@ -355,7 +368,7 @@ public class MainActivity extends Activity {
 
     private void processRXData(String rxString){
         String str[] = rxString.split("-");
-        Log.d(TAG, "Packet Recieved: " + str[2] );
+        Log.d(TAG, "Packet Recieved: " + str[0]+"---"+str[1] );
         if(showGraph)
             updateGraph(Integer.parseInt(str[0]),Integer.parseInt(str[1]));
         if(startDataStorage) {
