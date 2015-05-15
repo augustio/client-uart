@@ -132,8 +132,7 @@ public class MainActivity extends Activity {
                         startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
                     } else {
                         //Disconnect button pressed
-                        if (mDevice!=null)
-                        {
+                        if (mDevice != null) {
                             mService.disconnect();
                         }
                     }
@@ -227,7 +226,7 @@ public class MainActivity extends Activity {
                 mLineGraph.setRange(minX, maxX, 0, 1023);
                 mLineGraph.addValue(new Point(mCounter, ecg));
                 mGraphView.repaint();
-                mCounter+=5;
+                mCounter+=2;
             }
         });
     }

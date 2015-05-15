@@ -81,7 +81,7 @@ public class LineGraphView {
         renderer.setZoomRate(5.0f);
         //set title to x-axis and y-axis
         renderer.setXTitle("    Time (mS)");
-        renderer.setYTitle("    Voltage (mV)");
+        renderer.setYTitle("    Voltage (5mV)");
         renderer.addSeriesRenderer(mRenderer);
     }
 
