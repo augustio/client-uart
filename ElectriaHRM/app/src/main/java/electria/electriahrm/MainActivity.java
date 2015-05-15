@@ -189,7 +189,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Handle Store button
+        // Handle Record button
         btnStore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -250,7 +250,7 @@ public class MainActivity extends Activity {
     private void resetGUIComponents(){
         btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
         btnShow.setText("Show");
-        btnStore.setText("Store");
+        btnStore.setText("Record");
         btnConnectDisconnect.setText("Connect");
         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
         edtMessage.setHint("");
@@ -382,7 +382,7 @@ public class MainActivity extends Activity {
         if(dataRecording) {
             saveToDisk(fileName);
             dataRecording = false;
-            btnStore.setText("Store");
+            btnStore.setText("Record");
             mHandler.removeCallbacks(mDataSavingTimer);
             fileName = null;
         }
