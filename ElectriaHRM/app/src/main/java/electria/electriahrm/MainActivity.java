@@ -126,7 +126,7 @@ public class MainActivity extends Activity {
                     startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
                 }
                 else {
-                    if (btnConnectDisconnect.getText().equals("Connect")){
+                    if (mState == DISCONNECTED){
                         //Connect button pressed, open DeviceListActivity class, with popup windows that scan for devices
                         Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                         startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
