@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import java.io.File;
 
@@ -28,6 +31,7 @@ public class History extends Activity {
         listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
         historyView.setAdapter(listAdapter);
         historyView.setDivider(null);
+        historyView.setOnItemClickListener(mFileClickListener);
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -36,6 +40,16 @@ public class History extends Activity {
         directoryName = extras.getString(Intent.EXTRA_TEXT);
         readDirectory(directoryName);
     }
+
+    private OnItemClickListener mFileClickListener = new OnItemClickListener() {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+            String filePath = directoryName+"/"+listAdapter.getItem(position);
+            Log.d(TAG, "File "+filePath+" selected");
+        }
+    };
+
 
     private void readDirectory(String dirName){
         if(isExternalStorageReadable()){
