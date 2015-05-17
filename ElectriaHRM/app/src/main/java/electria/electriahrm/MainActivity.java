@@ -53,8 +53,8 @@ public class MainActivity extends Activity {
     private static final int X_RANGE = 500;
     private static final int DEFAULT_BATTERY_LEVEL = 0;
     private static final long DATA_COLLECTION_TIME = 3600000;//One hour
-    private static final int MAX_COLLECTION_SIZE = 6000;
-    private static final long MAX_COUNTER = 30000;
+    private static final int AVERAGE_COLLECTION_SIZE = 5000;
+    private static final int DATA_SAVING_INTERVAL = 60000;
 
     private boolean showGraph;
     private boolean graphViewActive;
@@ -200,7 +200,8 @@ public class MainActivity extends Activity {
                     else{
                         dataRecording = true;
                         btnStore.setText("Stop");
-                        mHandler.postDelayed(mDataSavingTimer, DATA_COLLECTION_TIME);
+                        mHandler.postDelayed(mStopDataRecordingTimer, DATA_COLLECTION_TIME);
+                        mRepeatTask.run();
                     }
                 }
             }
@@ -329,12 +330,10 @@ public class MainActivity extends Activity {
                                 Log.e(TAG, e.getMessage());
                             }
                             ECGArray = ECGString.split("-");
-                            Log.d(TAG, "Packet Recieved: " + ECGArray[0] + "---" + ECGArray[1]);
+                            //Log.d(TAG, "Packet Recieved: " + ECGArray[0] + "---" + ECGArray[1]);
                             if(dataRecording) {
                                 collection.add(ECGArray[0]);
                                 collection.add(ECGArray[1]);
-                                if (collection.size() >= MAX_COLLECTION_SIZE)
-                                    saveToDisk(fileName);
                             }
                             if(showGraph) {
                                 updateGraph(Integer.parseInt(ECGArray[0]));
@@ -371,7 +370,7 @@ public class MainActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
-    private Runnable mDataSavingTimer = new Runnable() {
+    private Runnable mStopDataRecordingTimer = new Runnable() {
         @Override
         public void run() {
             stopRecordingData();
@@ -383,10 +382,21 @@ public class MainActivity extends Activity {
             saveToDisk(fileName);
             dataRecording = false;
             btnStore.setText("Record");
-            mHandler.removeCallbacks(mDataSavingTimer);
+            mHandler.removeCallbacks(mStopDataRecordingTimer);
+            mHandler.removeCallbacks(mRepeatTask);
             fileName = null;
         }
     }
+
+    private Runnable mRepeatTask = new Runnable() {
+        @Override
+        public void run() {
+            if(collection.size() >= AVERAGE_COLLECTION_SIZE)
+                saveToDisk(fileName);
+            if (dataRecording)
+                mHandler.postDelayed(mRepeatTask, DATA_SAVING_INTERVAL);
+        }
+    };
 
     private void saveToDisk(String fName){
         if(isExternalStorageWritable()){
