@@ -45,7 +45,9 @@ public class History extends Activity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id){
             String filePath = directoryName+"/"+listAdapter.getItem(position);
-            Log.d(TAG, "File "+filePath+" selected");
+            Intent intent = new Intent(History.this, HistoryDetail.class);
+            intent.putExtra(Intent.EXTRA_TEXT, filePath);
+            startActivity(intent);
         }
     };
 
