@@ -232,7 +232,7 @@ public class MainActivity extends Activity {
         graphViewActive = true;
     }
 
-    //Plot two new sets of values on the graph and present on the GUI
+    //Plot a new set of values on the graph and present on the GUI
     private void updateGraph(int value) {
         final int ecg = value;
         runOnUiThread(new Runnable() {

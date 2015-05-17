@@ -16,7 +16,7 @@ import java.io.File;
 
 public class History extends Activity {
 
-    private static final String TAG = "ElectriaHRM";
+    private static final String TAG = History.class.getSimpleName();
 
     private ListView historyView;
     private ArrayAdapter<String> listAdapter;
