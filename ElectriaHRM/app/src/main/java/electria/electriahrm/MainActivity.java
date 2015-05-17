@@ -46,7 +46,8 @@ public class MainActivity extends Activity {
 
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
-    public static final String TAG = "ElectriaHRM";
+    private static final String TAG = "ElectriaHRM";
+    private static final String DIRECTORY_NAME = "/ECGDATA";
     private static final int CONNECTED = 20;
     private static final int DISCONNECTED = 21;
     private static final int CONNECTING = 22;
@@ -205,6 +206,18 @@ public class MainActivity extends Activity {
                         mHandler.postDelayed(mStopDataRecordingTimer, DATA_COLLECTION_TIME);
                         mRepeatTask.run();
                     }
+                }
+            }
+        });
+
+        // Handle Record button
+        btnHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mState == CONNECTED) {
+                    Intent intent = new Intent(MainActivity.this, History.class);
+                    intent.putExtra(Intent.EXTRA_TEXT, DIRECTORY_NAME);
+                    startActivity(intent);
                 }
             }
         });
@@ -403,7 +416,7 @@ public class MainActivity extends Activity {
     private void saveToDisk(String fName){
         if(isExternalStorageWritable()){
             File root = android.os.Environment.getExternalStorageDirectory();
-            File dir = new File (root.getAbsolutePath() + "/ECGDATA");
+            File dir = new File (root.getAbsolutePath() + DIRECTORY_NAME);
             if(!dir.isDirectory())
                 dir.mkdirs();
             File file;
