@@ -34,6 +34,7 @@ public class History extends Activity {
             finish();
         }
         directoryName = extras.getString(Intent.EXTRA_TEXT);
+        readDirectory(directoryName);
     }
 
     private void readDirectory(String dirName){
@@ -48,8 +49,10 @@ public class History extends Activity {
                 // do whatever you want with filename
             }
         }
-        else
+        else {
             Log.w(TAG, "External storage not readable");
+            finish();
+        }
     }
 
     /* Checks if external storage is available to at least read */
