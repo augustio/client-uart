@@ -1,6 +1,7 @@
 package electria.electriahrm;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -16,6 +17,7 @@ public class History extends Activity {
 
     private ListView historyView;
     private ArrayAdapter<String> listAdapter;
+    private String directoryName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +28,12 @@ public class History extends Activity {
         listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
         historyView.setAdapter(listAdapter);
         historyView.setDivider(null);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            finish();
+        }
+        directoryName = extras.getString(Intent.EXTRA_TEXT);
     }
 
     private void readDirectory(String dirName){
@@ -41,7 +49,7 @@ public class History extends Activity {
             }
         }
         else
-            Log.w(TAG, "External storage not writable");
+            Log.w(TAG, "External storage not readable");
     }
 
     /* Checks if external storage is available to at least read */
