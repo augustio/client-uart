@@ -30,7 +30,6 @@ public class History extends Activity {
         historyView = (ListView) findViewById(R.id.historyListView);
         listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
         historyView.setAdapter(listAdapter);
-        historyView.setDivider(null);
         historyView.setOnItemClickListener(mFileClickListener);
 
         Bundle extras = getIntent().getExtras();

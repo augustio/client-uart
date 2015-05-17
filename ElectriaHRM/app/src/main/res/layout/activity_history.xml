@@ -10,7 +10,9 @@
             android:id="@+id/historyListView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:stackFromBottom="false" />
+            android:stackFromBottom="false"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="15dp"/>
     </LinearLayout>
 
 </LinearLayout>
