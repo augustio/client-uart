@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
     private LineGraphView mLineGraph;
     private TextView batLevelView;
     private EditText edtMessage;
-    private Button btnConnectDisconnect,btnShow,btnSend,btnStore;
+    private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
     private ViewGroup mainLayout;
     private List<String> collection;
 
@@ -97,6 +97,8 @@ public class MainActivity extends Activity {
         btnSend=(Button) findViewById(R.id.sendButton);
         btnStore = (Button)findViewById(R.id.btn_store);
         btnStore.setBackgroundColor(getResources().getColor(R.color.green));
+        btnHistory = (Button)findViewById(R.id.btn_history);
+        btnHistory.setBackgroundColor(getResources().getColor(R.color.yellow));
         edtMessage=(EditText) findViewById(R.id.sendText);
         batLevelView = (TextView) findViewById(R.id.bat_level);
         collection = new ArrayList<String>();
