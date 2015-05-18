@@ -23,7 +23,7 @@ package electria.electriahrm;
         import android.graphics.Point;
 
 /**
- * This class uses external library AChartEngine to show dynamic real time line graph for HR values
+ * This class uses external library AChartEngine to show dynamic real time line graph for ECG values
  */
 public class LineGraphView {
     //TimeSeries will hold the data in x,y format for single chart
@@ -77,8 +77,8 @@ public class LineGraphView {
         renderer.setLegendTextSize(20);
         renderer.setInScroll(true);
         renderer.setPanEnabled(true, true);
-        renderer.setZoomEnabled(true, true);
-        renderer.setZoomRate(5.0f);
+        renderer.setZoomEnabled(false, false);
+        renderer.setPanLimits(new double[]{0.0, 3000.0, 0.0, 1023.0});
         //set title to x-axis and y-axis
         renderer.setXTitle("    Time (5mS)");
         renderer.setYTitle("    Voltage (mV)");
