@@ -69,7 +69,6 @@ public class HistoryDetail extends Activity {
                     readString = buf.readLine ( ) ;
                 }
                 buf.close();
-                Log.d(TAG, "Done reading");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 Log.i(TAG, "******* File not found. Did you" +

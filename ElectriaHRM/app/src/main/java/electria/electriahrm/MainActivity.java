@@ -433,10 +433,10 @@ public class MainActivity extends Activity {
             try {
                 FileWriter fw = new FileWriter(file, true);
                 String str = Arrays.toString(collection.toArray(new String[collection.size()]));
-                str = str.substring(1, str.length()-1).replaceAll(",", "");
+                str = str.substring(1, str.length()-1).replaceAll(",", "\n");
                 fw.append(str);
                 fw.flush();
-                fw.append(" ");
+                fw.append("\n");
                 fw.flush();
                 fw.close();
                 Log.i(TAG, "Data saved, size: "+collection.size());
