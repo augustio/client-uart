@@ -214,7 +214,7 @@ public class MainActivity extends Activity {
         btnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mState == CONNECTED) {
+                if (mState == DISCONNECTED) {
                     Intent intent = new Intent(MainActivity.this, History.class);
                     intent.putExtra(Intent.EXTRA_TEXT, DIRECTORY_NAME);
                     startActivity(intent);
