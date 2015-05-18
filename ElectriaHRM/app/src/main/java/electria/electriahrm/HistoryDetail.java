@@ -1,6 +1,6 @@
 package electria.electriahrm;
 
-import android.app.Activity;;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -46,6 +46,7 @@ public class HistoryDetail extends Activity {
         historyViewLayout.addView(mGraphView);
     }
 
+    //Read data from phone storage
     private void readFromDisk(String fName) {
         if (isExternalStorageReadable()) {
             File root = android.os.Environment.getExternalStorageDirectory();
