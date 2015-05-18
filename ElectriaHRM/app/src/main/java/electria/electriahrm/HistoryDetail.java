@@ -20,11 +20,9 @@ import java.io.IOException;
 public class HistoryDetail extends Activity {
 
     private static final String TAG = HistoryDetail.class.getSimpleName();
-
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
     private ViewGroup historyViewLayout;
-
     private String filePath;
     private int mCounter;
 
@@ -33,9 +31,7 @@ public class HistoryDetail extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
         setGraphView();
-
         mCounter = 0;
-
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finish();
@@ -59,21 +55,11 @@ public class HistoryDetail extends Activity {
                 BufferedReader buf = new BufferedReader(new FileReader(root.getAbsolutePath() + fName));
                 String readString = buf.readLine ( ) ;
                 while ( readString != null ) {
-                    readString = readString.replaceAll("\\s+","");
-                    double maxX = mCounter;
-                    double minX =  (maxX < 500) ? 0 : (maxX - 500);
-                    mLineGraph.setRange(minX, maxX, 0, 1023);
-                    mLineGraph.addValue(new Point(mCounter, Integer.parseInt(readString)));
-                    mGraphView.repaint();
-                    mCounter += 2;
+                   updateGraph(readString.replaceAll("\\s+",""));
                     readString = buf.readLine ( ) ;
                 }
                 buf.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Log.i(TAG, "******* File not found. Did you" +
-                        " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else
@@ -88,5 +74,15 @@ public class HistoryDetail extends Activity {
             return true;
         }
         return false;
+    }
+
+    //Plot a new set of values on the graph and present on the GUI
+    private void updateGraph(String str){
+        double maxX = mCounter;
+        double minX =  (maxX < 500) ? 0 : (maxX - 500);
+        mLineGraph.setRange(minX, maxX, 0, 1023);
+        mLineGraph.addValue(new Point(mCounter, Integer.parseInt(str)));
+        mGraphView.repaint();
+        mCounter += 2;
     }
 }
