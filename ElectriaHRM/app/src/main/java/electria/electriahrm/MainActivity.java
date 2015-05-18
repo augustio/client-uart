@@ -71,9 +71,11 @@ public class MainActivity extends Activity {
 
     private int mCounter;
     private int lastBatLevel;
+    private int timerCounter, min, sec, hour;
     private BleService mService;
     private int mState;
     private String fileName;
+    private String timerString;
     private String ECGString;
     private String [] ECGArray;
     private Handler mHandler;
@@ -109,11 +111,12 @@ public class MainActivity extends Activity {
         graphViewActive = false;
 
         collection = new ArrayList<String>();
-        mCounter = 0;
-        lastBatLevel = 0;
+        mCounter = lastBatLevel = 0;
+        timerCounter = min = sec =  hour = 0;
         fileName = null;
         mService = null;
         mDevice = null;
+        timerString = "";
         mState = DISCONNECTED;
         mHandler = new Handler();
 
@@ -205,6 +208,7 @@ public class MainActivity extends Activity {
                         btnStore.setText("Stop");
                         mHandler.postDelayed(mStopDataRecordingTimer, DATA_COLLECTION_TIME);
                         mRepeatTask.run();
+                        mTimerTask.run();
                     }
                 }
             }
@@ -399,6 +403,9 @@ public class MainActivity extends Activity {
             btnStore.setText("Record");
             mHandler.removeCallbacks(mStopDataRecordingTimer);
             mHandler.removeCallbacks(mRepeatTask);
+            mHandler.removeCallbacks(mTimerTask);
+            ((TextView) findViewById(R.id.timer_view)).setText("");
+            timerCounter = hour = min = sec = 0;
             fileName = null;
         }
     }
@@ -467,6 +474,32 @@ public class MainActivity extends Activity {
         Random rand = new Random(System.currentTimeMillis());
         fN = "ECG_"+rand.nextInt(1000);
         return fN;
+    }
+
+    private Runnable mTimerTask = new Runnable() {
+        @Override
+        public void run() {
+            if(timerCounter < 60){
+                sec = timerCounter;
+            }
+            else if(timerCounter < 360){
+                min = timerCounter/60;
+                sec = timerCounter%60;
+            }
+            else{
+                hour = timerCounter/360;
+                min = (timerCounter%360)/60;
+                min = (timerCounter%360)%60;
+            }
+            timerCounter++;
+            updateTimer();
+            mHandler.postDelayed(mTimerTask, 1000);
+        }
+    };
+
+    private void updateTimer(){
+        timerString = timerString.format("%02d:%02d:%02d", hour,min,sec);
+        ((TextView) findViewById(R.id.timer_view)).setText(timerString);
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
