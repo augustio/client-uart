@@ -1,6 +1,8 @@
 package electria.electriahrm;
 
 import android.app.Activity;;
+import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -8,6 +10,7 @@ import android.view.ViewGroup;
 
 import org.achartengine.GraphicalView;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -22,19 +25,28 @@ public class HistoryDetail extends Activity {
     private LineGraphView mLineGraph;
     private ViewGroup historyViewLayout;
 
-    private String ecgDataArray[];
+    private String filePath;
+    private int mCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
+        setGraphView();
 
-        ecgDataArray = null;
+        mCounter = 0;
+
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            finish();
+        }
+        filePath = extras.getString(Intent.EXTRA_TEXT);
+        readFromDisk(filePath);
     }
 
     //Prepare the initial GUI for graph
     private void setGraphView() {
-        mLineGraph = LineGraphView.getLineGraphView();
+        mLineGraph = new LineGraphView();
         mGraphView = mLineGraph.getView(this);
         historyViewLayout = (ViewGroup) findViewById(R.id.history_detail);
         historyViewLayout.addView(mGraphView);
@@ -43,23 +55,27 @@ public class HistoryDetail extends Activity {
     private void readFromDisk(String fName) {
         if (isExternalStorageReadable()) {
             File root = android.os.Environment.getExternalStorageDirectory();
-            File file = new File(root.getAbsolutePath() + fName);
-            String ecgData = null;
             try {
-                FileReader fr = new FileReader(file);
-                fr.read();
-                ecgData = fr.toString();
-                fr.close();
+                BufferedReader buf = new BufferedReader(new FileReader(root.getAbsolutePath() + fName));
+                String readString = buf.readLine ( ) ;
+                while ( readString != null ) {
+                    readString = readString.replaceAll("\\s+","");
+                    double maxX = mCounter;
+                    double minX =  (maxX < 500) ? 0 : (maxX - 500);
+                    mLineGraph.setRange(minX, maxX, 0, 1023);
+                    mLineGraph.addValue(new Point(mCounter, Integer.parseInt(readString)));
+                    mGraphView.repaint();
+                    mCounter += 2;
+                    readString = buf.readLine ( ) ;
+                }
+                buf.close();
+                Log.d(TAG, "Done reading");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 Log.i(TAG, "******* File not found. Did you" +
                         " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-            if (ecgData != null) {
-                ecgDataArray = ecgData.split(" ");
-                Log.d(TAG, "File read");
             }
         } else
             Log.w(TAG, "External storage not readable");
@@ -74,6 +90,4 @@ public class HistoryDetail extends Activity {
         }
         return false;
     }
-
-
 }

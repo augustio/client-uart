@@ -61,7 +61,6 @@ public class History extends Activity {
             for (File f : dir.listFiles()) {
                 if (f.isFile())
                     listAdapter.add(f.getName());
-                // do whatever you want with filename
             }
         }
         else {
