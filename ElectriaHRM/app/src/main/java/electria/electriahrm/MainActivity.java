@@ -442,7 +442,7 @@ public class MainActivity extends Activity {
             try {
                 FileWriter fw = new FileWriter(file, true);
                 String str = Arrays.toString(collection.toArray(new String[collection.size()]));
-                str = str.substring(1, str.length()-1).replaceAll(",", "\n");
+                str = str.substring(1, str.length()-1).replaceAll("\\s+","").replaceAll(",", "\n");
                 fw.append(str);
                 fw.flush();
                 fw.append("\n");

@@ -54,7 +54,7 @@ public class HistoryDetail extends Activity {
                 BufferedReader buf = new BufferedReader(new FileReader(root.getAbsolutePath() + fName));
                 String readString = buf.readLine ( ) ;
                 while ( readString != null && mCounter < 3000 ) {
-                   updateGraph(readString.replaceAll("\\s+",""));
+                   updateGraph(readString);
                     readString = buf.readLine ( ) ;
                 }
                 buf.close();
