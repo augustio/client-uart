@@ -53,8 +53,8 @@ public class LineGraphView {
     public LineGraphView() {
         //add single line chart mSeries
         mDataset.addSeries(mSeries);
-        //set line chart color to Black
-        mRenderer.setColor(Color.BLACK);
+        //set line chart color to blue
+        mRenderer.setColor(Color.BLUE);
         //set line chart style to square points
         //mRenderer.setPointStyle(PointStyle.SQUARE);
         mRenderer.setFillPoints(true);
