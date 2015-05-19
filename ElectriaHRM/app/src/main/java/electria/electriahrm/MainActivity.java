@@ -239,15 +239,15 @@ public class MainActivity extends Activity {
     //Plot a new set of values on the graph and present on the GUI
     private void updateGraph(int value) {
         final int ecg = value;
-        if(value >700 && value >=200) {
+        if(value <= 700 && value >=200) {
             runOnUiThread(new Runnable() {
                 public void run() {
-                    double maxX = mCounter;
-                    double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-                    mLineGraph.setRange(minX, maxX, 200, 700);
-                    mLineGraph.addValue(new Point(mCounter, ecg));
-                    mGraphView.repaint();
-                    mCounter += 2;
+                double maxX = mCounter;
+                double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+                mLineGraph.setRange(minX, maxX, 200, 700);
+                mLineGraph.addValue(new Point(mCounter, ecg));
+                mGraphView.repaint();
+                mCounter += 2;
                 }
             });
         }
