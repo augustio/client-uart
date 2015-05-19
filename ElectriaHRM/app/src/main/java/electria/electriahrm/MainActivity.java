@@ -239,16 +239,18 @@ public class MainActivity extends Activity {
     //Plot a new set of values on the graph and present on the GUI
     private void updateGraph(int value) {
         final int ecg = value;
-        runOnUiThread(new Runnable() {
-            public void run() {
-                double maxX = mCounter;
-                double minX =  (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-                mLineGraph.setRange(minX, maxX, 0, 1023);
-                mLineGraph.addValue(new Point(mCounter, ecg));
-                mGraphView.repaint();
-                mCounter+=2;
-            }
-        });
+        if(value >700 && value >=200) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    double maxX = mCounter;
+                    double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+                    mLineGraph.setRange(minX, maxX, 200, 700);
+                    mLineGraph.addValue(new Point(mCounter, ecg));
+                    mGraphView.repaint();
+                    mCounter += 2;
+                }
+            });
+        }
     }
 
     private void updateBatteryLevel(int level) {

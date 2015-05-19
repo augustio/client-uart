@@ -78,7 +78,7 @@ public class LineGraphView {
         renderer.setInScroll(true);
         renderer.setPanEnabled(true, true);
         renderer.setZoomEnabled(false, false);
-        renderer.setPanLimits(new double[]{0.0, 3000.0, 0.0, 1023.0});
+        renderer.setPanLimits(new double[]{0.0, 3000.0, 200.0, 700.0});
         //set title to x-axis and y-axis
         renderer.setXTitle("    Time (5mS)");
         renderer.setYTitle("    Voltage (mV)");

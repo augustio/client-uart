@@ -79,7 +79,7 @@ public class HistoryDetail extends Activity {
     private void updateGraph(String str){
         double maxX = mCounter;
         double minX =  (maxX < 500) ? 0 : (maxX - 500);
-        mLineGraph.setRange(minX, maxX, 0, 1023);
+        mLineGraph.setRange(minX, maxX, 200, 700);
         mLineGraph.addValue(new Point(mCounter, Integer.parseInt(str)));
         mGraphView.repaint();
         mCounter += 2;
