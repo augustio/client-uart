@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.ViewGroup;
@@ -65,6 +66,7 @@ public class MainActivity extends Activity {
     private LineGraphView mLineGraph;
     private TextView batLevelView;
     private EditText edtMessage;
+    private LinearLayout.LayoutParams param_enable, param_disable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
     private ViewGroup mainLayout;
     private List<String> collection;
@@ -101,9 +103,11 @@ public class MainActivity extends Activity {
         btnStore = (Button)findViewById(R.id.btn_store);
         btnStore.setBackgroundColor(getResources().getColor(R.color.green));
         btnHistory = (Button)findViewById(R.id.btn_history);
-        btnHistory.setBackgroundColor(getResources().getColor(R.color.yellow));
+        btnHistory.setBackgroundColor(getResources().getColor(R.color.blue));
         edtMessage=(EditText) findViewById(R.id.sendText);
         batLevelView = (TextView) findViewById(R.id.bat_level);
+        param_enable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
+        param_disable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
         collection = new ArrayList<String>();
 
         dataRecording = false;
@@ -231,7 +235,7 @@ public class MainActivity extends Activity {
     private void setGraphView() {
         mLineGraph = LineGraphView.getLineGraphView();
         mGraphView = mLineGraph.getView(this);
-        mainLayout = (ViewGroup) findViewById(R.id.linearLayout3);
+        mainLayout = (ViewGroup) findViewById(R.id.graph_layout);
         mainLayout.addView(mGraphView);
         graphViewActive = true;
     }
@@ -277,10 +281,11 @@ public class MainActivity extends Activity {
         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
         edtMessage.setHint("");
         edtMessage.setEnabled(false);
-        btnShow.setEnabled(false);
-        btnStore.setEnabled(false);
-        batLevelView.setText(R.string.batteryLevel);
-        ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
+        btnShow.setLayoutParams(param_disable);
+        btnStore.setLayoutParams(param_disable);
+        btnHistory.setLayoutParams(param_enable);
+        batLevelView.setText("");
+        ((TextView) findViewById(R.id.deviceName)).setText(R.string.no_device);
     }
 
     //UART service connected/disconnected
@@ -313,8 +318,9 @@ public class MainActivity extends Activity {
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.red));
                         edtMessage.setHint(R.string.text_hint);
                         edtMessage.setEnabled(true);
-                        btnShow.setEnabled(true);
-                        btnStore.setEnabled(true);
+                        btnShow.setLayoutParams(param_enable);
+                        btnStore.setLayoutParams(param_enable);
+                        btnHistory.setLayoutParams(param_disable);
                         ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "- Connected");
                         setGraphView();
                         mState = CONNECTED;

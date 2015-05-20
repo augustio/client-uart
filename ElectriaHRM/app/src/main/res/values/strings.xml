@@ -9,7 +9,7 @@
     <string name="paired">paired</string>
     <string name="batteryLevel">Battery: N/A</string>
     <string name="device">Device:</string>
-    <string name="no_device">&lt;Select a device&gt;</string>
+    <string name="no_device"></string>
     <string name="popup_title">Quit ElectriaHRM?</string>
     <string name="quit_message">Do you want to quit this Application?</string>
     <string name="disconnect_message">Still connected, disconnect before quitting</string>
