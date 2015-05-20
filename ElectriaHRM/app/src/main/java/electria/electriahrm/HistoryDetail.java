@@ -54,7 +54,7 @@ public class HistoryDetail extends Activity {
                 BufferedReader buf = new BufferedReader(new FileReader(root.getAbsolutePath() + fName));
                 String readString = buf.readLine ( ) ;
                 while ( readString != null && mCounter < 3000 ) {
-                   updateGraph(readString);
+                   updateGraph(Integer.parseInt(readString));
                     readString = buf.readLine ( ) ;
                 }
                 buf.close();
@@ -76,12 +76,14 @@ public class HistoryDetail extends Activity {
     }
 
     //Plot a new set of values on the graph and present on the GUI
-    private void updateGraph(String str){
-        double maxX = mCounter;
-        double minX =  (maxX < 500) ? 0 : (maxX - 500);
-        mLineGraph.setRange(minX, maxX, 200, 700);
-        mLineGraph.addValue(new Point(mCounter, Integer.parseInt(str)));
-        mGraphView.repaint();
-        mCounter += 2;
+    private void updateGraph(int value){
+        if(value <= 700 && value >=200) {
+            double maxX = mCounter;
+            double minX = (maxX < 500) ? 0 : (maxX - 500);
+            mLineGraph.setRange(minX, maxX, 200, 700);
+            mLineGraph.addValue(new Point(mCounter, value));
+            mGraphView.repaint();
+            mCounter += 2;
+        }
     }
 }
