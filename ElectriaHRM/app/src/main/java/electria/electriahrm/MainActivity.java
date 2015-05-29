@@ -54,9 +54,9 @@ public class MainActivity extends Activity {
     private static final int CONNECTING = 22;
     private static final int X_RANGE = 500;
     private static final int DEFAULT_BATTERY_LEVEL = 0;
-    private static final long DATA_COLLECTION_TIME = 3600000;//One hour
+    private static final long MAX_DATA_RECORDING_TIME = 120;//One hour
     private static final int AVERAGE_COLLECTION_SIZE = 5000;
-    private static final int DATA_SAVING_INTERVAL = 60000;
+    private static final int DATA_SAVING_INTERVAL = 60000;//
 
     private boolean showGraph;
     private boolean graphViewActive;
@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
 
     private int mCounter;
     private int lastBatLevel;
-    private int timerCounter, min, sec, hour;
+    private int recordTimerCounter, min, sec, hour;
     private BleService mService;
     private int mState;
     private String fileName;
@@ -116,7 +116,7 @@ public class MainActivity extends Activity {
 
         collection = new ArrayList<String>();
         mCounter = lastBatLevel = 0;
-        timerCounter = min = sec =  hour = 0;
+        recordTimerCounter = min = sec =  hour = 0;
         fileName = null;
         mService = null;
         mDevice = null;
@@ -395,17 +395,9 @@ public class MainActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
-    private Runnable mStopDataRecordingTimer = new Runnable() {
-        @Override
-        public void run() {
-            stopRecordingData();
-        }
-    };
-
     private void startRecordingData(){
-        mHandler.postDelayed(mStopDataRecordingTimer, DATA_COLLECTION_TIME);
-        mRepeatTask.run();
-        mTimerTask.run();
+        mSaveDataTask.run();
+        mRecordTimer.run();
     }
 
     private void stopRecordingData(){
@@ -413,22 +405,21 @@ public class MainActivity extends Activity {
             saveToDisk(fileName);
             dataRecording = false;
             btnStore.setText("Record");
-            mHandler.removeCallbacks(mStopDataRecordingTimer);
-            mHandler.removeCallbacks(mRepeatTask);
-            mHandler.removeCallbacks(mTimerTask);
+            mHandler.removeCallbacks(mSaveDataTask);
+            mHandler.removeCallbacks(mRecordTimer);
             ((TextView) findViewById(R.id.timer_view)).setText("");
             fileName = null;
             refreshTimer();
         }
     }
 
-    private Runnable mRepeatTask = new Runnable() {
+    private Runnable mSaveDataTask = new Runnable() {
         @Override
         public void run() {
             if(collection.size() >= AVERAGE_COLLECTION_SIZE)
                 saveToDisk(fileName);
             if (dataRecording)
-                mHandler.postDelayed(mRepeatTask, DATA_SAVING_INTERVAL);
+                mHandler.postDelayed(mSaveDataTask, DATA_SAVING_INTERVAL);
         }
     };
 
@@ -486,29 +477,33 @@ public class MainActivity extends Activity {
         return fN;
     }
 
-    private Runnable mTimerTask = new Runnable() {
+    private Runnable mRecordTimer = new Runnable() {
         @Override
         public void run() {
-            if(timerCounter < 60){
-                sec = timerCounter;
+            if(recordTimerCounter < 60){
+                sec = recordTimerCounter;
             }
-            else if(timerCounter < 360){
-                min = timerCounter/60;
-                sec = timerCounter%60;
+            else if(recordTimerCounter < 360){
+                min = recordTimerCounter/60;
+                sec = recordTimerCounter%60;
             }
             else{
-                hour = timerCounter/360;
-                min = (timerCounter%360)/60;
-                min = (timerCounter%360)%60;
+                hour = recordTimerCounter/360;
+                min = (recordTimerCounter%360)/60;
+                min = (recordTimerCounter%360)%60;
             }
-            timerCounter++;
             updateTimer();
-            mHandler.postDelayed(mTimerTask, 1000);
+            if(recordTimerCounter == MAX_DATA_RECORDING_TIME) {
+                stopRecordingData();
+                return;
+            }
+            recordTimerCounter++;
+            mHandler.postDelayed(mRecordTimer, 1000);
         }
     };
 
     private void refreshTimer(){
-        timerCounter = hour = min = sec = 0;
+        recordTimerCounter = hour = min = sec = 0;
     }
 
     private void updateTimer(){
