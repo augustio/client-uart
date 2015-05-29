@@ -240,16 +240,12 @@ public class MainActivity extends Activity {
     private void updateGraph(int value) {
         final int ecg = value;
         if(value <= 700 && value >=200) {
-            runOnUiThread(new Runnable() {
-                public void run() {
-                double maxX = mCounter;
-                double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-                mLineGraph.setRange(minX, maxX, 200, 700);
-                mLineGraph.addValue(new Point(mCounter, ecg));
-                mGraphView.repaint();
-                mCounter += 2;
-                }
-            });
+            double maxX = mCounter;
+            double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+            mLineGraph.setRange(minX, maxX, 200, 700);
+            mLineGraph.addValue(new Point(mCounter, ecg));
+            mGraphView.repaint();
+            mCounter += 2;
         }
     }
 
@@ -343,23 +339,19 @@ public class MainActivity extends Activity {
             }
 
             if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
-                final String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
-                new Thread(new Runnable() {
-                    public void run() {
-                        if (rxString != null){
-                            String [] ECGData = rxString.split("-");
-                            //Log.d(TAG, "Packet Recieved: " + ECGArray[0] + "---" + ECGArray[1]);
-                            if(dataRecording) {
-                                collection.add(ECGData[0]);
-                                collection.add(ECGData[1]);
-                            }
-                            if(showGraph) {
-                                updateGraph(Integer.parseInt(ECGData[0]));
-                                updateGraph(Integer.parseInt(ECGData[1]));
-                            }
-                        }
+                String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
+                if (rxString != null){
+                    String [] ECGData = rxString.split("-");
+                    Log.d(TAG, "Packet Recieved: " +ECGData[0] + "---" + ECGData[1]);
+                    if(dataRecording) {
+                        collection.add(ECGData[0]);
+                        collection.add(ECGData[1]);
                     }
-                }).start();
+                    if(showGraph) {
+                        updateGraph(Integer.parseInt(ECGData[0]));
+                        updateGraph(Integer.parseInt(ECGData[1]));
+                    }
+                }
             }
 
             if (action.equals(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE)){
