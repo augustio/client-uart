@@ -210,9 +210,7 @@ public class MainActivity extends Activity {
                     else{
                         dataRecording = true;
                         btnStore.setText("Stop");
-                        mHandler.postDelayed(mStopDataRecordingTimer, DATA_COLLECTION_TIME);
-                        mRepeatTask.run();
-                        mTimerTask.run();
+                        startRecordingData();
                     }
                 }
             }
@@ -403,6 +401,12 @@ public class MainActivity extends Activity {
             stopRecordingData();
         }
     };
+
+    private void startRecordingData(){
+        mHandler.postDelayed(mStopDataRecordingTimer, DATA_COLLECTION_TIME);
+        mRepeatTask.run();
+        mTimerTask.run();
+    }
 
     private void stopRecordingData(){
         if(dataRecording) {
