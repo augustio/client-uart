@@ -432,8 +432,8 @@ public class MainActivity extends Activity {
                 fw.append(str+"\n");
                 fw.flush();
                 fw.close();
-                Log.i(TAG, "Data saved, size: "+collection.size());
                 collection.clear();
+                showMessage("Saved ECG data to SD card");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 Log.i(TAG, "******* File not found. Did you" +
@@ -627,6 +627,5 @@ public class MainActivity extends Activity {
 
     private void showMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-
     }
 }
