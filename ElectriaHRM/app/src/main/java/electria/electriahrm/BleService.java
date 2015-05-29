@@ -187,7 +187,7 @@ public class BleService extends Service {
     private void broadcastUpdate(final String action,
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-        intent.putExtra(EXTRA_DATA, characteristic.getValue());
+        intent.putExtra(EXTRA_DATA, characteristic.getStringValue(0));
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

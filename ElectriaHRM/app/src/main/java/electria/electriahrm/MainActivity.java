@@ -78,8 +78,6 @@ public class MainActivity extends Activity {
     private int mState;
     private String fileName;
     private String timerString;
-    private String ECGString;
-    private String [] ECGArray;
     private Handler mHandler;
     private BluetoothDevice mDevice;
     private BluetoothAdapter mBtAdapter = null;
@@ -345,24 +343,19 @@ public class MainActivity extends Activity {
             }
 
             if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
-                final byte[] rxValue = intent.getByteArrayExtra(BleService.EXTRA_DATA);
+                final String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
                 new Thread(new Runnable() {
                     public void run() {
-                        if (rxValue != null){
-                            try{
-                                ECGString = new String(rxValue, "UTF-8");
-                            }catch(UnsupportedEncodingException e){
-                                Log.e(TAG, e.getMessage());
-                            }
-                            ECGArray = ECGString.split("-");
+                        if (rxString != null){
+                            String [] ECGData = rxString.split("-");
                             //Log.d(TAG, "Packet Recieved: " + ECGArray[0] + "---" + ECGArray[1]);
                             if(dataRecording) {
-                                collection.add(ECGArray[0]);
-                                collection.add(ECGArray[1]);
+                                collection.add(ECGData[0]);
+                                collection.add(ECGData[1]);
                             }
                             if(showGraph) {
-                                updateGraph(Integer.parseInt(ECGArray[0]));
-                                updateGraph(Integer.parseInt(ECGArray[1]));
+                                updateGraph(Integer.parseInt(ECGData[0]));
+                                updateGraph(Integer.parseInt(ECGData[1]));
                             }
                         }
                     }
