@@ -413,8 +413,8 @@ public class MainActivity extends Activity {
             mHandler.removeCallbacks(mRepeatTask);
             mHandler.removeCallbacks(mTimerTask);
             ((TextView) findViewById(R.id.timer_view)).setText("");
-            timerCounter = hour = min = sec = 0;
             fileName = null;
+            refreshTimer();
         }
     }
 
@@ -504,6 +504,10 @@ public class MainActivity extends Activity {
             mHandler.postDelayed(mTimerTask, 1000);
         }
     };
+
+    private void refreshTimer(){
+        timerCounter = hour = min = sec = 0;
+    }
 
     private void updateTimer(){
         timerString = timerString.format("%02d:%02d:%02d", hour,min,sec);
