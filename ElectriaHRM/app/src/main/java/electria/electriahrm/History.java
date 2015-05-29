@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -56,16 +57,21 @@ public class History extends Activity {
         if(isExternalStorageReadable()){
             File root = android.os.Environment.getExternalStorageDirectory();
             File dir = new File (root.getAbsolutePath() + dirName);
-            if(!dir.exists())
-                finish();
-            for (File f : dir.listFiles()) {
-                if (f.isFile())
-                    listAdapter.add(f.getName());
+            if(!dir.exists()) {
+                Toast toast = Toast.makeText(this, "No ECG file saved", Toast.LENGTH_SHORT);
+                toast.show();
+                return;
+            }
+            else{
+                for (File f : dir.listFiles()) {
+                    if (f.isFile())
+                        listAdapter.add(f.getName());
+                }
             }
         }
         else {
             Log.w(TAG, "External storage not readable");
-            finish();
+            return;
         }
     }
 
