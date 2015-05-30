@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
     private static final int CONNECTING = 22;
     private static final int X_RANGE = 500;
     private static final int DEFAULT_BATTERY_LEVEL = 0;
-    private static final long MAX_DATA_RECORDING_TIME = 120;//One hour
+    private static final long MAX_DATA_RECORDING_TIME = 3600;//One hour
     private static final int AVERAGE_COLLECTION_SIZE = 5000;
     private static final int DATA_SAVING_INTERVAL = 60000;//
 
@@ -468,14 +468,14 @@ public class MainActivity extends Activity {
             if(recordTimerCounter < 60){
                 sec = recordTimerCounter;
             }
-            else if(recordTimerCounter < 360){
+            else if(recordTimerCounter < 3600){
                 min = recordTimerCounter/60;
                 sec = recordTimerCounter%60;
             }
             else{
-                hour = recordTimerCounter/360;
-                min = (recordTimerCounter%360)/60;
-                min = (recordTimerCounter%360)%60;
+                hour = recordTimerCounter/3600;
+                min = (recordTimerCounter%3600)/60;
+                min = (recordTimerCounter%3600)%60;
             }
             updateTimer();
             if(recordTimerCounter == MAX_DATA_RECORDING_TIME) {
