@@ -482,6 +482,8 @@ public class MainActivity extends Activity {
                 stopRecordingData();
                 return;
             }
+            if((MAX_DATA_RECORDING_TIME - recordTimerCounter) <=10)
+                ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.green));
             recordTimerCounter++;
             mHandler.postDelayed(mRecordTimer, 1000);
         }
