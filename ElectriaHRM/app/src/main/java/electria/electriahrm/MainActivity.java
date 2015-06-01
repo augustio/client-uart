@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
     private static final int DEFAULT_BATTERY_LEVEL = 0;
-    private static final long MAX_DATA_RECORDING_TIME = 3600;//3600 seconds (One hour)
+    private static final long MAX_DATA_RECORDING_TIME = 120;//3600 seconds (One hour)
     private static final int AVERAGE_COLLECTION_SIZE = 5000;//
     private static final int DATA_SAVING_INTERVAL = 60000;//
 
@@ -491,6 +491,7 @@ public class MainActivity extends Activity {
 
     private void refreshTimer(){
         recordTimerCounter = hour = min = sec = 0;
+        ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.red));
     }
 
     private void updateTimer(){
