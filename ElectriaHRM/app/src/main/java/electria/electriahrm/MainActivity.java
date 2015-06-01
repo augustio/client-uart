@@ -53,9 +53,11 @@ public class MainActivity extends Activity {
     private static final int DISCONNECTED = 21;
     private static final int CONNECTING = 22;
     private static final int X_RANGE = 500;
+    private static final int MIN_Y = 0;//Minimum ECG data value
+    private static final int MAX_Y = 1023;//Maximum ECG data value
     private static final int DEFAULT_BATTERY_LEVEL = 0;
-    private static final long MAX_DATA_RECORDING_TIME = 3600;//One hour
-    private static final int AVERAGE_COLLECTION_SIZE = 5000;
+    private static final long MAX_DATA_RECORDING_TIME = 3600;//3600 seconds (One hour)
+    private static final int AVERAGE_COLLECTION_SIZE = 5000;//
     private static final int DATA_SAVING_INTERVAL = 60000;//
 
     private boolean showGraph;
@@ -239,14 +241,12 @@ public class MainActivity extends Activity {
     //Plot a new set of values on the graph and present on the GUI
     private void updateGraph(int value) {
         final int ecg = value;
-        if(value <= 700 && value >=200) {
-            double maxX = mCounter;
-            double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-            mLineGraph.setRange(minX, maxX, 200, 700);
-            mLineGraph.addValue(new Point(mCounter, ecg));
-            mGraphView.repaint();
-            mCounter += 2;
-        }
+        double maxX = mCounter;
+        double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+        mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
+        mLineGraph.addValue(new Point(mCounter, ecg));
+        mGraphView.repaint();
+        mCounter += 2;
     }
 
     private void updateBatteryLevel(int level) {

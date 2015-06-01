@@ -18,6 +18,10 @@ import java.io.FileReader;
 public class HistoryDetail extends Activity {
 
     private static final String TAG = HistoryDetail.class.getSimpleName();
+    private static final int MAX_DATA_TO_DISPLAY = 4000; //Max data to show on graph
+    private static final int X_RANGE = 500;
+    private static final int MIN_Y = 0;//Minimum ECG data value
+    private static final int MAX_Y = 1023;//Maximum ECG data value
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
     private ViewGroup historyViewLayout;
@@ -53,7 +57,7 @@ public class HistoryDetail extends Activity {
             try {
                 BufferedReader buf = new BufferedReader(new FileReader(root.getAbsolutePath() + fName));
                 String readString = buf.readLine ( ) ;
-                while ( readString != null && mCounter < 3000 ) {
+                while ( readString != null && mCounter < MAX_DATA_TO_DISPLAY ) {
                    updateGraph(Integer.parseInt(readString));
                     readString = buf.readLine ( ) ;
                 }
@@ -77,13 +81,11 @@ public class HistoryDetail extends Activity {
 
     //Plot a new set of values on the graph and present on the GUI
     private void updateGraph(int value){
-        if(value <= 700 && value >=200) {
-            double maxX = mCounter;
-            double minX = (maxX < 500) ? 0 : (maxX - 500);
-            mLineGraph.setRange(minX, maxX, 200, 700);
-            mLineGraph.addValue(new Point(mCounter, value));
-            mGraphView.repaint();
-            mCounter += 2;
-        }
+        double maxX = mCounter;
+        double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+        mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
+        mLineGraph.addValue(new Point(mCounter, value));
+        mGraphView.repaint();
+        mCounter += 2;
     }
 }
