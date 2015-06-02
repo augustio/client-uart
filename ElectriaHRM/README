@@ -15,7 +15,7 @@ updates at the above specified intervals. While connected, the user can either d
 data in a graph, or record the data to be stored in the android device's internal storage location by pressing 
 corresponding buttons. Displaying the sensor data and recording the data could be done simultaneously.  The recording is 
 set to last for an hour if the user does not pressing it by pressing the stop button. Recorded sensor data is stored 
-approximately every 50 seconds in the same file, and after an hour of recording or by pressing the stop button.
+approximately every 60 seconds in the same file, and after an hour of recording or by pressing the stop button.
 The History button is used to display a list of files containing recorded sensor data. Each of these files is a link to 
 a details view which is basically a graphical display of a portion of the recorded data.
 
