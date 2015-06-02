@@ -1,0 +1,57 @@
+# client-uart
+This application is designed to work with an ECG sensor patch. It serves as a client to the server that runs 
+in the sensor patch which,among other things, pushes ECG data to the client every twenty millisecond. The ECG data 
+are delivered in a very in a packet with a very simple structure: each packet contains two ECG values with a hyphen (-) 
+as the separator. The ECG packets are delivered over the custom UART Service by Nordic Semiconductors. The sensor patch 
+could also be written to using the same UART Service.
+This application also gets battery level update from the Sensor patch at specific intervals, which it delivers through 
+the Battery Service.
+
+#How it works
+When the application starts, two buttons: Connect and History are visible to the user. By pressing the connect button, the
+user is able to view a list of the BLE devices within range and is able to connect to a selected device. If the right BLE
+device is selected and a connection is established, the application would start getting the ECG packets and battery level 
+updates at the above specified intervals. While connected, the user can either disconnect from the sensor, display sensor
+data in a graph, or record the data to be stored in the android device's internal storage location by pressing 
+corresponding buttons. Displaying the sensor data and recording the data could be done simultaneously.  The recording is 
+set to last for an hour if the user does not pressing it by pressing the stop button. Recorded sensor data is stored 
+approximately every 50 seconds in the same file, and after an hour of recording or by pressing the stop button.
+The History button is used to display a list of files containing recorded sensor data. Each of these files is a link to 
+a details view which is basically a graphical display of a portion of the recorded data.
+
+#Android Device Requirements
+Minimum memory size: 2G ?
+Minimum Android version: 4.4.4 kitkat
+
+#Requirement for Building and Installing the application on Linux Platform
+-Download and install Java Runtime Environment (JRE) latest version and Java Development Kit (JDK) version 6 or later.
+-Download Android stand-alone SDK Tools package for Linux OS from https://developer.android.com/sdk/index.html#Other
+-Unbundle the downloaded Linux tar ball into a convinient location.
+-Check that the unbundled folder has the folders tools and platform-tools. 
+-Add these folders to your executable path.
+The stand-alone SDK Tools package does not include a complete Android development environment so 
+there are still a couple packages you should add to make your Android SDK complete.
+-Open sdk manager with the command: android sdk (contained in the tools/ which has been added to the executable path).
+-Add the needed sdk packages following this guide from by Android: 
+https://developer.android.com/sdk/installing/adding-packages.html
+(For the SDK platform, add SDK 5.1.1(API 22), 5.0.1(API 21) and 4.4.2(API 19))
+
+#Build
+-On the command line, navigate to the root directory of the application
+-Ensure that the Android SDK tools/ directory is included in your PATH environment
+-Build the application with the following commands:
+$ chmod +x gradlew 
+$ ./gradlew assembleDebug
+Here the output .apk file is located in app/build/outputs/apk 
+
+#Install
+To install the app to a real device:
+-enable usb debugging on the android device:
+1.Navigate to Settings and check if the 'Developer options' is available, if not then 
+navigate to About Phone > scroll to the bottom > tap Build number seven (7) times. 
+You'll get a short pop-up in the lower area of your display saying that you're now a developer. 
+2. Now access the Developer options menu, check 'USB debugging' and click OK on the prompt.
+-Connect the device to the Linux machine and respond to any prompt that pops up
+-On the command line, navigate to the root directory of the application
+-Ensure that the Android SDK platform-tools/ directory is included in your PATH environment variable and then execute:
+adb install app/build/outputs/apk/app-debug.apk
