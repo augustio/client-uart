@@ -51,6 +51,7 @@ public class BleService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCharacteristic mBatteryCharacteristic;
+    private BluetoothGattCharacteristic mHRLocationCharacteristic;
     private BluetoothGattCharacteristic mRXCharacteristic;
     private BluetoothGattCharacteristic mTXCharacteristic;
     private BluetoothGattCharacteristic mTempCharacteristic;
@@ -78,6 +79,8 @@ public class BleService extends Service {
             "electria.electriahrm.EXTRA_DATA";
     public final static String DEVICE_DOES_NOT_SUPPORT_UART =
             "electria.electriahrm.DEVICE_DOES_NOT_SUPPORT_UART";
+    public final static String ACTION_SENSOR_POSITION_READ =
+            "electria.electriahrm.ACTION_SENSOR_POSITION_READ";
 
     private final static UUID CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     private final static UUID UART_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
@@ -87,7 +90,8 @@ public class BleService extends Service {
     private final static UUID BATTERY_LEVEL_CHAR_UUID = UUID.fromString("00002A19-0000-1000-8000-00805f9b34fb");
     private final static UUID HT_SERVICE_UUID = UUID.fromString("00001809-0000-1000-8000-00805f9b34fb");
     private final static UUID HT_MEASUREMENT_CHARACTERISTIC_UUID = UUID.fromString("00002A1C-0000-1000-8000-00805f9b34fb");
-
+    private final static UUID HR_SERVICE_UUID = UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb");
+    private static final UUID ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID = UUID.fromString("00002A38-0000-1000-8000-00805f9b34fb");
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -122,7 +126,11 @@ public class BleService extends Service {
                     if (service.getUuid().equals(UART_SERVICE_UUID)) {
                         mRXCharacteristic = service.getCharacteristic(RX_CHAR_UUID);
                         mTXCharacteristic = service.getCharacteristic(TX_CHAR_UUID);
-                    } else if (service.getUuid().equals(BATTERY_SERVICE_UUID)) {
+                    } else if (service.getUuid().equals(HR_SERVICE_UUID)) {
+                        mHRLocationCharacteristic = service.getCharacteristic(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID);
+                        //Read sensor location
+                        readECGSensorLocation();
+                    }else if (service.getUuid().equals(BATTERY_SERVICE_UUID)) {
                         mBatteryCharacteristic = service.getCharacteristic(BATTERY_LEVEL_CHAR_UUID);
                         //Start reading battery characteristic every minute
                         mReadBatteryLevel.run();
@@ -145,6 +153,10 @@ public class BleService extends Service {
                         mBatteryCharacteristic.getUuid().equals(characteristic.getUuid())) {
                     broadcastUpdate(ACTION_BATTERY_LEVEL_DATA_AVAILABLE,
                             characteristic.getValue()[0]);
+                }
+                if (characteristic.getUuid().equals(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID)) {
+                    final String sensorPosition = getBodySensorPosition(characteristic.getValue()[0]);
+                    broadcastUpdate(ACTION_SENSOR_POSITION_READ, sensorPosition);
                     enableRXNotification();
                 }
             }
@@ -154,7 +166,7 @@ public class BleService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             if(mRXCharacteristic.getUuid().equals(characteristic.getUuid())) {
-                broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic);
+                broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic.getStringValue(0));
             }
         }
 
@@ -185,9 +197,9 @@ public class BleService extends Service {
     }
 
     private void broadcastUpdate(final String action,
-                                 final BluetoothGattCharacteristic characteristic) {
+                                 final String stringValue) {
         final Intent intent = new Intent(action);
-        intent.putExtra(EXTRA_DATA, characteristic.getStringValue(0));
+        intent.putExtra(EXTRA_DATA, stringValue);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -330,6 +342,19 @@ public class BleService extends Service {
             showMessage("Charateristic not found!");
             broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
         }
+    }
+
+    private void readECGSensorLocation() {
+        if (mHRLocationCharacteristic != null) {
+            mBluetoothGatt.readCharacteristic(mHRLocationCharacteristic);
+        }
+    }
+
+    private String getBodySensorPosition(byte bodySensorPositionValue) {
+        String[] locations = this.getResources().getStringArray(R.array.sensor_locations);
+        if (bodySensorPositionValue > locations.length)
+            return this.getString(R.string.location_other);
+        return locations[bodySensorPositionValue];
     }
 
     public void enableRXNotification()

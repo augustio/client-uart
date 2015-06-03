@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
 
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
-    private TextView batLevelView;
+    private TextView batLevelView,sensorPositionView;
     private EditText edtMessage;
     private LinearLayout.LayoutParams param_enable, param_disable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
@@ -80,6 +80,7 @@ public class MainActivity extends Activity {
     private int mState;
     private String fileName;
     private String timerString;
+    private String sensorPosition;
     private Handler mHandler;
     private BluetoothDevice mDevice;
     private BluetoothAdapter mBtAdapter = null;
@@ -106,6 +107,7 @@ public class MainActivity extends Activity {
         btnHistory.setBackgroundColor(getResources().getColor(R.color.blue));
         edtMessage=(EditText) findViewById(R.id.sendText);
         batLevelView = (TextView) findViewById(R.id.bat_level);
+        sensorPositionView = (TextView) findViewById(R.id.sensor_position);
         param_enable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
         param_disable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
         collection = new ArrayList<String>();
@@ -185,6 +187,7 @@ public class MainActivity extends Activity {
         btnShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setSensorPosition(sensorPosition);
                 if (mState == CONNECTED) {
                     if (showGraph) {
                         showGraph = false;
@@ -255,6 +258,14 @@ public class MainActivity extends Activity {
         batLevelView.setText("Battery Level: " + lastBatLevel + "%");
     }
 
+    private void setSensorPosition(final String position) {
+        if (position != null) {
+            sensorPositionView.setText("Sensor Position " + position.toUpperCase());
+        } else {
+            sensorPositionView.setText(" ");
+        }
+    }
+
     private void clearGraph() {
         if(graphViewActive) {
             graphViewActive = false;
@@ -262,9 +273,10 @@ public class MainActivity extends Activity {
             mLineGraph.clearGraph();
             mCounter = 0;
             mainLayout.removeView(mGraphView);
+            setSensorPosition(null);
         }
     }
-
+;
     private void resetGUIComponents(){
         btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
         btnShow.setText("Show");
@@ -334,10 +346,6 @@ public class MainActivity extends Activity {
                 });
             }
 
-            if (action.equals(BleService.ACTION_GATT_SERVICES_DISCOVERED)) {
-                mService.enableRXNotification();
-            }
-
             if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
                 String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
                 if (rxString != null){
@@ -368,6 +376,9 @@ public class MainActivity extends Activity {
             }
             if(action.equals(BleService.ACTION_TX_CHAR_WRITE)){
                 Log.d(TAG, "Write RX done");
+            }
+            if(action.equals(BleService.ACTION_SENSOR_POSITION_READ)){
+                sensorPosition = intent.getStringExtra(BleService.EXTRA_DATA);
             }
 
         }
@@ -508,6 +519,7 @@ public class MainActivity extends Activity {
         intentFilter.addAction(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE);
         intentFilter.addAction(BleService.DEVICE_DOES_NOT_SUPPORT_UART);
         intentFilter.addAction(BleService.ACTION_TX_CHAR_WRITE);
+        intentFilter.addAction(BleService.ACTION_SENSOR_POSITION_READ);
         return intentFilter;
     }
 
