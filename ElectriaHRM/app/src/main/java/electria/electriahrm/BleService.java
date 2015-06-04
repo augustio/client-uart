@@ -45,6 +45,7 @@ package electria.electriahrm;
  */
 public class BleService extends Service {
     private final static String TAG = BleService.class.getSimpleName();
+    private static final int FIRST_BITMASK = 0x01;
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -54,6 +55,7 @@ public class BleService extends Service {
     private BluetoothGattCharacteristic mHRLocationCharacteristic;
     private BluetoothGattCharacteristic mRXCharacteristic;
     private BluetoothGattCharacteristic mTXCharacteristic;
+    private BluetoothGattCharacteristic mHRMCharacteristic;
     private BluetoothGattCharacteristic mTempCharacteristic;
     private int mConnectionState = STATE_DISCONNECTED;
     private Handler mHandler = new Handler();
@@ -81,6 +83,8 @@ public class BleService extends Service {
             "electria.electriahrm.DEVICE_DOES_NOT_SUPPORT_UART";
     public final static String ACTION_SENSOR_POSITION_READ =
             "electria.electriahrm.ACTION_SENSOR_POSITION_READ";
+    public final static String ACTION_HEART_RATE_READ =
+            "electria.electriahrm.ACTION_HEART_RATE_READ";
 
     private final static UUID CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     private final static UUID UART_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
@@ -91,6 +95,7 @@ public class BleService extends Service {
     private final static UUID HT_SERVICE_UUID = UUID.fromString("00001809-0000-1000-8000-00805f9b34fb");
     private final static UUID HT_MEASUREMENT_CHARACTERISTIC_UUID = UUID.fromString("00002A1C-0000-1000-8000-00805f9b34fb");
     private final static UUID HR_SERVICE_UUID = UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb");
+    private static final UUID HRM_CHARACTERISTIC_UUID = UUID.fromString("00002A37-0000-1000-8000-00805f9b34fb");
     private static final UUID ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID = UUID.fromString("00002A38-0000-1000-8000-00805f9b34fb");
 
     // Implements callback methods for GATT events that the app cares about.  For example,
@@ -127,6 +132,7 @@ public class BleService extends Service {
                         mRXCharacteristic = service.getCharacteristic(RX_CHAR_UUID);
                         mTXCharacteristic = service.getCharacteristic(TX_CHAR_UUID);
                     } else if (service.getUuid().equals(HR_SERVICE_UUID)) {
+                        mHRMCharacteristic = service.getCharacteristic(HRM_CHARACTERISTIC_UUID );
                         mHRLocationCharacteristic = service.getCharacteristic(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID);
                         //Read sensor location
                         readECGSensorLocation();
@@ -165,8 +171,18 @@ public class BleService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            if(mRXCharacteristic.getUuid().equals(characteristic.getUuid())) {
+            if(characteristic.getUuid().equals(RX_CHAR_UUID)) {
                 broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic.getStringValue(0));
+            }
+            else if (characteristic.getUuid().equals(HRM_CHARACTERISTIC_UUID)) {
+                Log.e(TAG, "Heart Rate Read");
+                int hrValue = 0;
+                if (isHeartRateInUINT16(characteristic.getValue()[0])) {
+                    hrValue = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 1);
+                } else {
+                    hrValue = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
+                }
+                broadcastUpdate(ACTION_HEART_RATE_READ, hrValue);
             }
         }
 
@@ -177,6 +193,20 @@ public class BleService extends Service {
             if(status == BluetoothGatt.GATT_SUCCESS){
                 if(mTXCharacteristic.getUuid().equals(characteristic.getUuid()))
                     broadcastUpdate(ACTION_TX_CHAR_WRITE);
+            }
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            if(status == BluetoothGatt.GATT_SUCCESS){
+                Log.i(TAG, "Descriptor written");
+                if(descriptor.getCharacteristic().getUuid().equals(RX_CHAR_UUID)) {
+                    Log.e(TAG, "RX Descriptor written");
+                    enableHRNotification();
+                }
+                else if(descriptor.getCharacteristic().getUuid().equals(HRM_CHARACTERISTIC_UUID)) {
+                    Log.e(TAG, "HR Descriptor written");
+                }
             }
         }
     };
@@ -370,6 +400,18 @@ public class BleService extends Service {
         }
     }
 
+    public void enableHRNotification()
+    {
+        if (mHRMCharacteristic != null && mConnectionState == STATE_CONNECTED) {
+            mBluetoothGatt.setCharacteristicNotification(mHRMCharacteristic, true);
+            BluetoothGattDescriptor descriptor = mHRMCharacteristic.getDescriptor(CCCD_UUID);
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(descriptor);
+        }else if(mHRMCharacteristic == null){
+            showMessage("Charateristic not found!");
+        }
+    }
+
     public void writeTXCharacteristic(byte[] value)
     {
         if(mTXCharacteristic != null && mConnectionState == STATE_CONNECTED) {
@@ -381,6 +423,15 @@ public class BleService extends Service {
             showMessage("Charateristic not found!");
             broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
         }
+    }
+
+    /**
+     * This method will check if Heart rate value is in 8 bits or 16 bits
+     */
+    private boolean isHeartRateInUINT16(byte value) {
+        if ((value & FIRST_BITMASK) != 0)
+            return true;
+        return false;
     }
 
     private void showMessage(String msg) {

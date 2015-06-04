@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
 
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
-    private TextView batLevelView,sensorPositionView;
+    private TextView batLevelView,sensorPositionView, heartRateView;
     private EditText edtMessage;
     private LinearLayout.LayoutParams param_enable, param_disable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
@@ -78,6 +78,7 @@ public class MainActivity extends Activity {
     private int recordTimerCounter, min, sec, hour;
     private BleService mService;
     private int mState;
+    private int mHeartRate;
     private String fileName;
     private String timerString;
     private String sensorPosition;
@@ -108,6 +109,7 @@ public class MainActivity extends Activity {
         edtMessage=(EditText) findViewById(R.id.sendText);
         batLevelView = (TextView) findViewById(R.id.bat_level);
         sensorPositionView = (TextView) findViewById(R.id.sensor_position);
+        heartRateView = (TextView) findViewById(R.id.heart_rate);
         param_enable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
         param_disable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
         collection = new ArrayList<String>();
@@ -266,6 +268,14 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void setHeartRateValue(final int value) {
+        if (value != 0) {
+            heartRateView.setText("Heart Rate  " + value + "BPM");
+        } else {
+            heartRateView.setText(" ");
+        }
+    }
+
     private void clearGraph() {
         if(graphViewActive) {
             graphViewActive = false;
@@ -274,6 +284,7 @@ public class MainActivity extends Activity {
             mCounter = 0;
             mainLayout.removeView(mGraphView);
             setSensorPosition(null);
+            setHeartRateValue(0);
         }
     }
 ;
@@ -350,7 +361,7 @@ public class MainActivity extends Activity {
                 String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
                 if (rxString != null){
                     String [] ECGData = rxString.split("-");
-                    Log.d(TAG, "Packet Recieved: " +ECGData[0] + "---" + ECGData[1]);
+                    //Log.d(TAG, "Packet Recieved: " +ECGData[0] + "---" + ECGData[1]);
                     if(dataRecording) {
                         collection.add(ECGData[0]);
                         collection.add(ECGData[1]);
@@ -370,17 +381,24 @@ public class MainActivity extends Activity {
                     }
                 });
             }
+
             if (action.equals(BleService.DEVICE_DOES_NOT_SUPPORT_UART)){
                 showMessage("Device doesn't support UART. Disconnecting");
                 mService.disconnect();
             }
+
             if(action.equals(BleService.ACTION_TX_CHAR_WRITE)){
                 Log.d(TAG, "Write RX done");
             }
+
             if(action.equals(BleService.ACTION_SENSOR_POSITION_READ)){
                 sensorPosition = intent.getStringExtra(BleService.EXTRA_DATA);
             }
 
+            if(action.equals(BleService.ACTION_HEART_RATE_READ)){
+                if(showGraph == true)
+                    setHeartRateValue(intent.getIntExtra(BleService.EXTRA_DATA, 0));
+            }
         }
     };
 
@@ -520,6 +538,7 @@ public class MainActivity extends Activity {
         intentFilter.addAction(BleService.DEVICE_DOES_NOT_SUPPORT_UART);
         intentFilter.addAction(BleService.ACTION_TX_CHAR_WRITE);
         intentFilter.addAction(BleService.ACTION_SENSOR_POSITION_READ);
+        intentFilter.addAction(BleService.ACTION_HEART_RATE_READ);
         return intentFilter;
     }
 
