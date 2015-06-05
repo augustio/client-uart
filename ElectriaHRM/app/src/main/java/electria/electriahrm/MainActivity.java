@@ -55,7 +55,6 @@ public class MainActivity extends Activity {
     private static final int X_RANGE = 500;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
-    private static final int DEFAULT_BATTERY_LEVEL = 0;
     private static final long MAX_DATA_RECORDING_TIME = 3600;//One hour (3600 seconds)
     private static final int AVERAGE_COLLECTION_SIZE = 5000;//Five thousand ECG values
     private static final int DATA_SAVING_INTERVAL = 60000;//One minute (60000 milliseconds)
@@ -374,7 +373,7 @@ public class MainActivity extends Activity {
             }
 
             if (action.equals(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE)){
-                final int batValue = intent.getIntExtra(BleService.EXTRA_DATA, DEFAULT_BATTERY_LEVEL);
+                final int batValue = intent.getIntExtra(BleService.EXTRA_DATA, 0);
                 runOnUiThread(new Runnable() {
                     public void run() {
                         updateBatteryLevel(batValue);

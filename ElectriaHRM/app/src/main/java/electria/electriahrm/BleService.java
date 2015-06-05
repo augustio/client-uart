@@ -57,12 +57,12 @@ public class BleService extends Service {
     private BluetoothGattCharacteristic mTXCharacteristic;
     private BluetoothGattCharacteristic mHRMCharacteristic;
     private int mConnectionState = STATE_DISCONNECTED;
+    private int readBatteryInterval;
     private Handler mHandler = new Handler();
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
-    private static final int BATTERY_LEVEL_READ_INTERVAL = 60000;
 
     public final static String ACTION_GATT_CONNECTED =
             "electria.electriahrm.ACTION_GATT_CONNECTED";
@@ -151,11 +151,11 @@ public class BleService extends Service {
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (mBatteryCharacteristic != null &&
-                        mBatteryCharacteristic.getUuid().equals(characteristic.getUuid())) {
-                    broadcastUpdate(ACTION_BATTERY_LEVEL_DATA_AVAILABLE,
-                            characteristic.getValue()[0]);
+                        characteristic.getUuid().equals(BATTERY_LEVEL_CHAR_UUID)) {
+                        broadcastUpdate(ACTION_BATTERY_LEVEL_DATA_AVAILABLE,
+                                characteristic.getValue()[0]);
                 }
-                if (characteristic.getUuid().equals(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID)) {
+                else if (characteristic.getUuid().equals(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID)) {
                     final String sensorPosition = getBodySensorPosition(characteristic.getValue()[0]);
                     broadcastUpdate(ACTION_SENSOR_POSITION_READ, sensorPosition);
                     enableRXNotification();
@@ -185,7 +185,7 @@ public class BleService extends Service {
                                           BluetoothGattCharacteristic characteristic,
                                           int status) {
             if(status == BluetoothGatt.GATT_SUCCESS){
-                if(mTXCharacteristic.getUuid().equals(characteristic.getUuid()))
+                if(characteristic.getUuid().equals(TX_CHAR_UUID))
                     broadcastUpdate(ACTION_TX_CHAR_WRITE);
             }
         }
@@ -204,8 +204,11 @@ public class BleService extends Service {
         @Override
         public void run() {
             if (mBluetoothGatt != null && mBatteryCharacteristic != null) {
-                mBluetoothGatt.readCharacteristic(mBatteryCharacteristic);
-                mHandler.postDelayed(mReadBatteryLevel, BATTERY_LEVEL_READ_INTERVAL);
+                if(!mBluetoothGatt.readCharacteristic(mBatteryCharacteristic))
+                    readBatteryInterval = 1000;//One second
+                else
+                    readBatteryInterval = 60000;//One minute
+                mHandler.postDelayed(mReadBatteryLevel, readBatteryInterval);
             }
         }
     };
