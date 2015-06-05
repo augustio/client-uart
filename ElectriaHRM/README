@@ -1,27 +1,27 @@
 # client-uart
-This application is designed to work with an ECG sensor patch. It serves as a client to the server that runs 
-in the sensor patch which,among other things, pushes ECG data to the client every twenty millisecond. The ECG data 
-are delivered in a very in a packet with a very simple structure: each packet contains two ECG values with a hyphen (-) 
-as the separator. The ECG packets are delivered over the custom UART Service by Nordic Semiconductors. The sensor patch 
-could also be written to using the same UART Service.
-This application also gets battery level update from the Sensor patch at specific intervals, which it delivers through 
-the Battery Service.
+This application is designed to work with an ECG sensor patch.
+It serves as a client to the server that runs in the sensor patch which,among other things, pushes ECG data to the client every twenty millisecond, and the heart rate delivered through the standard Heart Rate Service.
+The ECG data are delivered in a packet with a very simple structure: each packet contains two ECG values with a hyphen (-) as the separator. 
+The ECG packets are delivered over the custom UART Service by Nordic Semiconductors. 
+The sensor patch could also be written to using the same UART Service.
+This application also reads battery level characteristic of the Battery Service from the sensor every minute and updates the battery level view only when the level changes.
 
 #How it works
-When the application starts, two buttons: Connect and History are visible to the user. By pressing the connect button, the
-user is able to view a list of the BLE devices within range and is able to connect to a selected device. If the right BLE
-device is selected and a connection is established, the application would start getting the ECG packets and battery level 
-updates at the above specified intervals. While connected, the user can either disconnect from the sensor, display sensor
-data in a graph, or record the data to be stored in the android device's internal storage location by pressing 
-corresponding buttons. Displaying the sensor data and recording the data could be done simultaneously.  The recording is 
-set to last for an hour if the user does not pressing it by pressing the stop button. Recorded sensor data is stored 
-approximately every 60 seconds in the same file, and after an hour of recording or by pressing the stop button.
-The History button is used to display a list of files containing recorded sensor data. Each of these files is a link to 
-a details view which is basically a graphical display of a portion of the recorded data.
+When the application starts, two buttons: Connect and History are visible to the user.
+By pressing the connect button, the user is able to view a list of the BLE devices within range and is able to connect to a selected device.
+If the right BLE device is selected and a connection is established, the application would start getting the ECG packets and battery level updates at the above specified intervals.
+While connected, the user can either disconnect from the sensor, display sensor data graphically, or record the data to be stored in the android device's internal storage location by pressing corresponding buttons.
+The sensor position and heart rate value are also displayed along with the ECG graph.
+The heart rate is updated every time there is a change in the value.
+Displaying the sensor data and recording the data could be done simultaneously.
+The recording is set to last for an hour if the user does not stop it by pressing the stop button. 
+Recorded sensor data is stored approximately every 60 seconds in the same file, and after an hour of recording or by pressing the stop button. 
+The History button is used to display a list of files containing recorded sensor data.
+Each of these files is a link to a details view which is basically a graphical display of a portion of the recorded data.
 
 #Android Device Requirements
 Minimum memory size: 2G ?
-Minimum Android version: 4.4.4 kitkat
+Minimum Android version: 4.4.4 kitkat. (Works with Version 4.4.2 and 4.4.3 but might have some instability issues)
 
 #Requirement for Building and Installing the application on Linux Platform
 -Download and install Java Runtime Environment (JRE) latest version and Java Development Kit (JDK) version 6 or later.
@@ -54,4 +54,5 @@ You'll get a short pop-up in the lower area of your display saying that you're n
 -Connect the device to the Linux machine and respond to any prompt that pops up
 -On the command line, navigate to the root directory of the application
 -Ensure that the Android SDK platform-tools/ directory is included in your PATH environment variable and then execute:
-adb install app/build/outputs/apk/app-debug.apk
+$ adb install app/build/outputs/apk/app-debug.apk
+If you get an error message saying that the application already exists, then unistall the existing application that has the same application name "ElectriaHRM" from your phone and execute the command again. The application should be installed on your phone.
