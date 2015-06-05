@@ -28,18 +28,13 @@ package electria.electriahrm;
         import android.bluetooth.BluetoothAdapter;
         import android.bluetooth.BluetoothDevice;
         import android.bluetooth.BluetoothManager;
-        import android.content.BroadcastReceiver;
-        import android.content.ComponentName;
         import android.content.Context;
         import android.content.Intent;
         import android.content.IntentFilter;
-        import android.content.ServiceConnection;
         import android.content.pm.PackageManager;
         import android.graphics.Color;
         import android.os.Bundle;
         import android.os.Handler;
-        import android.os.IBinder;
-        import android.os.Message;
         import android.util.Log;
         import android.view.Gravity;
         import android.view.LayoutInflater;
@@ -64,7 +59,6 @@ public class DeviceListActivity extends Activity {
 
     List<BluetoothDevice> deviceList;
     private DeviceAdapter deviceAdapter;
-    private ServiceConnection onService = null;
     Map<String, Integer> devRssiValues;
     private static final long SCAN_PERIOD = 10000; //10 seconds
     private Handler mHandler;
@@ -228,7 +222,6 @@ public class DeviceListActivity extends Activity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            //BluetoothDevice device = deviceList.get(position);
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
             Bundle b = new Bundle();
@@ -318,8 +311,5 @@ public class DeviceListActivity extends Activity {
             }
             return vg;
         }
-    }
-    private void showMessage(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }

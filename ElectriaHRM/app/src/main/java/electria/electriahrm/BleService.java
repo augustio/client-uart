@@ -56,7 +56,6 @@ public class BleService extends Service {
     private BluetoothGattCharacteristic mRXCharacteristic;
     private BluetoothGattCharacteristic mTXCharacteristic;
     private BluetoothGattCharacteristic mHRMCharacteristic;
-    private BluetoothGattCharacteristic mTempCharacteristic;
     private int mConnectionState = STATE_DISCONNECTED;
     private Handler mHandler = new Handler();
 
@@ -92,8 +91,6 @@ public class BleService extends Service {
     private final static UUID RX_CHAR_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
     private final static UUID BATTERY_SERVICE_UUID = UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb");
     private final static UUID BATTERY_LEVEL_CHAR_UUID = UUID.fromString("00002A19-0000-1000-8000-00805f9b34fb");
-    private final static UUID HT_SERVICE_UUID = UUID.fromString("00001809-0000-1000-8000-00805f9b34fb");
-    private final static UUID HT_MEASUREMENT_CHARACTERISTIC_UUID = UUID.fromString("00002A1C-0000-1000-8000-00805f9b34fb");
     private final static UUID HR_SERVICE_UUID = UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb");
     private static final UUID HRM_CHARACTERISTIC_UUID = UUID.fromString("00002A37-0000-1000-8000-00805f9b34fb");
     private static final UUID ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID = UUID.fromString("00002A38-0000-1000-8000-00805f9b34fb");
@@ -109,15 +106,15 @@ public class BleService extends Service {
                 intentAction = ACTION_GATT_CONNECTED;
                 mConnectionState = STATE_CONNECTED;
                 broadcastUpdate(intentAction);
-                Log.i(TAG, "Connected to GATT server.");
+                Log.d(TAG, "Connected to GATT server.");
                 // Attempts to discover services after successful connection.
-                Log.i(TAG, "Attempting to start service discovery:" +
+                Log.d(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
-                Log.i(TAG, "Disconnected from GATT server.");
+                Log.d(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
         }
@@ -125,7 +122,7 @@ public class BleService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.w(TAG, "mBluetoothGatt = " + mBluetoothGatt);
+                Log.d(TAG, "mBluetoothGatt = " + mBluetoothGatt);
                 List<BluetoothGattService> services = gatt.getServices();
                 for (BluetoothGattService service : services) {
                     if (service.getUuid().equals(UART_SERVICE_UUID)) {
@@ -140,8 +137,6 @@ public class BleService extends Service {
                         mBatteryCharacteristic = service.getCharacteristic(BATTERY_LEVEL_CHAR_UUID);
                         //Start reading battery characteristic every minute
                         mReadBatteryLevel.run();
-                    } else if (service.getUuid().equals(HT_SERVICE_UUID)) {
-                        mTempCharacteristic = service.getCharacteristic(HT_MEASUREMENT_CHARACTERISTIC_UUID);
                     }
                 }
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
@@ -175,7 +170,6 @@ public class BleService extends Service {
                 broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic.getStringValue(0));
             }
             else if (characteristic.getUuid().equals(HRM_CHARACTERISTIC_UUID)) {
-                Log.e(TAG, "Heart Rate Read");
                 int hrValue = 0;
                 if (isHeartRateInUINT16(characteristic.getValue()[0])) {
                     hrValue = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 1);
@@ -199,13 +193,8 @@ public class BleService extends Service {
         @Override
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
             if(status == BluetoothGatt.GATT_SUCCESS){
-                Log.i(TAG, "Descriptor written");
                 if(descriptor.getCharacteristic().getUuid().equals(RX_CHAR_UUID)) {
-                    Log.e(TAG, "RX Descriptor written");
                     enableHRNotification();
-                }
-                else if(descriptor.getCharacteristic().getUuid().equals(HRM_CHARACTERISTIC_UUID)) {
-                    Log.e(TAG, "HR Descriptor written");
                 }
             }
         }
@@ -350,7 +339,7 @@ public class BleService extends Service {
             return;
         }
         mBluetoothGatt.close();
-        Log.w(TAG, "mBluetoothGatt closed");
+        Log.d(TAG, "mBluetoothGatt closed");
         mBluetoothGatt = null;
         mBluetoothDeviceAddress = null;
         mHandler.removeCallbacks(mReadBatteryLevel);
@@ -369,7 +358,7 @@ public class BleService extends Service {
             Log.d(TAG, "Read char - status=" + status);
         }
         else if(characteristic == null){
-            showMessage("Charateristic not found!");
+            Log.e(TAG, "Charateristic not found!");
             broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
         }
     }
@@ -395,7 +384,7 @@ public class BleService extends Service {
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
         }else if(mRXCharacteristic == null){
-            showMessage("Charateristic not found!");
+            Log.e(TAG, "Charateristic not found!");
             broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
         }
     }
@@ -408,7 +397,7 @@ public class BleService extends Service {
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
         }else if(mHRMCharacteristic == null){
-            showMessage("Charateristic not found!");
+            Log.e(TAG, "Charateristic not found!");
         }
     }
 
@@ -420,7 +409,7 @@ public class BleService extends Service {
             Log.d(TAG, "write TXchar - status=" + status);
         }
         else if(mTXCharacteristic == null){
-            showMessage("Charateristic not found!");
+            Log.e(TAG, "Charateristic not found!");
             broadcastUpdate(DEVICE_DOES_NOT_SUPPORT_UART);
         }
     }
@@ -432,10 +421,6 @@ public class BleService extends Service {
         if ((value & FIRST_BITMASK) != 0)
             return true;
         return false;
-    }
-
-    private void showMessage(String msg) {
-        Log.e(TAG, msg);
     }
 
 }

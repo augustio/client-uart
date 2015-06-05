@@ -56,9 +56,12 @@ public class MainActivity extends Activity {
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
     private static final int DEFAULT_BATTERY_LEVEL = 0;
-    private static final long MAX_DATA_RECORDING_TIME = 3600;//3600 seconds (One hour)
-    private static final int AVERAGE_COLLECTION_SIZE = 5000;//
-    private static final int DATA_SAVING_INTERVAL = 60000;//
+    private static final long MAX_DATA_RECORDING_TIME = 3600;//One hour (3600 seconds)
+    private static final int AVERAGE_COLLECTION_SIZE = 5000;//Five thousand ECG values
+    private static final int DATA_SAVING_INTERVAL = 60000;//One minute (60000 milliseconds)
+    private static final int SECONDS_IN_ONE_MINUTE = 60;
+    private static final int SECONDS_IN_ONE_HOUR = 3600;
+    private static final int ONE_SECOND = 1000;// 1000 milliseconds in one second
 
     private boolean showGraph;
     private boolean graphViewActive;
@@ -78,7 +81,6 @@ public class MainActivity extends Activity {
     private int recordTimerCounter, min, sec, hour;
     private BleService mService;
     private int mState;
-    private int mHeartRate;
     private String fileName;
     private String timerString;
     private String sensorPosition;
@@ -185,7 +187,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Handle Plot Graph button
+        // Handle Show Graph button
         btnShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,7 +223,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Handle Record button
+        // Handle History button
         btnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -303,7 +305,7 @@ public class MainActivity extends Activity {
         ((TextView) findViewById(R.id.deviceName)).setText(R.string.no_device);
     }
 
-    //UART service connected/disconnected
+    //BLE service connected/disconnected
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder rawBinder) {
             mService = ((BleService.LocalBinder) rawBinder).getService();
@@ -315,12 +317,11 @@ public class MainActivity extends Activity {
         }
 
         public void onServiceDisconnected(ComponentName classname) {
-            ////     mService.disconnect(mDevice);
             mService = null;
         }
     };
 
-    private final BroadcastReceiver UARTStatusChangeReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver BLEStatusChangeReceiver = new BroadcastReceiver() {
 
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -328,7 +329,7 @@ public class MainActivity extends Activity {
             if (action.equals(BleService.ACTION_GATT_CONNECTED)) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Log.d(TAG, "UART_CONNECT_MSG");
+                        Log.d(TAG, "CONNECT_MSG");
                         btnConnectDisconnect.setText("Disconnect");
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.red));
                         edtMessage.setHint(R.string.text_hint);
@@ -361,7 +362,6 @@ public class MainActivity extends Activity {
                 String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
                 if (rxString != null){
                     String [] ECGData = rxString.split("-");
-                    //Log.d(TAG, "Packet Recieved: " +ECGData[0] + "---" + ECGData[1]);
                     if(dataRecording) {
                         collection.add(ECGData[0]);
                         collection.add(ECGData[1]);
@@ -406,7 +406,7 @@ public class MainActivity extends Activity {
         Intent bindIntent = new Intent(this, BleService.class);
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
+        LocalBroadcastManager.getInstance(this).registerReceiver(BLEStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
     private void startRecordingData(){
@@ -494,27 +494,27 @@ public class MainActivity extends Activity {
     private Runnable mRecordTimer = new Runnable() {
         @Override
         public void run() {
-            if(recordTimerCounter < 60){
+            if(recordTimerCounter < SECONDS_IN_ONE_MINUTE){
                 sec = recordTimerCounter;
             }
-            else if(recordTimerCounter < 3600){
-                min = recordTimerCounter/60;
-                sec = recordTimerCounter%60;
+            else if(recordTimerCounter < SECONDS_IN_ONE_HOUR){
+                min = recordTimerCounter/SECONDS_IN_ONE_MINUTE;
+                sec = recordTimerCounter%SECONDS_IN_ONE_MINUTE;
             }
             else{
-                hour = recordTimerCounter/3600;
-                min = (recordTimerCounter%3600)/60;
-                min = (recordTimerCounter%3600)%60;
+                hour = recordTimerCounter/SECONDS_IN_ONE_HOUR;
+                min = (recordTimerCounter%SECONDS_IN_ONE_HOUR)/SECONDS_IN_ONE_MINUTE;
+                min = (recordTimerCounter%SECONDS_IN_ONE_HOUR)%SECONDS_IN_ONE_MINUTE;
             }
             updateTimer();
             if(recordTimerCounter == MAX_DATA_RECORDING_TIME) {
                 stopRecordingData();
                 return;
             }
-            if((MAX_DATA_RECORDING_TIME - recordTimerCounter) <=10)
+            if((MAX_DATA_RECORDING_TIME - recordTimerCounter) <=10)//Ten seconds to the end of timer
                 ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.green));
             recordTimerCounter++;
-            mHandler.postDelayed(mRecordTimer, 1000);
+            mHandler.postDelayed(mRecordTimer, ONE_SECOND);
         }
     };
 
@@ -552,7 +552,7 @@ public class MainActivity extends Activity {
         super.onDestroy();
         Log.d(TAG, "onDestroy()");
         try {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(UARTStatusChangeReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(BLEStatusChangeReceiver);
         } catch (Exception ignore) {
             Log.e(TAG, ignore.toString());
         }
@@ -615,12 +615,12 @@ public class MainActivity extends Activity {
             case REQUEST_ENABLE_BT:
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(this, "Bluetooth has turned on ", Toast.LENGTH_SHORT).show();
+                   showMessage("Bluetooth has turned on ");
 
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");
-                    Toast.makeText(this, "Problem in BT Turning ON ", Toast.LENGTH_SHORT).show();
+                    showMessage("Problem in BT Turning ON ");
                     finish();
                 }
                 break;
