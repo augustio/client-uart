@@ -460,16 +460,13 @@ public class MainActivity extends Activity {
                 fw.close();
                 collection.clear();
                 showMessage("Saved ECG data to SD card");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Log.i(TAG, "******* File not found. Did you" +
-                        " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, e.toString());
+                showMessage("Problem writing to Storage");
             }
         }
         else
-            Log.w(TAG, "External storage not writable");
+            showMessage("Cannot write to storage");
     }
 
     /* Checks if external storage is available for read and write */
