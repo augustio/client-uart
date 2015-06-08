@@ -5,20 +5,24 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.achartengine.GraphicalView;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class HistoryDetail extends Activity {
 
     private static final String TAG = HistoryDetail.class.getSimpleName();
-    private static final int MAX_DATA_TO_DISPLAY = 4000; //Max data to show on graph
+    private static final int MAX_DATA_TO_DISPLAY = 5000; //Max data to show on graph
     private static final int X_RANGE = 500;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
@@ -26,20 +30,25 @@ public class HistoryDetail extends Activity {
     private LineGraphView mLineGraph;
     private ViewGroup historyViewLayout;
     private String filePath;
-    private int mCounter;
+    private int mCounter, mCollectionIndex;
+    private Handler mHandler;
+    private List<String> mCollection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
+        mCollection = new ArrayList<String>();
+        mHandler = new Handler();
         setGraphView();
-        mCounter = 0;
+        mCounter = mCollectionIndex = 0;
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finish();
         }
         filePath = extras.getString(Intent.EXTRA_TEXT);
         readFromDisk(filePath);
+        mDisplayGraph.run();//Initiate graph display and update
     }
 
     //Prepare the initial GUI for graph
@@ -51,22 +60,19 @@ public class HistoryDetail extends Activity {
     }
 
     //Read data from phone storage
-    private void readFromDisk(String fName) {
+    private void readFromDisk(final String fName) {
         if (isExternalStorageReadable()) {
-            File root = android.os.Environment.getExternalStorageDirectory();
             try {
+                File root = android.os.Environment.getExternalStorageDirectory();
                 BufferedReader buf = new BufferedReader(new FileReader(root.getAbsolutePath() + fName));
-                String readString = buf.readLine ( ) ;
-                while ( readString != null && mCounter < MAX_DATA_TO_DISPLAY ) {
-                   updateGraph(Integer.parseInt(readString));
-                    readString = buf.readLine ( ) ;
-                }
+                while ( mCollection.add(buf.readLine()) && mCollection.size() < MAX_DATA_TO_DISPLAY );
                 buf.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, e.toString());
+                showMessage("Problem reading from Storage");
             }
         } else
-            Log.w(TAG, "External storage not readable");
+            showMessage("Cannot read from storage");
     }
 
     /* Checks if external storage is available to at least read */
@@ -79,13 +85,31 @@ public class HistoryDetail extends Activity {
         return false;
     }
 
-    //Plot a new set of values on the graph and present on the GUI
-    private void updateGraph(int value){
-        double maxX = mCounter;
+    //Updates graph every millisecond with values in the collection
+    private Runnable mDisplayGraph = new Runnable() {
+        @Override
+        public void run() {
+            String value;
+            if (mCollectionIndex < mCollection.size() &&
+                    (value = mCollection.get(mCollectionIndex)) != null) {
+                updateGraph(Integer.parseInt(value));
+                mCollectionIndex++;
+                mHandler.post(mDisplayGraph);
+            }
+        }
+    };
+
+    //Add a point to the graph
+    private void updateGraph(final int value){
+        double maxX = mCounter+1;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
         mLineGraph.addValue(new Point(mCounter, value));
         mGraphView.repaint();
-        mCounter += 2;
+        mCounter ++;
+    }
+
+    private void showMessage(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }
