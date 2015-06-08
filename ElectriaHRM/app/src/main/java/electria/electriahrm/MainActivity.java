@@ -193,13 +193,12 @@ public class MainActivity extends Activity {
                 setSensorPosition(sensorPosition);
                 if (mState == CONNECTED) {
                     if (showGraph) {
-                        showGraph = false;
-                        btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
+                        clearGraph();
                         btnShow.setText("Show");
                     }else{
+                        setGraphView();
                         showGraph = true;
-                        btnShow.setBackgroundColor(getResources().getColor(R.color.yellow));
-                        btnShow.setText("Pause");
+                        btnShow.setText("Stop");
                     }
                 }
             }
@@ -337,7 +336,6 @@ public class MainActivity extends Activity {
                         btnStore.setLayoutParams(param_enable);
                         btnHistory.setLayoutParams(param_disable);
                         ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "- Connected");
-                        setGraphView();
                         mState = CONNECTED;
                     }
                 });
