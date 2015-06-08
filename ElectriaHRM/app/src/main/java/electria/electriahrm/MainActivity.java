@@ -251,7 +251,7 @@ public class MainActivity extends Activity {
         mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
         mLineGraph.addValue(new Point(mCounter, ecg));
         mGraphView.repaint();
-        mCounter += 2;
+        mCounter ++;
     }
 
     private void updateBatteryLevel(int level) {
