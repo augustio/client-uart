@@ -53,8 +53,8 @@ public class MainActivity extends Activity {
     private static final int DISCONNECTED = 21;
     private static final int CONNECTING = 22;
     private static final int X_RANGE = 500;
-    private static final int MIN_Y = 0;//Minimum ECG data value
-    private static final int MAX_Y = 1023;//Maximum ECG data value
+    private static final int MIN_Y = 200;//Minimum ECG data value
+    private static final int MAX_Y = 700;//Maximum ECG data value
     private static final long MAX_DATA_RECORDING_TIME = 3600;//One hour (3600 seconds)
     private static final int AVERAGE_COLLECTION_SIZE = 5000;//Five thousand ECG values
     private static final int DATA_SAVING_INTERVAL = 60000;//One minute (60000 milliseconds)
@@ -245,7 +245,7 @@ public class MainActivity extends Activity {
 
     //Plot a new set of values on the graph and present on the GUI
     private void updateGraph(int value) {
-        final int ecg = value;
+        final int ecg = (value<=MAX_Y && value>=MIN_Y)? value: MAX_Y;
         double maxX = mCounter;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
