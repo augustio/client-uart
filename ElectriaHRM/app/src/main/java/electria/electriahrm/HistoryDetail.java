@@ -3,14 +3,18 @@ package electria.electriahrm;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import org.achartengine.GraphicalView;
+import org.apache.http.protocol.HTTP;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,6 +33,7 @@ public class HistoryDetail extends Activity {
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
     private ViewGroup historyViewLayout;
+    private Button btnSend;
     private String filePath;
     private int mCounter, mCollectionIndex;
     private Handler mHandler;
@@ -39,6 +44,7 @@ public class HistoryDetail extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
         mCollection = new ArrayList<String>();
+        btnSend = (Button)findViewById(R.id.send_data);
         mHandler = new Handler();
         setGraphView();
         mCounter = mCollectionIndex = 0;
@@ -47,8 +53,15 @@ public class HistoryDetail extends Activity {
             finish();
         }
         filePath = extras.getString(Intent.EXTRA_TEXT);
-        readFromDisk(filePath);
+        readFromDisk();
         mDisplayGraph.run();//Initiate graph display and update
+
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    sendAttachment();
+            }
+        });
     }
 
     //Prepare the initial GUI for graph
@@ -60,11 +73,11 @@ public class HistoryDetail extends Activity {
     }
 
     //Read data from phone storage
-    private void readFromDisk(final String fName) {
+    private void readFromDisk() {
         if (isExternalStorageReadable()) {
             try {
-                File root = android.os.Environment.getExternalStorageDirectory();
-                BufferedReader buf = new BufferedReader(new FileReader(root.getAbsolutePath() + fName));
+                filePath = android.os.Environment.getExternalStorageDirectory().getAbsolutePath()+filePath;
+                BufferedReader buf = new BufferedReader(new FileReader(filePath));
                 while ( mCollection.add(buf.readLine()) && mCollection.size() < MAX_DATA_TO_DISPLAY );
                 buf.close();
             } catch (Exception e) {
@@ -100,13 +113,30 @@ public class HistoryDetail extends Activity {
     };
 
     //Add a point to the graph
-    private void updateGraph(final int value){
+    private void updateGraph(int value){
         double maxX = mCounter+1;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
         mLineGraph.addValue(new Point(mCounter, value));
         mGraphView.repaint();
         mCounter ++;
+    }
+
+    //Send ECG data as attachment to a specified Email address
+    private void sendAttachment(){
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECG Data");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Attached is a copy of ECG samples");
+        emailIntent.setData(Uri.parse("mailto:electria.metropolia@gmail.com"));
+        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse( "file://"+filePath));
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Sending Email...."));
+        }catch (android.content.ActivityNotFoundException ex) {
+            showMessage("No email clients installed.");
+        }
+        finish();
     }
 
     private void showMessage(String msg) {

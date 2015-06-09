@@ -481,7 +481,7 @@ public class MainActivity extends Activity {
     private String getFileName(){
         String fN;
         Random rand = new Random(System.currentTimeMillis());
-        fN = "ECG_"+rand.nextInt(1000);
+        fN = "ECG_"+rand.nextInt(1000)+".txt";
         return fN;
     }
 
