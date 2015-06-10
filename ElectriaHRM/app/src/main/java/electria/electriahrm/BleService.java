@@ -63,6 +63,8 @@ public class BleService extends Service {
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
+    private static final int ONE_SECOND = 1000;
+    private static final int ONE_MINUTE = 60000;
 
     public final static String ACTION_GATT_CONNECTED =
             "electria.electriahrm.ACTION_GATT_CONNECTED";
@@ -205,9 +207,9 @@ public class BleService extends Service {
         public void run() {
             if (mBluetoothGatt != null && mBatteryCharacteristic != null) {
                 if(!mBluetoothGatt.readCharacteristic(mBatteryCharacteristic))
-                    readBatteryInterval = 1000;//One second
+                    readBatteryInterval = ONE_SECOND;
                 else
-                    readBatteryInterval = 60000;//One minute
+                    readBatteryInterval = ONE_MINUTE;
                 mHandler.postDelayed(mReadBatteryLevel, readBatteryInterval);
             }
         }
