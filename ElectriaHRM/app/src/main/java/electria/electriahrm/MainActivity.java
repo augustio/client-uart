@@ -243,15 +243,21 @@ public class MainActivity extends Activity {
         graphViewActive = true;
     }
 
-    //Plot a new set of values on the graph and present on the GUI
-    private void updateGraph(int value) {
-        final int ecg = (value<=MAX_Y && value>=MIN_Y)? value: MAX_Y;
+    //Plot a new set of two ECG values on the graph and present on the GUI
+    private void updateGraph(int value1, int value2) {
         double maxX = mCounter;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
-        mLineGraph.addValue(new Point(mCounter, ecg));
+        mLineGraph.addValue(new Point(mCounter, (value1<=MAX_Y && value1>=MIN_Y)? value1: MAX_Y));
+        mLineGraph.addValue(new Point(++mCounter, (value2<=MAX_Y && value2>=MIN_Y)? value2: MAX_Y));
         mGraphView.repaint();
         mCounter ++;
+    }
+
+    //Add a set of two ECG values to collection buffer
+    private void recordData(String value1, String value2){
+        collection.add(value1);
+        collection.add(value2);
     }
 
     private void updateBatteryLevel(int level) {
@@ -360,12 +366,10 @@ public class MainActivity extends Activity {
                 if (rxString != null){
                     String [] ECGData = rxString.split("-");
                     if(dataRecording) {
-                        collection.add(ECGData[0]);
-                        collection.add(ECGData[1]);
+                        recordData(ECGData[0], ECGData[1]);
                     }
                     if(showGraph) {
-                        updateGraph(Integer.parseInt(ECGData[0]));
-                        updateGraph(Integer.parseInt(ECGData[1]));
+                        updateGraph(Integer.parseInt(ECGData[0]), Integer.parseInt(ECGData[1]));
                     }
                 }
             }
