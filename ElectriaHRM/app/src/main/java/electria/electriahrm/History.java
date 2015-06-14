@@ -45,8 +45,10 @@ public class History extends Activity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+            String fn = listAdapter.getItem(position);//Get file name from list adapter
+            fn = fn.substring(0, fn.indexOf('\n'));//File name is followed by a new line character
             String filePath = android.os.Environment.getExternalStorageDirectory()+
-                    directoryName+"/"+listAdapter.getItem(position);
+                    directoryName+"/"+fn;
             Intent intent = new Intent(History.this, HistoryDetail.class);
             intent.putExtra(Intent.EXTRA_TEXT, filePath);
             startActivity(intent);
@@ -59,20 +61,18 @@ public class History extends Activity {
             File root = android.os.Environment.getExternalStorageDirectory();
             File dir = new File (root.getAbsolutePath() + dirName);
             if(!dir.exists()) {
-                Toast toast = Toast.makeText(this, "No ECG file saved", Toast.LENGTH_SHORT);
-                toast.show();
+                showMessage("No ECG file saved");
                 return;
             }
             else{
                 for (File f : dir.listFiles()) {
                     if (f.isFile())
-                        listAdapter.add(f.getName());
+                        listAdapter.add(f.getName()+"\n"+getFileSize(f.length()));
                 }
             }
         }
         else {
-            Log.w(TAG, "External storage not readable");
-            return;
+            showMessage("Cannot read from storage");
         }
     }
 
@@ -84,5 +84,26 @@ public class History extends Activity {
             return true;
         }
         return false;
+    }
+
+    private String getFileSize(double len){
+        String size;
+        if(len <1000){
+            size = len+"B";
+        }
+        else if(len < 1e+6){
+            size = String.format("%.3f", (len/1000))+"KB";
+        }
+        else if(len < 1e+9){
+            size = String.format("%.3f", (len/1e+6))+"MB";
+        }
+        else{
+            size = String.format("%.3f", (len/1e+9))+"GB";
+        }
+        return size;
+    }
+
+    private void showMessage(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }
