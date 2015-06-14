@@ -58,8 +58,8 @@ public class MainActivity extends Activity {
     private static final int DISCONNECTED = 21;
     private static final int CONNECTING = 22;
     private static final int X_RANGE = 500;
-    private static final int MIN_Y = 200;//Minimum ECG data value
-    private static final int MAX_Y = 700;//Maximum ECG data value
+    private static final int MIN_Y = 0;//Minimum ECG data value
+    private static final int MAX_Y = 1023;//Maximum ECG data value
     private static final long MAX_DATA_RECORDING_TIME = 3600;//One hour (3600 seconds)
     private static final int AVERAGE_COLLECTION_SIZE = 5000;//Five thousand ECG values
     private static final int DATA_SAVING_INTERVAL = 60000;//One minute (60000 milliseconds)
@@ -243,6 +243,7 @@ public class MainActivity extends Activity {
     //Prepare the initial GUI for graph
     private void setGraphView() {
         mLineGraph = LineGraphView.getLineGraphView();
+        mLineGraph.setYRange(MIN_Y, MAX_Y);
         mGraphView = mLineGraph.getView(this);
         mainLayout = (ViewGroup) findViewById(R.id.graph_layout);
         mainLayout.addView(mGraphView);
@@ -253,7 +254,7 @@ public class MainActivity extends Activity {
     private void updateGraph(int value1, int value2) {
         double maxX = mCounter;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-        mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
+        mLineGraph.setXRange(minX, maxX);
         mLineGraph.addValue(new Point(mCounter, (value1 <= MAX_Y && value1 >= MIN_Y) ? value1 : MAX_Y));
         mLineGraph.addValue(new Point(++mCounter, (value2<=MAX_Y && value2>=MIN_Y)? value2: MAX_Y));
         mGraphView.repaint();

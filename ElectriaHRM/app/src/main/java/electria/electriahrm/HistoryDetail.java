@@ -77,6 +77,7 @@ public class HistoryDetail extends Activity {
     //Prepare the initial GUI for graph
     private void setGraphView() {
         mLineGraph = new LineGraphView();
+        mLineGraph.setYRange(MIN_Y, MAX_Y);
         mGraphView = mLineGraph.getView(this);
         historyViewLayout = (ViewGroup) findViewById(R.id.history_detail);
         historyViewLayout.addView(mGraphView);
@@ -135,7 +136,7 @@ public class HistoryDetail extends Activity {
     private void updateGraph(int value){
         double maxX = mCounter+1;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-        mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
+        mLineGraph.setXRange(minX, maxX);
         mLineGraph.addValue(new Point(mCounter, value));
         mGraphView.repaint();
         mCounter ++;
