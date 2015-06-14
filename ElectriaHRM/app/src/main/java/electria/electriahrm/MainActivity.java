@@ -126,7 +126,8 @@ public class MainActivity extends Activity {
 
         collection = new ArrayList<String>();
         mCounter = lastBatLevel = 0;
-        recordTimerCounter = min = sec =  hr = 0;
+        recordTimerCounter = 1;
+        min = sec =  hr = 0;
         fileName = null;
         mService = null;
         mDevice = null;
@@ -459,6 +460,10 @@ public class MainActivity extends Activity {
                 FileWriter fw = new FileWriter(file, true);
                 String str = Arrays.toString(collection.toArray(new String[collection.size()]));
                 str = str.substring(1, str.length()-1).replaceAll("\\s+","").replaceAll(",", "\n");
+                if(str.isEmpty() || str.length() <= 0){
+                    showMessage("No data recorded");
+                    return;
+                }
                 fw.append(str+"\n");
                 fw.flush();
                 fw.close();
@@ -490,32 +495,33 @@ public class MainActivity extends Activity {
     private Runnable mRecordTimer = new Runnable() {
         @Override
         public void run() {
-            if(recordTimerCounter < SECONDS_IN_ONE_MINUTE){
-                sec = recordTimerCounter;
+            if(!collection.isEmpty()) {
+                if (recordTimerCounter < SECONDS_IN_ONE_MINUTE) {
+                    sec = recordTimerCounter;
+                } else if (recordTimerCounter < SECONDS_IN_ONE_HOUR) {
+                    min = recordTimerCounter / SECONDS_IN_ONE_MINUTE;
+                    sec = recordTimerCounter % SECONDS_IN_ONE_MINUTE;
+                } else {
+                    hr = recordTimerCounter / SECONDS_IN_ONE_HOUR;
+                    min = (recordTimerCounter % SECONDS_IN_ONE_HOUR) / SECONDS_IN_ONE_MINUTE;
+                    min = (recordTimerCounter % SECONDS_IN_ONE_HOUR) % SECONDS_IN_ONE_MINUTE;
+                }
+                updateTimer();
+                if (recordTimerCounter == MAX_DATA_RECORDING_TIME) {
+                    stopRecordingData();
+                    return;
+                }
+                if ((MAX_DATA_RECORDING_TIME - recordTimerCounter) <= 10)//Ten seconds to the end of timer
+                    ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.green));
+                recordTimerCounter++;
             }
-            else if(recordTimerCounter < SECONDS_IN_ONE_HOUR){
-                min = recordTimerCounter/SECONDS_IN_ONE_MINUTE;
-                sec = recordTimerCounter%SECONDS_IN_ONE_MINUTE;
-            }
-            else{
-                hr = recordTimerCounter/SECONDS_IN_ONE_HOUR;
-                min = (recordTimerCounter%SECONDS_IN_ONE_HOUR)/SECONDS_IN_ONE_MINUTE;
-                min = (recordTimerCounter%SECONDS_IN_ONE_HOUR)%SECONDS_IN_ONE_MINUTE;
-            }
-            updateTimer();
-            if(recordTimerCounter == MAX_DATA_RECORDING_TIME) {
-                stopRecordingData();
-                return;
-            }
-            if((MAX_DATA_RECORDING_TIME - recordTimerCounter) <=10)//Ten seconds to the end of timer
-                ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.green));
-            recordTimerCounter++;
             mHandler.postDelayed(mRecordTimer, ONE_SECOND);
         }
     };
 
     private void refreshTimer(){
-        recordTimerCounter = hr = min = sec = 0;
+        recordTimerCounter = 1;
+        hr = min = sec = 0;
         ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.red));
     }
 

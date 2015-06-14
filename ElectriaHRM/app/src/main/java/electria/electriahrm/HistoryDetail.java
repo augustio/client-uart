@@ -38,6 +38,7 @@ public class HistoryDetail extends Activity {
     private int mCounter, mCollectionIndex;
     private Handler mHandler;
     private List<String> mCollection;
+    private boolean isFileEmpty, isFileFormatInvalid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +49,21 @@ public class HistoryDetail extends Activity {
         mHandler = new Handler();
         setGraphView();
         mCounter = mCollectionIndex = 0;
+        isFileEmpty = isFileFormatInvalid = false;
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finish();
         }
         filePath = extras.getString(Intent.EXTRA_TEXT);
         readFromDisk();
+        if(isFileEmpty){
+            showMessage("Empty File");
+            finish();
+        }
+        if(isFileFormatInvalid){
+            showMessage("Invalid File Format");
+            finish();
+        }
         mDisplayGraph.run();//Initiate graph display and update
 
         btnSend.setOnClickListener(new View.OnClickListener() {
@@ -75,15 +85,15 @@ public class HistoryDetail extends Activity {
     //Read data from phone storage
     private void readFromDisk() {
         if(!filePath.endsWith(("txt"))){
-            showMessage("Wrong file format");
-            finish();
+            isFileFormatInvalid = true;
+            return;
         }
         if (isExternalStorageReadable()) {
             try {
                 File f = new File(filePath);
-                if(f.length() <= 0) {
-                    showMessage("Empty file");
-                    finish();
+                if(f.length() <= Character.SIZE) {
+                    isFileEmpty = true;
+                    return;
                 }
                 BufferedReader buf = new BufferedReader(new FileReader(f));
                 while ( mCollection.add(buf.readLine()) && mCollection.size() < MAX_DATA_TO_DISPLAY );
