@@ -5,9 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -77,7 +82,7 @@ public class MainActivity extends Activity {
 
     private int mCounter;
     private int lastBatLevel;
-    private int recordTimerCounter, min, sec, hour;
+    private int recordTimerCounter, min, sec, hr;
     private BleService mService;
     private int mState;
     private String fileName;
@@ -121,7 +126,7 @@ public class MainActivity extends Activity {
 
         collection = new ArrayList<String>();
         mCounter = lastBatLevel = 0;
-        recordTimerCounter = min = sec =  hour = 0;
+        recordTimerCounter = min = sec =  hr = 0;
         fileName = null;
         mService = null;
         mDevice = null;
@@ -248,7 +253,7 @@ public class MainActivity extends Activity {
         double maxX = mCounter;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setRange(minX, maxX, MIN_Y, MAX_Y);
-        mLineGraph.addValue(new Point(mCounter, (value1<=MAX_Y && value1>=MIN_Y)? value1: MAX_Y));
+        mLineGraph.addValue(new Point(mCounter, (value1 <= MAX_Y && value1 >= MIN_Y) ? value1 : MAX_Y));
         mLineGraph.addValue(new Point(++mCounter, (value2<=MAX_Y && value2>=MIN_Y)? value2: MAX_Y));
         mGraphView.repaint();
         mCounter ++;
@@ -445,16 +450,11 @@ public class MainActivity extends Activity {
             if(!dir.isDirectory())
                 dir.mkdirs();
             File file;
-            if(fName == null) {//Get a unique fileName
-                do {
-                    fName = getFileName();
-                    file = new File(dir, fName);
-                } while (file.exists());
+            if(fName == null) {
+                fName = getFileName();
                 fileName = fName;
             }
-            else{
-                file = new File(dir, fName);
-            }
+            file = new File(dir, fName);
             try {
                 FileWriter fw = new FileWriter(file, true);
                 String str = Arrays.toString(collection.toArray(new String[collection.size()]));
@@ -483,10 +483,8 @@ public class MainActivity extends Activity {
     }
 
     private String getFileName(){
-        String fN;
-        Random rand = new Random(System.currentTimeMillis());
-        fN = "ECG_"+rand.nextInt(1000)+".txt";
-        return fN;
+        String currentTime = new SimpleDateFormat("yyMMddHHmmss", Locale.US).format(new Date());
+        return mBtAdapter.getName()+"_"+currentTime+".txt";
     }
 
     private Runnable mRecordTimer = new Runnable() {
@@ -500,7 +498,7 @@ public class MainActivity extends Activity {
                 sec = recordTimerCounter%SECONDS_IN_ONE_MINUTE;
             }
             else{
-                hour = recordTimerCounter/SECONDS_IN_ONE_HOUR;
+                hr = recordTimerCounter/SECONDS_IN_ONE_HOUR;
                 min = (recordTimerCounter%SECONDS_IN_ONE_HOUR)/SECONDS_IN_ONE_MINUTE;
                 min = (recordTimerCounter%SECONDS_IN_ONE_HOUR)%SECONDS_IN_ONE_MINUTE;
             }
@@ -517,12 +515,12 @@ public class MainActivity extends Activity {
     };
 
     private void refreshTimer(){
-        recordTimerCounter = hour = min = sec = 0;
+        recordTimerCounter = hr = min = sec = 0;
         ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.red));
     }
 
     private void updateTimer(){
-        timerString = timerString.format("%02d:%02d:%02d", hour,min,sec);
+        timerString = timerString.format("%02d:%02d:%02d", hr,min,sec);
         ((TextView) findViewById(R.id.timer_view)).setText(timerString);
     }
 
