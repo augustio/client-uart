@@ -45,7 +45,8 @@ public class History extends Activity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-            String filePath = directoryName+"/"+listAdapter.getItem(position);
+            String filePath = android.os.Environment.getExternalStorageDirectory()+
+                    directoryName+"/"+listAdapter.getItem(position);
             Intent intent = new Intent(History.this, HistoryDetail.class);
             intent.putExtra(Intent.EXTRA_TEXT, filePath);
             startActivity(intent);

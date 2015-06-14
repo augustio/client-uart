@@ -74,10 +74,18 @@ public class HistoryDetail extends Activity {
 
     //Read data from phone storage
     private void readFromDisk() {
+        if(!filePath.endsWith(("txt"))){
+            showMessage("Wrong file format");
+            finish();
+        }
         if (isExternalStorageReadable()) {
             try {
-                filePath = android.os.Environment.getExternalStorageDirectory().getAbsolutePath()+filePath;
-                BufferedReader buf = new BufferedReader(new FileReader(filePath));
+                File f = new File(filePath);
+                if(f.length() <= 0) {
+                    showMessage("Empty file");
+                    finish();
+                }
+                BufferedReader buf = new BufferedReader(new FileReader(f));
                 while ( mCollection.add(buf.readLine()) && mCollection.size() < MAX_DATA_TO_DISPLAY );
                 buf.close();
             } catch (Exception e) {
@@ -105,7 +113,8 @@ public class HistoryDetail extends Activity {
             String value;
             if (mCollectionIndex < mCollection.size() &&
                     (value = mCollection.get(mCollectionIndex)) != null) {
-                updateGraph(Integer.parseInt(value));
+                if(android.text.TextUtils.isDigitsOnly(value))
+                    updateGraph(Integer.parseInt(value));
                 mCollectionIndex++;
                 mHandler.post(mDisplayGraph);
             }
