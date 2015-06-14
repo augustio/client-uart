@@ -92,13 +92,13 @@ public class History extends Activity {
             size = len+"B";
         }
         else if(len < 1e+6){
-            size = String.format("%.3f", (len/1000))+"KB";
+            size = String.format("%.2f", (len/1024))+"KB";
         }
         else if(len < 1e+9){
-            size = String.format("%.3f", (len/1e+6))+"MB";
+            size = String.format("%.2f", (len/1.049e+6))+"MB";
         }
         else{
-            size = String.format("%.3f", (len/1e+9))+"GB";
+            size = String.format("%.2f", (len/1.074e+9))+"GB";
         }
         return size;
     }
