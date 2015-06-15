@@ -56,9 +56,7 @@ public class MainActivity extends Activity {
     private static final int X_RANGE = 500;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
-    private static final long MAX_DATA_RECORDING_TIME = 60;//One minute(60 seconds)
-    private static final int AVERAGE_COLLECTION_SIZE = 6000;//Six thousand ECG values
-    private static final int DATA_SAVING_INTERVAL = 60000;//One minute (60000 milliseconds)
+    private static final long MAX_DATA_RECORDING_TIME = 120;//Two minutes(60 seconds)
     private static final int SECONDS_IN_ONE_MINUTE = 60;
     private static final int SECONDS_IN_ONE_HOUR = 3600;
     private static final int ONE_SECOND = 1000;// 1000 milliseconds in one second
@@ -81,7 +79,6 @@ public class MainActivity extends Activity {
     private int recordTimerCounter, min, sec, hr;
     private BleService mService;
     private int mState;
-    private String fileName;
     private String timerString;
     private String sensorPosition;
     private Handler mHandler;
@@ -124,7 +121,6 @@ public class MainActivity extends Activity {
         mCounter = lastBatLevel = 0;
         recordTimerCounter = 1;
         min = sec =  hr = 0;
-        fileName = null;
         mService = null;
         mDevice = null;
         timerString = "";
@@ -217,7 +213,7 @@ public class MainActivity extends Activity {
                     else{
                         dataRecording = true;
                         btnStore.setText("Stop");
-                        startRecordingData();
+                        mRecordTimer.run();
                     }
                 }
             }
@@ -413,63 +409,46 @@ public class MainActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(BLEStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
-    private void startRecordingData(){
-        mSaveDataTask.run();
-        mRecordTimer.run();
-    }
-
     private void stopRecordingData(){
         if(dataRecording) {
-            saveToDisk(fileName);
+            saveToDisk();
             dataRecording = false;
             btnStore.setText("Record");
-            mHandler.removeCallbacks(mSaveDataTask);
             mHandler.removeCallbacks(mRecordTimer);
             ((TextView) findViewById(R.id.timer_view)).setText("");
-            fileName = null;
             refreshTimer();
         }
     }
 
-    private Runnable mSaveDataTask = new Runnable() {
-        @Override
-        public void run() {
-            if(collection.size() >= AVERAGE_COLLECTION_SIZE)
-                saveToDisk(fileName);
-            if (dataRecording)
-                mHandler.postDelayed(mSaveDataTask, DATA_SAVING_INTERVAL);
-        }
-    };
-
-    private void saveToDisk(String fName){
+    private void saveToDisk(){
         if(isExternalStorageWritable()){
-            File root = android.os.Environment.getExternalStorageDirectory();
-            File dir = new File (root.getAbsolutePath() + DIRECTORY_NAME);
-            if(!dir.isDirectory())
-                dir.mkdirs();
-            File file;
-            if(fName == null) {
-                fName = getFileName();
-                fileName = fName;
-            }
-            file = new File(dir, fName);
-            try {
-                FileWriter fw = new FileWriter(file, true);
-                String str = Arrays.toString(collection.toArray(new String[collection.size()]));
-                str = str.substring(1, str.length()-1).replaceAll("\\s+","").replaceAll(",", "\n");
-                if(str.isEmpty() || str.length() <= 0){
-                    showMessage("No data recorded");
-                    return;
+            new Thread(new Runnable(){
+                public void run(){
+                    File root = android.os.Environment.getExternalStorageDirectory();
+                    File dir = new File (root.getAbsolutePath() + DIRECTORY_NAME);
+                    if(!dir.isDirectory())
+                        dir.mkdirs();
+                    File file;
+                    file = new File(dir, getFileName());
+                    try {
+                        FileWriter fw = new FileWriter(file, true);
+                        String str = Arrays.toString(collection.toArray(new String[collection.size()]));
+                        str = str.substring(1, str.length()-1).replaceAll("\\s+","").replaceAll(",", "\n");
+                        if(str.isEmpty() || str.length() <= 0){
+                            showMessage("No data recorded");
+                            return;
+                        }
+                        fw.append(str+"\n");
+                        fw.flush();
+                        fw.close();
+                        collection.clear();
+                        showMessage("Saved ECG data to SD card");
+                    } catch (IOException e) {
+                        Log.e(TAG, e.toString());
+                        showMessage("Problem writing to Storage");
+                    }
                 }
-                fw.append(str+"\n");
-                fw.flush();
-                fw.close();
-                collection.clear();
-                showMessage("Saved ECG data to SD card");
-            } catch (IOException e) {
-                Log.e(TAG, e.toString());
-                showMessage("Problem writing to Storage");
-            }
+            }).start();
         }
         else
             showMessage("Cannot write to storage");
@@ -504,7 +483,7 @@ public class MainActivity extends Activity {
                     min = (recordTimerCounter % SECONDS_IN_ONE_HOUR) % SECONDS_IN_ONE_MINUTE;
                 }
                 updateTimer();
-                if (recordTimerCounter == MAX_DATA_RECORDING_TIME) {
+                if (recordTimerCounter >= MAX_DATA_RECORDING_TIME) {
                     stopRecordingData();
                     return;
                 }
@@ -658,7 +637,13 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void showMessage(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    private void showMessage(final String msg) {
+        Runnable showMessage = new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+        };
+        mHandler.post(showMessage);
+
     }
 }
