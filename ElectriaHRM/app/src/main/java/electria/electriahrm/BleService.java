@@ -35,7 +35,6 @@ package electria.electriahrm;
         import android.support.v4.content.LocalBroadcastManager;
         import android.util.Log;
 
-        import java.io.UnsupportedEncodingException;
         import java.util.List;
         import java.util.UUID;
 

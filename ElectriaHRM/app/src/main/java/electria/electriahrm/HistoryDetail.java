@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.achartengine.GraphicalView;
-import org.apache.http.protocol.HTTP;
 
 import java.io.BufferedReader;
 import java.io.File;
