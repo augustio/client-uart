@@ -60,8 +60,8 @@ public class MainActivity extends Activity {
     private static final int X_RANGE = 500;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
-    private static final long MAX_DATA_RECORDING_TIME = 3600;//One hour (3600 seconds)
-    private static final int AVERAGE_COLLECTION_SIZE = 5000;//Five thousand ECG values
+    private static final long MAX_DATA_RECORDING_TIME = 60;//One minute(60 seconds)
+    private static final int AVERAGE_COLLECTION_SIZE = 6000;//Six thousand ECG values
     private static final int DATA_SAVING_INTERVAL = 60000;//One minute (60000 milliseconds)
     private static final int SECONDS_IN_ONE_MINUTE = 60;
     private static final int SECONDS_IN_ONE_HOUR = 3600;
@@ -512,7 +512,7 @@ public class MainActivity extends Activity {
                     stopRecordingData();
                     return;
                 }
-                if ((MAX_DATA_RECORDING_TIME - recordTimerCounter) <= 10)//Ten seconds to the end of timer
+                if ((MAX_DATA_RECORDING_TIME - recordTimerCounter) < 5)//Five seconds to the end of timer
                     ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.green));
                 recordTimerCounter++;
             }
