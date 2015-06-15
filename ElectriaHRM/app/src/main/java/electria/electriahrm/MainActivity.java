@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
 
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
-    private TextView batLevelView,sensorPositionView, heartRateView;
+    private TextView batLevelView,sensorPositionView, heartRateView, avHeartRateView;
     private EditText edtMessage;
     private LinearLayout.LayoutParams param_enable, param_disable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
@@ -79,6 +79,7 @@ public class MainActivity extends Activity {
     private int recordTimerCounter, min, sec, hr;
     private BleService mService;
     private int mState;
+    private int mAvHeartRate, mHeartRateCount;
     private String timerString;
     private String sensorPosition;
     private Handler mHandler;
@@ -109,6 +110,7 @@ public class MainActivity extends Activity {
         batLevelView = (TextView) findViewById(R.id.bat_level);
         sensorPositionView = (TextView) findViewById(R.id.sensor_position);
         heartRateView = (TextView) findViewById(R.id.heart_rate);
+        avHeartRateView = (TextView) findViewById(R.id.av_heart_rate);
         param_enable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
         param_disable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
         collection = new ArrayList<String>();
@@ -118,9 +120,12 @@ public class MainActivity extends Activity {
         graphViewActive = false;
 
         collection = new ArrayList<String>();
-        mCounter = lastBatLevel = 0;
+        mCounter = 0;
+        lastBatLevel = 0;
         recordTimerCounter = 1;
         min = sec =  hr = 0;
+        mAvHeartRate = 0;
+        mHeartRateCount = 0;
         mService = null;
         mDevice = null;
         timerString = "";
@@ -267,17 +272,20 @@ public class MainActivity extends Activity {
 
     private void setSensorPosition(final String position) {
         if (position != null) {
-            sensorPositionView.setText("Sensor Position " + position.toUpperCase());
+            sensorPositionView.setText("Position " + position.toUpperCase());
         } else {
             sensorPositionView.setText(" ");
         }
     }
 
-    private void setHeartRateValue(final int value) {
+    private void setHeartRateValue(int value) {
         if (value != 0) {
-            heartRateView.setText("Heart Rate  " + value + "BPM");
+            heartRateView.setText("HR  " + value + "BPM");
+            mAvHeartRate = ((mAvHeartRate*mHeartRateCount)+value)/(++mHeartRateCount);
+            avHeartRateView.setText("AvHR " +mAvHeartRate+ "BPM");
         } else {
             heartRateView.setText(" ");
+            avHeartRateView.setText(" ");
         }
     }
 
@@ -290,6 +298,8 @@ public class MainActivity extends Activity {
             mainLayout.removeView(mGraphView);
             setSensorPosition(null);
             setHeartRateValue(0);
+            mAvHeartRate = 0;
+            mHeartRateCount = 0;
         }
     }
 ;
