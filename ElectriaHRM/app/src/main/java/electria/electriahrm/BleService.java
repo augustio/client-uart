@@ -58,12 +58,14 @@ public class BleService extends Service {
     private int mConnectionState = STATE_DISCONNECTED;
     private int readBatteryInterval;
     private Handler mHandler = new Handler();
+    private int initBatteryLevel = INVALID_LEVEL;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
-    private static final int ONE_SECOND = 1000;
-    private static final int ONE_MINUTE = 60000;
+    private static final int SHORT_INTERVAL = 500;
+    private static final int LONG_INTERVAL = 60000;
+    private static final int INVALID_LEVEL = 255;
 
     public final static String ACTION_GATT_CONNECTED =
             "electria.electriahrm.ACTION_GATT_CONNECTED";
@@ -115,6 +117,7 @@ public class BleService extends Service {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
+                initBatteryLevel = INVALID_LEVEL;
                 Log.d(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
@@ -153,8 +156,10 @@ public class BleService extends Service {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (mBatteryCharacteristic != null &&
                         characteristic.getUuid().equals(BATTERY_LEVEL_CHAR_UUID)) {
-                        broadcastUpdate(ACTION_BATTERY_LEVEL_DATA_AVAILABLE,
-                                characteristic.getValue()[0]);
+                    int level = characteristic.getValue()[0];
+                    broadcastUpdate(ACTION_BATTERY_LEVEL_DATA_AVAILABLE, level);
+                    if(initBatteryLevel == INVALID_LEVEL)
+                        initBatteryLevel = level;
                 }
                 else if (characteristic.getUuid().equals(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID)) {
                     final String sensorPosition = getBodySensorPosition(characteristic.getValue()[0]);
@@ -205,10 +210,11 @@ public class BleService extends Service {
         @Override
         public void run() {
             if (mBluetoothGatt != null && mBatteryCharacteristic != null) {
-                if(!mBluetoothGatt.readCharacteristic(mBatteryCharacteristic))
-                    readBatteryInterval = ONE_SECOND;
+                mBluetoothGatt.readCharacteristic(mBatteryCharacteristic);
+                if(initBatteryLevel == INVALID_LEVEL)
+                    readBatteryInterval = SHORT_INTERVAL;
                 else
-                    readBatteryInterval = ONE_MINUTE;
+                    readBatteryInterval = LONG_INTERVAL;
                 mHandler.postDelayed(mReadBatteryLevel, readBatteryInterval);
             }
         }
