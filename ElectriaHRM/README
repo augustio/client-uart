@@ -11,13 +11,14 @@ When the application starts, two buttons: Connect and History are visible to the
 By pressing the connect button, the user is able to view a list of the BLE devices within range and is able to connect to a selected device.
 If the right BLE device is selected and a connection is established, the application would start getting the ECG packets and battery level updates at the above specified intervals.
 While connected, the user can either disconnect from the sensor, display sensor data graphically, or record the data to be stored in the android device's internal storage location by pressing corresponding buttons.
-The sensor position and heart rate value are also displayed along with the ECG graph.
-The heart rate is updated every time there is a change in the value.
+The sensor position, heart rate and average heart rate are also displayed along with the ECG graph.
+The heart rate values are updated every time they change.
 Displaying the sensor data and recording the data could be done simultaneously.
-The recording is set to last for an hour if the user does not stop it by pressing the stop button. 
-Recorded sensor data is stored approximately every 60 seconds in the same file, and after an hour of recording or by pressing the stop button. 
-The History button is used to display a list of files containing recorded sensor data.
-Each of these files is a link to a details view which is basically a graphical display of a portion of the recorded data.
+The recording is set to last for two minutes if the user does not stop it by pressing the stop button. 
+While recording, a timer is displayed to show the duration of the recording. 
+When the recording time elapses, the timer and the graph display are turned off.
+Recorded sensor data is stored in the devices internal storage location within a folder, ECGDATA after two minutes of recording or by pressing the stop button. 
+The History button is used to display a list of files containing recorded sensor data. Each item in this list is the name of the file where the data is saved and the size of the file. Each file name is in the format deviceName_YYMMddHHmmss.txt and is a link to a details view which is basically a graphical display of a portion of the recorded data.
 
 #Android Device Requirements
 Minimum memory size: 2G ?
