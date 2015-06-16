@@ -196,8 +196,7 @@ public class MainActivity extends Activity {
                 setSensorPosition(sensorPosition);
                 if (mState == CONNECTED) {
                     if (showGraph) {
-                        clearGraph();
-                        btnShow.setText("Show");
+                        stopGraph();
                     }else{
                         setGraphView();
                         showGraph = true;
@@ -256,6 +255,11 @@ public class MainActivity extends Activity {
         mLineGraph.addValue(new Point(++mCounter, (value2<=MAX_Y && value2>=MIN_Y)? value2: MAX_Y));
         mGraphView.repaint();
         mCounter ++;
+    }
+
+    private void stopGraph(){
+        clearGraph();
+        btnShow.setText("Show");
     }
 
     //Add a set of two ECG values to collection buffer
@@ -495,6 +499,9 @@ public class MainActivity extends Activity {
                 updateTimer();
                 if (recordTimerCounter >= MAX_DATA_RECORDING_TIME) {
                     stopRecordingData();
+                    if (showGraph) {
+                        stopGraph();
+                    }
                     return;
                 }
                 if ((MAX_DATA_RECORDING_TIME - recordTimerCounter) < 5)//Five seconds to the end of timer
@@ -554,6 +561,9 @@ public class MainActivity extends Activity {
     protected void onStop() {
         Log.d(TAG, "onStop");
         super.onStop();
+        if (showGraph) {
+            stopGraph();
+        }
     }
 
     @Override
