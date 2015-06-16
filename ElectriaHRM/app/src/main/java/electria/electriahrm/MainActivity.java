@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
     private int recordTimerCounter, min, sec, hr;
     private BleService mService;
     private int mState;
-    private int mAvHeartRate, mHeartRateCount;
+    private double mAvHeartRate, mHeartRateCount;
     private String timerString;
     private String sensorPosition;
     private Handler mHandler;
@@ -282,7 +282,7 @@ public class MainActivity extends Activity {
         if (value != 0) {
             heartRateView.setText("HR  " + value + "BPM");
             mAvHeartRate = ((mAvHeartRate*mHeartRateCount)+value)/(++mHeartRateCount);
-            avHeartRateView.setText("AvHR " +mAvHeartRate+ "BPM");
+            avHeartRateView.setText("AvHR " +Math.round(mAvHeartRate)+ "BPM");
         } else {
             heartRateView.setText(" ");
             avHeartRateView.setText(" ");
