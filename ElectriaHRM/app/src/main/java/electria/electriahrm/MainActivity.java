@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
     private static final int SECONDS_IN_ONE_MINUTE = 60;
     private static final int SECONDS_IN_ONE_HOUR = 3600;
     private static final int ONE_SECOND = 1000;// 1000 milliseconds in one second
+    private static final int X_SCALE = 10;//Ten milliseconds interval for X axis
 
     private boolean showGraph;
     private boolean graphViewActive;
@@ -247,14 +248,19 @@ public class MainActivity extends Activity {
     }
 
     //Plot a new set of two ECG values on the graph and present on the GUI
-    private void updateGraph(int value1, int value2) {
-        double maxX = mCounter;
-        double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-        mLineGraph.setXRange(minX, maxX);
-        mLineGraph.addValue(new Point(mCounter, (value1 <= MAX_Y && value1 >= MIN_Y) ? value1 : MAX_Y));
-        mLineGraph.addValue(new Point(++mCounter, (value2<=MAX_Y && value2>=MIN_Y)? value2: MAX_Y));
-        mGraphView.repaint();
-        mCounter ++;
+    private void updateGraph(final int value1, final int value2) {
+        Runnable graphUpdate = new Runnable() {
+            public void run() {
+                double maxX = mCounter;
+                double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+                mLineGraph.setXRange(minX, maxX);
+                mLineGraph.addValue(new Point(mCounter, value1));
+                mLineGraph.addValue(new Point(++mCounter, value2));
+                mGraphView.repaint();
+                mCounter ++;
+            }
+        };
+        mHandler.postDelayed(graphUpdate, X_SCALE);
     }
 
     private void stopGraph(){
