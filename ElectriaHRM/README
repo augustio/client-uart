@@ -1,7 +1,7 @@
 # client-uart
 This application is designed to work with an ECG sensor patch.
 It serves as a client to the server that runs in the sensor patch which,among other things, pushes ECG data to the client every twenty millisecond, and the heart rate delivered through the standard Heart Rate Service.
-The ECG data are delivered in a packet with a very simple structure: each packet contains two ECG values and a packet number (0-99), with with a hyphen (-) as the separator. 
+The ECG data are delivered in a packet with a very simple structure: each packet contains two ECG values and a packet number (0-100), with with a hyphen (-) as the separator. 
 The ECG packets are delivered over the custom UART Service by Nordic Semiconductors. 
 The sensor patch could also be written to using the same UART Service.
 This application also reads battery level characteristic of the Battery Service from the sensor every minute.
