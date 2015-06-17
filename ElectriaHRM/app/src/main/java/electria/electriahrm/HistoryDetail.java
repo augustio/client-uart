@@ -116,7 +116,7 @@ public class HistoryDetail extends Activity {
         return false;
     }
 
-    //Updates graph every millisecond with values in the collection
+    //Updates graph with values in the collection
     private Runnable mDisplayGraph = new Runnable() {
         @Override
         public void run() {
