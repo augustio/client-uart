@@ -27,26 +27,27 @@ public class HistoryDetail extends Activity {
     private static final String TAG = HistoryDetail.class.getSimpleName();
     private static final int MAX_DATA_TO_DISPLAY = 5000; //Max data to show on graph
     private static final int X_RANGE = 500;
-    private static final int MIN_Y = 0;//Minimum ECG data value
-    private static final int MAX_Y = 1023;//Maximum ECG data value
+    private static final int DEFAULT_MIN_Y = 0;//Minimum ECG data value
+    private static final int DEFAULT_MAX_Y = 1023;//Maximum ECG data value
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
     private ViewGroup historyViewLayout;
     private Button btnSend;
     private String filePath;
-    private int mCounter, mCollectionIndex;
+    private int mCounter, mCollectionIndex, minY, maxY;
     private Handler mHandler;
-    private List<String> mCollection;
+    private List<Integer> mCollection;
     private boolean isFileEmpty, isFileFormatInvalid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
-        mCollection = new ArrayList<String>();
+        mCollection = new ArrayList<Integer>();
         btnSend = (Button)findViewById(R.id.send_data);
         mHandler = new Handler();
-        setGraphView();
+        maxY = DEFAULT_MIN_Y;
+        minY = DEFAULT_MAX_Y;
         mCounter = mCollectionIndex = 0;
         isFileEmpty = isFileFormatInvalid = false;
         Bundle extras = getIntent().getExtras();
@@ -63,6 +64,7 @@ public class HistoryDetail extends Activity {
             showMessage("Invalid File Format");
             finish();
         }
+        setGraphView();
         mDisplayGraph.run();//Initiate graph display and update
 
         btnSend.setOnClickListener(new View.OnClickListener() {
@@ -76,7 +78,8 @@ public class HistoryDetail extends Activity {
     //Prepare the initial GUI for graph
     private void setGraphView() {
         mLineGraph = new LineGraphView();
-        mLineGraph.setYRange(MIN_Y, MAX_Y);
+        mLineGraph.setYRange(minY, maxY);
+        mLineGraph.setPanLimits(0, MAX_DATA_TO_DISPLAY, minY, maxY);
         mGraphView = mLineGraph.getView(this);
         historyViewLayout = (ViewGroup) findViewById(R.id.history_detail);
         historyViewLayout.addView(mGraphView);
@@ -96,7 +99,18 @@ public class HistoryDetail extends Activity {
                     return;
                 }
                 BufferedReader buf = new BufferedReader(new FileReader(f));
-                while ( mCollection.add(buf.readLine()) && mCollection.size() < MAX_DATA_TO_DISPLAY );
+                String line;
+                int value;
+                while ( (line = buf.readLine()) != null && mCollection.size() < MAX_DATA_TO_DISPLAY ){
+                    if(android.text.TextUtils.isDigitsOnly(line)) {
+                        value = Integer.parseInt(line);
+                        mCollection.add(value);
+                        if(value < minY)
+                            minY = value;
+                        if(value > maxY)
+                            maxY = value;
+                    }
+                }
                 buf.close();
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
@@ -120,11 +134,8 @@ public class HistoryDetail extends Activity {
     private Runnable mDisplayGraph = new Runnable() {
         @Override
         public void run() {
-            String value;
-            if (mCollectionIndex < mCollection.size() &&
-                    (value = mCollection.get(mCollectionIndex)) != null) {
-                if(android.text.TextUtils.isDigitsOnly(value))
-                    updateGraph(Integer.parseInt(value));
+            if (mCollectionIndex < mCollection.size()){
+                updateGraph(mCollection.get(mCollectionIndex));
                 mCollectionIndex++;
                 mHandler.post(mDisplayGraph);
             }
