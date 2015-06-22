@@ -155,7 +155,6 @@ public class HistoryDetail extends Activity {
     //Send ECG data as attachment to a specified Email address
     private void sendAttachment(){
         Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-        emailIntent.setType("text/plain");
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECG Data");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "Attached is a copy of ECG samples");
         emailIntent.setData(Uri.parse("mailto:electria.metropolia@gmail.com"));
