@@ -22,7 +22,7 @@ The History button is used to display a list of files containing recorded sensor
 
 #Android Device Requirements
 Minimum memory size: 2G ?
-Minimum Android version: 4.4.4 kitkat. (Works with Version 4.4.2 and 4.4.3 but might have some instability issues)
+Minimum Android version: 4.4.4 kitkat. (Works with Version 4.4.2 and 4.4.3 but might have some stability issues)
 
 #Requirement for Building and Installing the application on Linux Platform
 -Download and install Java Runtime Environment (JRE) latest version and Java Development Kit (JDK) version 6 or later.
@@ -33,7 +33,7 @@ Minimum Android version: 4.4.4 kitkat. (Works with Version 4.4.2 and 4.4.3 but m
 The stand-alone SDK Tools package does not include a complete Android development environment so 
 there are still a couple packages you should add to make your Android SDK complete.
 -Open sdk manager with the command: android sdk (contained in the tools/ which has been added to the executable path).
--Add the needed sdk packages following this guide from by Android: 
+-Add the needed sdk packages following this guide by Android: 
 https://developer.android.com/sdk/installing/adding-packages.html
 (For the SDK platform, add SDK 5.1.1(API 22), 5.0.1(API 21) and 4.4.2(API 19))
 
