@@ -450,18 +450,18 @@ public class MainActivity extends Activity {
                         dir.mkdirs();
                     File file;
                     file = new File(dir, getFileName());
+                    String str = Arrays.toString(collection.toArray(new String[collection.size()]));
+                    collection.clear();
+                    if(str.isEmpty() || str.length() <= 1){
+                        showMessage("No data recorded");
+                        return;
+                    }
+                    str = str.substring(1, str.length()-1).replaceAll("\\s+","").replaceAll(",", "\n");
                     try {
                         FileWriter fw = new FileWriter(file, true);
-                        String str = Arrays.toString(collection.toArray(new String[collection.size()]));
-                        str = str.substring(1, str.length()-1).replaceAll("\\s+","").replaceAll(",", "\n");
-                        if(str.isEmpty() || str.length() <= 0){
-                            showMessage("No data recorded");
-                            return;
-                        }
                         fw.append(str+"\n");
                         fw.flush();
                         fw.close();
-                        collection.clear();
                         showMessage("Saved ECG data to SD card");
                     } catch (IOException e) {
                         Log.e(TAG, e.toString());
