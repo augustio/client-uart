@@ -14,10 +14,17 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.achartengine.GraphicalView;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,21 +170,45 @@ public class HistoryDetail extends Activity {
         mGraphView.repaint();
     }
 
-    //Send ECG data as attachment to a specified Email address
-    private void sendAttachment(){
-        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECG Data");
-        emailIntent.putExtra(Intent.EXTRA_TEXT, "Attached is a copy of ECG samples");
-        emailIntent.setData(Uri.parse("mailto:electria.metropolia@gmail.com"));
-        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse( "file://"+filePath));
-
+    public static String POST(String url, ECGMeasurement ecgM){
+        InputStream inputStream = null;
+        String result = "";
         try {
-            startActivity(Intent.createChooser(emailIntent, "Sending Email...."));
-        }catch (android.content.ActivityNotFoundException ex) {
-            showMessage("No email clients installed.");
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(url);
+            String json = "";
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.accumulate("sensor", ecgM.getId());
+            jsonObject.accumulate("timestamp", ecgM.getTimeStamp());
+            jsonObject.accumulate("data", ecgM.getData());
+
+            json = jsonObject.toString();
+            Log.w(TAG, "Json String: " + json);
+
+            StringEntity se = new StringEntity(json);
+            httpPost.setEntity(se);
+
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+
+            HttpResponse httpResponse = httpclient.execute(httpPost);
+
+            inputStream = httpResponse.getEntity().getContent();
+
+            if(inputStream != null)
+                result = convertInputStreamToString(inputStream);
+            else
+                result = "No Response From Server!";
+
+        } catch (Exception e) {
+            Log.d("InputStream", e.getLocalizedMessage());
+            result =  "Server Access Error";
         }
-        finish();
+
+        return result;
     }
+
 
     private void showMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
