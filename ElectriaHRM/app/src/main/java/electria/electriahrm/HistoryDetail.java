@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,45 +25,47 @@ import java.util.List;
 public class HistoryDetail extends Activity {
 
     private static final String TAG = HistoryDetail.class.getSimpleName();
-    private static final int MAX_DATA_TO_DISPLAY = 5000; //Max data to show on graph
+    private static final String SUCCESS = "Operation Successful";
     private static final int X_RANGE = 500;
-    private static final int DEFAULT_MIN_Y = 0;//Minimum ECG data value
-    private static final int DEFAULT_MAX_Y = 1023;//Maximum ECG data value
+    private static final int MIN_Y = 0;//Minimum ECG data value
+    private static final int MAX_Y = 1023;//Maximum ECG data value
+    private static final int MIN_X = 0;
+    private static final int MAX_X = 20000;
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
     private ViewGroup historyViewLayout;
     private Button btnSend;
     private String filePath;
-    private int mCounter, mCollectionIndex, minY, maxY;
-    private Handler mHandler;
-    private List<Integer> mCollection;
+    private File file;
+    private List<String> mCollection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
-        mCollection = new ArrayList<Integer>();
+        mCollection = new ArrayList<String>();
         btnSend = (Button)findViewById(R.id.send_data);
-        mHandler = new Handler();
-        maxY = DEFAULT_MIN_Y;
-        minY = DEFAULT_MAX_Y;
-        mCounter = mCollectionIndex = 0;
-        isFileEmpty = isFileFormatInvalid = false;
+        btnSend.setEnabled(false);
+        file = null;
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finish();
         }
         filePath = extras.getString(Intent.EXTRA_TEXT);
-        readFromDisk();
-        if(isFileEmpty){
-
+        if(isExternalStorageReadable()){
+            validateFile(filePath);
+            if(file != null){
+                setGraphView();
+                new DisplayECGTask().execute(file);
+            }
+            else{
+                finish();
+            }
         }
-        if(isFileFormatInvalid){
-            showMessage("Invalid File Format");
+        else{
+            showMessage("Cannot read from storage");
             finish();
         }
-        setGraphView();
-        mDisplayGraph.run();//Initiate graph display and update
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,39 +78,56 @@ public class HistoryDetail extends Activity {
     //Prepare the initial GUI for graph
     private void setGraphView() {
         mLineGraph = new LineGraphView();
-        mLineGraph.setYRange(minY, maxY);
-        mLineGraph.setPanLimits(0, MAX_DATA_TO_DISPLAY, minY, maxY);
+        mLineGraph.setYRange(MIN_Y, MAX_Y);
+        mLineGraph.setPanLimits(MIN_X, MAX_X, MIN_Y, MAX_Y);
         mGraphView = mLineGraph.getView(this);
         historyViewLayout = (ViewGroup) findViewById(R.id.history_detail);
         historyViewLayout.addView(mGraphView);
     }
 
+    private class DisplayECGTask extends AsyncTask<File, Integer, String> {
 
-    //Read data from phone storage
-    private void readFromDisk() {
+        private Exception exception;
+        private int xValue = 0;
 
-        if (isExternalStorageReadable()) {
+        @Override
+        protected String doInBackground(File... files) {
             try {
-                BufferedReader buf = new BufferedReader(new FileReader(f));
+                BufferedReader buf = new BufferedReader(new FileReader(files[0]));
                 String line;
-                int value;
-                while ( (line = buf.readLine()) != null && mCollection.size() < MAX_DATA_TO_DISPLAY ){
+                while ( (line = buf.readLine()) != null){
                     if(android.text.TextUtils.isDigitsOnly(line)) {
-                        value = Integer.parseInt(line);
-                        mCollection.add(value);
-                        if(value < minY)
-                            minY = value;
-                        if(value > maxY)
-                            maxY = value;
+                        mCollection.add(line);
+                        publishProgress(Integer.parseInt(line));
                     }
                 }
                 buf.close();
             } catch (Exception e) {
-                Log.e(TAG, e.toString());
-                showMessage("Problem reading from Storage");
+                exception = e;
+                return null;
             }
-        } else
-            showMessage("Cannot read from storage");
+            return SUCCESS;
+        }
+
+        /*Displays ECG data on the graph*/
+        protected void onProgressUpdate(Integer... value) {
+            int yValue = value[0];
+            updateGraph(xValue, yValue);
+            xValue++;
+        }
+
+        /*Handles any exception and reports result of operation*/
+        @Override
+        protected void onPostExecute(String result) {
+            if(exception != null){
+                Log.e(TAG, exception.toString());
+                showMessage("Problem accessing file");
+            }
+            else {
+                Log.d(TAG, SUCCESS);
+                btnSend.setEnabled(true);
+            }
+        }
     }
 
     /* Checks if external storage is available to at least read */
@@ -123,46 +141,26 @@ public class HistoryDetail extends Activity {
     }
 
     /*Checks if file is a text file and is not empty*/
-    private boolean validateFile(String path, File file){
+    private void validateFile(String path){
         if(path.endsWith(("txt"))){
             file = new File(path);
             //File is considered empty if less than or equal to the size of a character
             if(file.length() <= Character.SIZE) {
                 showMessage("Empty File");
                 file = null;
-                return false;
             }
-            else
-                return true;
         }
-        else{
+        else
             showMessage("Invalid File Format");
-            return false;
-        }
     }
 
-
-
-    //Updates graph with values in the collection
-    private Runnable mDisplayGraph = new Runnable() {
-        @Override
-        public void run() {
-            if (mCollectionIndex < mCollection.size()){
-                updateGraph(mCollection.get(mCollectionIndex));
-                mCollectionIndex++;
-                mHandler.post(mDisplayGraph);
-            }
-        }
-    };
-
     //Add a point to the graph
-    private void updateGraph(int value){
-        double maxX = mCounter+1;
+    private void updateGraph(int x, int y){
+        double maxX = x;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setXRange(minX, maxX);
-        mLineGraph.addValue(new Point(mCounter, value));
+        mLineGraph.addValue(new Point(x, y));
         mGraphView.repaint();
-        mCounter ++;
     }
 
     //Send ECG data as attachment to a specified Email address
