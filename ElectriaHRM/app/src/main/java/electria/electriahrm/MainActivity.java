@@ -82,6 +82,7 @@ public class MainActivity extends Activity {
     private int mState;
     private double mAvHeartRate, mHeartRateCount;
     private String timerString;
+    private String timeStamp;
     private String sensorPosition;
     private Handler mHandler;
     private BluetoothDevice mDevice;
@@ -217,6 +218,7 @@ public class MainActivity extends Activity {
                     }
                     else{
                         dataRecording = true;
+                        timeStamp = new SimpleDateFormat("yyMMddHHmmss", Locale.US).format(new Date());
                         btnStore.setText("Stop");
                         mRecordTimer.run();
                     }
@@ -449,7 +451,8 @@ public class MainActivity extends Activity {
                     if(!dir.isDirectory())
                         dir.mkdirs();
                     File file;
-                    file = new File(dir, getFileName());
+                    String fileName = mDevice.getName()+"_"+timeStamp+".txt";
+                    file = new File(dir, fileName);
                     String str = Arrays.toString(collection.toArray(new String[collection.size()]));
                     collection.clear();
                     if(str.isEmpty() || str.length() <= 1){
@@ -481,11 +484,6 @@ public class MainActivity extends Activity {
             return true;
         }
         return false;
-    }
-
-    private String getFileName(){
-        String currentTime = new SimpleDateFormat("yyMMddHHmmss", Locale.US).format(new Date());
-        return mBtAdapter.getName()+"_"+currentTime+".txt";
     }
 
     private Runnable mRecordTimer = new Runnable() {
