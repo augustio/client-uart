@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -37,7 +38,6 @@ public class HistoryDetail extends Activity {
     private int mCounter, mCollectionIndex, minY, maxY;
     private Handler mHandler;
     private List<Integer> mCollection;
-    private boolean isFileEmpty, isFileFormatInvalid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +57,7 @@ public class HistoryDetail extends Activity {
         filePath = extras.getString(Intent.EXTRA_TEXT);
         readFromDisk();
         if(isFileEmpty){
-            showMessage("Empty File");
-            finish();
+
         }
         if(isFileFormatInvalid){
             showMessage("Invalid File Format");
@@ -85,19 +84,12 @@ public class HistoryDetail extends Activity {
         historyViewLayout.addView(mGraphView);
     }
 
+
     //Read data from phone storage
     private void readFromDisk() {
-        if(!filePath.endsWith(("txt"))){
-            isFileFormatInvalid = true;
-            return;
-        }
+
         if (isExternalStorageReadable()) {
             try {
-                File f = new File(filePath);
-                if(f.length() <= Character.SIZE) {
-                    isFileEmpty = true;
-                    return;
-                }
                 BufferedReader buf = new BufferedReader(new FileReader(f));
                 String line;
                 int value;
@@ -129,6 +121,27 @@ public class HistoryDetail extends Activity {
         }
         return false;
     }
+
+    /*Checks if file is a text file and is not empty*/
+    private boolean validateFile(String path, File file){
+        if(path.endsWith(("txt"))){
+            file = new File(path);
+            //File is considered empty if less than or equal to the size of a character
+            if(file.length() <= Character.SIZE) {
+                showMessage("Empty File");
+                file = null;
+                return false;
+            }
+            else
+                return true;
+        }
+        else{
+            showMessage("Invalid File Format");
+            return false;
+        }
+    }
+
+
 
     //Updates graph with values in the collection
     private Runnable mDisplayGraph = new Runnable() {
