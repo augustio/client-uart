@@ -3,6 +3,8 @@ package electria.electriahrm;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -37,6 +39,7 @@ public class HistoryDetail extends Activity {
     private static final String SUCCESS = "Operation Successful";
     private static final String SERVER_ERROR = "No Response From Server!";
     private static final String SERVER_EXCEPTION = "Exception from Server Access";
+    private static final String NOT_CONNECTED = "NOt Connected to Internet";
     private static final int X_RANGE = 500;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
@@ -82,7 +85,12 @@ public class HistoryDetail extends Activity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if(isConnected())
+                    // call AsynTask to perform network operation on separate thread
+                    new HttpAsyncTask().execute("http://52.18.112.240:3000/records");
+                else
+                    showMessage(NOT_CONNECTED);
+                finish();
             }
         });
     }
@@ -248,6 +256,15 @@ public class HistoryDetail extends Activity {
 
         inputStream.close();
         return result;
+    }
+
+    public boolean isConnected(){
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected())
+            return true;
+        else
+            return false;
     }
 
     private void showMessage(String msg) {
