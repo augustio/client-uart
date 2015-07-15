@@ -3,7 +3,6 @@ package electria.electriahrm;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -35,6 +35,8 @@ public class HistoryDetail extends Activity {
 
     private static final String TAG = HistoryDetail.class.getSimpleName();
     private static final String SUCCESS = "Operation Successful";
+    private static final String SERVER_ERROR = "No Response From Server!";
+    private static final String SERVER_EXCEPTION = "Exception from Server Access";
     private static final int X_RANGE = 500;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
@@ -47,6 +49,7 @@ public class HistoryDetail extends Activity {
     private String filePath;
     private File file;
     private List<String> mCollection;
+    private ECGMeasurement ecgM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +82,7 @@ public class HistoryDetail extends Activity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    sendAttachment();
+
             }
         });
     }
@@ -201,14 +204,39 @@ public class HistoryDetail extends Activity {
             if(inputStream != null)
                 result = convertInputStreamToString(inputStream);
             else
-                result = "No Response From Server!";
+                result = SERVER_ERROR;
 
         } catch (Exception e) {
             Log.d("InputStream", e.getLocalizedMessage());
-            result =  "Server Access Error";
+            result =  SERVER_EXCEPTION;
         }
 
         return result;
+    }
+
+    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+
+            ecgM = new ECGMeasurement();
+            ecgM.setId(filePath.substring(filePath.lastIndexOf("/") + 1, filePath.lastIndexOf("_")));
+            ecgM.setTimeStamp(filePath.substring(filePath.lastIndexOf("_") + 1, filePath.lastIndexOf(".")));
+            ecgM.setData(Arrays.toString(mCollection.toArray(new String[mCollection.size()])));
+
+            return POST(urls[0], ecgM);
+        }
+
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            if (result.equals(SERVER_ERROR))
+                showMessage("Error Connecting to Server");
+            else if (result.equals(SERVER_EXCEPTION))
+                showMessage("Data not Sent");
+            else
+                showMessage("Data Sent");
+        }
+
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {
