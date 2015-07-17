@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.achartengine.GraphicalView;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -68,8 +69,7 @@ public class HistoryDetail extends Activity {
         }
         mFPath = extras.getString(Intent.EXTRA_TEXT);
         if(isExternalStorageReadable()){
-            validateFile(mFPath);
-            if(mFile != null){
+            if((mFile = validateFile(mFPath))  != null){
                 setGraphView();
                 new DisplayECGTask().execute(mFile);
             }
@@ -85,12 +85,11 @@ public class HistoryDetail extends Activity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isConnected())
+                if(isNetworkAvailable())
                     // call AsynTask to perform network operation on separate thread
                     new HttpAsyncTask().execute("http://52.18.112.240:3000/records");
                 else
                     showMessage(NOT_CONNECTED);
-                finish();
             }
         });
     }
@@ -161,17 +160,19 @@ public class HistoryDetail extends Activity {
     }
 
     /*Checks if mFile is a text mFile and is not empty*/
-    private void validateFile(String path){
+    private File validateFile(String path){
+        File f = null;
         if(path.endsWith(("txt"))){
-            mFile = new File(path);
+            f = new File(path);
             //File is considered empty if less than or equal to the size of a character
-            if(mFile.length() <= Character.SIZE) {
+            if(f.length() <= Character.SIZE) {
                 showMessage("Empty File");
-                mFile = null;
+                return null;
             }
         }
         else
             showMessage("Invalid File Format");
+        return f;
     }
 
     //Add a point to the graph
@@ -184,12 +185,12 @@ public class HistoryDetail extends Activity {
     }
 
     public static String POST(String url, ECGMeasurement ecgM){
-        InputStream inputStream = null;
-        String result = "";
+        InputStream inputStream;
+        String result;
         try {
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost(url);
-            String json = "";
+            String json;
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.accumulate("sensor", ecgM.getId());
@@ -197,7 +198,6 @@ public class HistoryDetail extends Activity {
             jsonObject.accumulate("data", ecgM.getData());
 
             json = jsonObject.toString();
-            Log.w(TAG, "Json String: " + json);
 
             StringEntity se = new StringEntity(json);
             httpPost.setEntity(se);
@@ -207,11 +207,12 @@ public class HistoryDetail extends Activity {
 
             HttpResponse httpResponse = httpclient.execute(httpPost);
 
-            inputStream = httpResponse.getEntity().getContent();
+            HttpEntity httpEntity = httpResponse.getEntity();
 
-            if(inputStream != null)
+            if(httpEntity != null){
+                inputStream = httpEntity.getContent();
                 result = convertInputStreamToString(inputStream);
-            else
+            }else
                 result = SERVER_ERROR;
 
         } catch (Exception e) {
@@ -243,6 +244,8 @@ public class HistoryDetail extends Activity {
                 showMessage("Data not Sent");
             else
                 showMessage("Data Sent");
+
+            finish();
         }
 
     }
@@ -258,7 +261,7 @@ public class HistoryDetail extends Activity {
         return result;
     }
 
-    public boolean isConnected(){
+    public boolean isNetworkAvailable(){
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected())
