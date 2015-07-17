@@ -4,15 +4,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
 import java.io.File;
-
 
 public class History extends Activity {
 
@@ -21,6 +24,7 @@ public class History extends Activity {
     private ListView mHistView;
     private ArrayAdapter<String> mListAdapter;
     private String mDirName;
+    private ECGMeasurement ecgM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,7 @@ public class History extends Activity {
         mListAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
         mHistView.setAdapter(mListAdapter);
         mHistView.setOnItemClickListener(mFileClickListener);
+        registerForContextMenu(mHistView);
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -44,16 +49,32 @@ public class History extends Activity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-            String fn = mListAdapter.getItem(position);//Get file name from list adapter
-            fn = fn.substring(0, fn.indexOf('\n'));//File name is followed by a new line character
-            String filePath = android.os.Environment.getExternalStorageDirectory()+
-                    mDirName+"/"+fn;
+
             Intent intent = new Intent(History.this, HistoryDetail.class);
-            intent.putExtra(Intent.EXTRA_TEXT, filePath);
+            intent.putExtra(Intent.EXTRA_TEXT, getFilePath(position));
             startActivity(intent);
         }
     };
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_history, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.delete:
+                deleteECGFile(info);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
 
     private void readDirectory(String dirName){
         if(isExternalStorageReadable()){
@@ -100,6 +121,23 @@ public class History extends Activity {
             size = String.format("%.2f", (len/1.074e+9))+"GB";
         }
         return size;
+    }
+
+    private String getFilePath(int pos){
+        String item = mListAdapter.getItem(pos);//Get item from list adapter
+        String fn = item.substring(0, item.indexOf('\n'));//Get filename from item string
+        String path = android.os.Environment.getExternalStorageDirectory()+
+                mDirName+"/"+fn;
+        return path;
+    }
+
+    private void deleteECGFile(AdapterContextMenuInfo info){
+        File f = new File(getFilePath(info.position));
+        if(f.delete()) {
+            mListAdapter.remove(mListAdapter.getItem(info.position));
+            showMessage("ECG record deleted");
+        }else
+            showMessage("Problem deleting record");
     }
 
     private void showMessage(String msg) {
