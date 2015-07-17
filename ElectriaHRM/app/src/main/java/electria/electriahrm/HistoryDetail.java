@@ -36,7 +36,7 @@ import java.util.List;
 public class HistoryDetail extends Activity {
 
     private static final String TAG = HistoryDetail.class.getSimpleName();
-    private static final String SUCCESS = "Operation Successful";
+    private static final String SUCCESS = "File Access Successful";
     private static final String SERVER_ERROR = "No Response From Server!";
     private static final String SERVER_EXCEPTION = "Exception from Server Access";
     private static final String NOT_CONNECTED = "NOt Connected to Internet";
