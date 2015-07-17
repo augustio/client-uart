@@ -18,36 +18,36 @@ public class History extends Activity {
 
     private static final String TAG = History.class.getSimpleName();
 
-    private ListView historyView;
-    private ArrayAdapter<String> listAdapter;
-    private String directoryName;
+    private ListView mHistView;
+    private ArrayAdapter<String> mListAdapter;
+    private String mDirName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        historyView = (ListView) findViewById(R.id.historyListView);
-        listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
-        historyView.setAdapter(listAdapter);
-        historyView.setOnItemClickListener(mFileClickListener);
+        mHistView = (ListView) findViewById(R.id.historyListView);
+        mListAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
+        mHistView.setAdapter(mListAdapter);
+        mHistView.setOnItemClickListener(mFileClickListener);
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finish();
         }
-        directoryName = extras.getString(Intent.EXTRA_TEXT);
-        readDirectory(directoryName);
+        mDirName = extras.getString(Intent.EXTRA_TEXT);
+        readDirectory(mDirName);
     }
 
     private OnItemClickListener mFileClickListener = new OnItemClickListener() {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-            String fn = listAdapter.getItem(position);//Get file name from list adapter
+            String fn = mListAdapter.getItem(position);//Get file name from list adapter
             fn = fn.substring(0, fn.indexOf('\n'));//File name is followed by a new line character
             String filePath = android.os.Environment.getExternalStorageDirectory()+
-                    directoryName+"/"+fn;
+                    mDirName+"/"+fn;
             Intent intent = new Intent(History.this, HistoryDetail.class);
             intent.putExtra(Intent.EXTRA_TEXT, filePath);
             startActivity(intent);
@@ -66,7 +66,7 @@ public class History extends Activity {
             else{
                 for (File f : dir.listFiles()) {
                     if (f.isFile())
-                        listAdapter.add(f.getName()+"\n"+getFileSize(f.length()));
+                        mListAdapter.add(f.getName()+"\n"+getFileSize(f.length()));
                 }
             }
         }

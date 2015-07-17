@@ -47,10 +47,10 @@ public class HistoryDetail extends Activity {
     private static final int MAX_X = 20000;
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
-    private ViewGroup historyViewLayout;
+    private ViewGroup mHistLayout;
     private Button btnSend;
-    private String filePath;
-    private File file;
+    private String mFPath;
+    private File mFile;
     private List<String> mCollection;
     private ECGMeasurement ecgM;
 
@@ -61,17 +61,17 @@ public class HistoryDetail extends Activity {
         mCollection = new ArrayList<String>();
         btnSend = (Button)findViewById(R.id.send_data);
         btnSend.setEnabled(false);
-        file = null;
+        mFile = null;
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finish();
         }
-        filePath = extras.getString(Intent.EXTRA_TEXT);
+        mFPath = extras.getString(Intent.EXTRA_TEXT);
         if(isExternalStorageReadable()){
-            validateFile(filePath);
-            if(file != null){
+            validateFile(mFPath);
+            if(mFile != null){
                 setGraphView();
-                new DisplayECGTask().execute(file);
+                new DisplayECGTask().execute(mFile);
             }
             else{
                 finish();
@@ -101,8 +101,8 @@ public class HistoryDetail extends Activity {
         mLineGraph.setYRange(MIN_Y, MAX_Y);
         mLineGraph.setPanLimits(MIN_X, MAX_X, MIN_Y, MAX_Y);
         mGraphView = mLineGraph.getView(this);
-        historyViewLayout = (ViewGroup) findViewById(R.id.history_detail);
-        historyViewLayout.addView(mGraphView);
+        mHistLayout = (ViewGroup) findViewById(R.id.history_detail);
+        mHistLayout.addView(mGraphView);
     }
 
     private class DisplayECGTask extends AsyncTask<File, Integer, String> {
@@ -111,9 +111,9 @@ public class HistoryDetail extends Activity {
         private int xValue = 0;
 
         @Override
-        protected String doInBackground(File... files) {
+        protected String doInBackground(File... mFiles) {
             try {
-                BufferedReader buf = new BufferedReader(new FileReader(files[0]));
+                BufferedReader buf = new BufferedReader(new FileReader(mFiles[0]));
                 String line;
                 while ( (line = buf.readLine()) != null){
                     if(android.text.TextUtils.isDigitsOnly(line)) {
@@ -141,7 +141,7 @@ public class HistoryDetail extends Activity {
         protected void onPostExecute(String result) {
             if(exception != null){
                 Log.e(TAG, exception.toString());
-                showMessage("Problem accessing file");
+                showMessage("Problem accessing mFile");
             }
             else {
                 Log.d(TAG, SUCCESS);
@@ -160,14 +160,14 @@ public class HistoryDetail extends Activity {
         return false;
     }
 
-    /*Checks if file is a text file and is not empty*/
+    /*Checks if mFile is a text mFile and is not empty*/
     private void validateFile(String path){
         if(path.endsWith(("txt"))){
-            file = new File(path);
+            mFile = new File(path);
             //File is considered empty if less than or equal to the size of a character
-            if(file.length() <= Character.SIZE) {
+            if(mFile.length() <= Character.SIZE) {
                 showMessage("Empty File");
-                file = null;
+                mFile = null;
             }
         }
         else
@@ -227,8 +227,8 @@ public class HistoryDetail extends Activity {
         protected String doInBackground(String... urls) {
 
             ecgM = new ECGMeasurement();
-            ecgM.setId(filePath.substring(filePath.lastIndexOf("/") + 1, filePath.lastIndexOf("_")));
-            ecgM.setTimeStamp(filePath.substring(filePath.lastIndexOf("_") + 1, filePath.lastIndexOf(".")));
+            ecgM.setId(mFPath.substring(mFPath.lastIndexOf("/") + 1, mFPath.lastIndexOf("_")));
+            ecgM.setTimeStamp(mFPath.substring(mFPath.lastIndexOf("_") + 1, mFPath.lastIndexOf(".")));
             ecgM.setData(Arrays.toString(mCollection.toArray(new String[mCollection.size()])));
 
             return POST(urls[0], ecgM);

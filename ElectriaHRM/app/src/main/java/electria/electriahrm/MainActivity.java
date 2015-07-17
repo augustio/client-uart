@@ -62,28 +62,28 @@ public class MainActivity extends Activity {
     private static final int ONE_SECOND = 1000;// 1000 milliseconds in one second
     private static final int X_SCALE = 10;//Ten milliseconds interval for X axis
 
-    private boolean showGraph;
-    private boolean graphViewActive;
-    private boolean dataRecording;
+    private boolean mShowGraph;
+    private boolean mGraphViewActive;
+    private boolean mDataRecording;
 
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
-    private TextView batLevelView,sensorPositionView, heartRateView, avHeartRateView;
-    private EditText edtMessage;
-    private LinearLayout.LayoutParams param_enable, param_disable;
+    private TextView batLevelView,sensorPosView, hrView, avHRView;
+    private EditText editMessage;
+    private LinearLayout.LayoutParams mParamEnable, mParamDisable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
     private ViewGroup mainLayout;
-    private List<String> collection;
+    private List<String> mCollection;
 
     private int mCounter;
-    private int lastBatLevel;
-    private int recordTimerCounter, min, sec, hr;
+    private int mLastBatLevel;
+    private int mRecTimerCounter, min, sec, hr;
     private BleService mService;
     private int mState;
     private double mAvHeartRate, mHeartRateCount;
-    private String timerString;
-    private String timeStamp;
-    private String sensorPosition;
+    private String mTimerString;
+    private String mRecStartTime;
+    private String mSensorPos;
     private Handler mHandler;
     private BluetoothDevice mDevice;
     private BluetoothAdapter mBtAdapter = null;
@@ -108,29 +108,29 @@ public class MainActivity extends Activity {
         btnStore.setBackgroundColor(getResources().getColor(R.color.green));
         btnHistory = (Button)findViewById(R.id.btn_history);
         btnHistory.setBackgroundColor(getResources().getColor(R.color.blue));
-        edtMessage=(EditText) findViewById(R.id.sendText);
+        editMessage=(EditText) findViewById(R.id.sendText);
         batLevelView = (TextView) findViewById(R.id.bat_level);
-        sensorPositionView = (TextView) findViewById(R.id.sensor_position);
-        heartRateView = (TextView) findViewById(R.id.heart_rate);
-        avHeartRateView = (TextView) findViewById(R.id.av_heart_rate);
-        param_enable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
-        param_disable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
-        collection = new ArrayList<String>();
+        sensorPosView = (TextView) findViewById(R.id.sensor_position);
+        hrView = (TextView) findViewById(R.id.heart_rate);
+        avHRView = (TextView) findViewById(R.id.av_heart_rate);
+        mParamEnable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
+        mParamDisable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
+        mCollection = new ArrayList<String>();
 
-        dataRecording = false;
-        showGraph = false;
-        graphViewActive = false;
+        mDataRecording = false;
+        mShowGraph = false;
+        mGraphViewActive = false;
 
-        collection = new ArrayList<String>();
+        mCollection = new ArrayList<String>();
         mCounter = 0;
-        lastBatLevel = 0;
-        recordTimerCounter = 1;
+        mLastBatLevel = 0;
+        mRecTimerCounter = 1;
         min = sec =  hr = 0;
         mAvHeartRate = 0;
         mHeartRateCount = 0;
         mService = null;
         mDevice = null;
-        timerString = "";
+        mTimerString = "";
         mState = DISCONNECTED;
         mHandler = new Handler();
 
@@ -160,11 +160,11 @@ public class MainActivity extends Activity {
             }
         });
 
-        edtMessage.setOnClickListener(new View.OnClickListener() {
+        editMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 btnSend.setEnabled(true);
-                edtMessage.setHint("");
+                editMessage.setHint("");
             }
         });
 
@@ -172,7 +172,7 @@ public class MainActivity extends Activity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String message = edtMessage.getText().toString();
+                String message = editMessage.getText().toString();
                 byte[] value;
                 try {
                     //send data to service
@@ -182,12 +182,12 @@ public class MainActivity extends Activity {
                 } catch (UnsupportedEncodingException e) {
                     Log.d(TAG, e.getMessage());
                 }
-                edtMessage.setText("");
+                editMessage.setText("");
                 btnSend.setEnabled(false);
-                edtMessage.setHint(R.string.text_hint);
+                editMessage.setHint(R.string.text_hint);
                 //Close keyboard
                 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(edtMessage.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(editMessage.getWindowToken(), 0);
             }
         });
 
@@ -195,13 +195,13 @@ public class MainActivity extends Activity {
         btnShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setSensorPosition(sensorPosition);
+                setSensorPosition(mSensorPos);
                 if (mState == CONNECTED) {
-                    if (showGraph) {
+                    if (mShowGraph) {
                         stopGraph();
                     }else{
                         setGraphView();
-                        showGraph = true;
+                        mShowGraph = true;
                         btnShow.setText("Stop");
                     }
                 }
@@ -213,12 +213,12 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (mState == CONNECTED) {
-                    if(dataRecording){
+                    if(mDataRecording){
                         stopRecordingData();
                     }
                     else{
-                        dataRecording = true;
-                        timeStamp = new SimpleDateFormat("yyMMddHHmmss", Locale.US).format(new Date());
+                        mDataRecording = true;
+                        mRecStartTime = new SimpleDateFormat("yyMMddHHmmss", Locale.US).format(new Date());
                         btnStore.setText("Stop");
                         mRecordTimer.run();
                     }
@@ -246,7 +246,7 @@ public class MainActivity extends Activity {
         mGraphView = mLineGraph.getView(this);
         mainLayout = (ViewGroup) findViewById(R.id.graph_layout);
         mainLayout.addView(mGraphView);
-        graphViewActive = true;
+        mGraphViewActive = true;
     }
 
     //Plot a new set of two ECG values on the graph and present on the GUI
@@ -270,41 +270,41 @@ public class MainActivity extends Activity {
         btnShow.setText("Show");
     }
 
-    //Add a set of two ECG values to collection buffer
+    //Add a set of two ECG values to mCollection buffer
     private void recordData(String value1, String value2){
-        collection.add(value1);
-        collection.add(value2);
+        mCollection.add(value1);
+        mCollection.add(value2);
     }
 
     private void updateBatteryLevel(int level) {
-        if(lastBatLevel != level)
-            lastBatLevel = level;
-        batLevelView.setText("Battery Level: " + lastBatLevel + "%");
+        if(mLastBatLevel != level)
+            mLastBatLevel = level;
+        batLevelView.setText("Battery Level: " + mLastBatLevel + "%");
     }
 
     private void setSensorPosition(final String position) {
         if (position != null) {
-            sensorPositionView.setText("Position " + position.toUpperCase());
+            sensorPosView.setText("Position " + position.toUpperCase());
         } else {
-            sensorPositionView.setText(" ");
+            sensorPosView.setText(" ");
         }
     }
 
     private void setHeartRateValue(int value) {
         if (value != 0) {
-            heartRateView.setText("HR  " + value + "BPM");
+            hrView.setText("HR  " + value + "BPM");
             mAvHeartRate = ((mAvHeartRate*mHeartRateCount)+value)/(++mHeartRateCount);
-            avHeartRateView.setText("AvHR " +Math.round(mAvHeartRate)+ "BPM");
+            avHRView.setText("AvHR " +Math.round(mAvHeartRate)+ "BPM");
         } else {
-            heartRateView.setText(" ");
-            avHeartRateView.setText(" ");
+            hrView.setText(" ");
+            avHRView.setText(" ");
         }
     }
 
     private void clearGraph() {
-        if(graphViewActive) {
-            graphViewActive = false;
-            showGraph = false;
+        if(mGraphViewActive) {
+            mGraphViewActive = false;
+            mShowGraph = false;
             mLineGraph.clearGraph();
             mCounter = 0;
             mainLayout.removeView(mGraphView);
@@ -321,11 +321,11 @@ public class MainActivity extends Activity {
         btnStore.setText("Record");
         btnConnectDisconnect.setText("Connect");
         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
-        edtMessage.setHint("");
-        edtMessage.setEnabled(false);
-        btnShow.setLayoutParams(param_disable);
-        btnStore.setLayoutParams(param_disable);
-        btnHistory.setLayoutParams(param_enable);
+        editMessage.setHint("");
+        editMessage.setEnabled(false);
+        btnShow.setLayoutParams(mParamDisable);
+        btnStore.setLayoutParams(mParamDisable);
+        btnHistory.setLayoutParams(mParamEnable);
         batLevelView.setText("");
         ((TextView) findViewById(R.id.deviceName)).setText(R.string.no_device);
     }
@@ -357,11 +357,11 @@ public class MainActivity extends Activity {
                         Log.d(TAG, "CONNECT_MSG");
                         btnConnectDisconnect.setText("Disconnect");
                         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.red));
-                        edtMessage.setHint(R.string.text_hint);
-                        edtMessage.setEnabled(true);
-                        btnShow.setLayoutParams(param_enable);
-                        btnStore.setLayoutParams(param_enable);
-                        btnHistory.setLayoutParams(param_disable);
+                        editMessage.setHint(R.string.text_hint);
+                        editMessage.setEnabled(true);
+                        btnShow.setLayoutParams(mParamEnable);
+                        btnStore.setLayoutParams(mParamEnable);
+                        btnHistory.setLayoutParams(mParamDisable);
                         ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "- Connected");
                         mState = CONNECTED;
                     }
@@ -375,7 +375,7 @@ public class MainActivity extends Activity {
                         mService.close();
                         clearGraph();
                         resetGUIComponents();
-                        if(dataRecording)
+                        if(mDataRecording)
                             stopRecordingData();
                         mState = DISCONNECTED;
                     }
@@ -386,10 +386,10 @@ public class MainActivity extends Activity {
                 String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
                 if (rxString != null){
                     String [] ECGData = rxString.split("-");
-                    if(dataRecording) {
+                    if(mDataRecording) {
                         recordData(ECGData[0], ECGData[1]);
                     }
-                    if(showGraph) {
+                    if(mShowGraph) {
                         updateGraph(Integer.parseInt(ECGData[0]), Integer.parseInt(ECGData[1]));
                     }
                 }
@@ -414,11 +414,11 @@ public class MainActivity extends Activity {
             }
 
             if(action.equals(BleService.ACTION_SENSOR_POSITION_READ)){
-                sensorPosition = intent.getStringExtra(BleService.EXTRA_DATA);
+                mSensorPos = intent.getStringExtra(BleService.EXTRA_DATA);
             }
 
             if(action.equals(BleService.ACTION_HEART_RATE_READ)){
-                if(showGraph == true)
+                if(mShowGraph == true)
                     setHeartRateValue(intent.getIntExtra(BleService.EXTRA_DATA, 0));
             }
         }
@@ -432,9 +432,9 @@ public class MainActivity extends Activity {
     }
 
     private void stopRecordingData(){
-        if(dataRecording) {
+        if(mDataRecording) {
             saveToDisk();
-            dataRecording = false;
+            mDataRecording = false;
             btnStore.setText("Record");
             mHandler.removeCallbacks(mRecordTimer);
             ((TextView) findViewById(R.id.timer_view)).setText("");
@@ -451,10 +451,10 @@ public class MainActivity extends Activity {
                     if(!dir.isDirectory())
                         dir.mkdirs();
                     File file;
-                    String fileName = mDevice.getName()+"_"+timeStamp+".txt";
+                    String fileName = mDevice.getName()+"_"+mRecStartTime+".txt";
                     file = new File(dir, fileName);
-                    String str = Arrays.toString(collection.toArray(new String[collection.size()]));
-                    collection.clear();
+                    String str = Arrays.toString(mCollection.toArray(new String[mCollection.size()]));
+                    mCollection.clear();
                     if(str.isEmpty() || str.length() <= 1){
                         showMessage("No data recorded");
                         return;
@@ -489,42 +489,42 @@ public class MainActivity extends Activity {
     private Runnable mRecordTimer = new Runnable() {
         @Override
         public void run() {
-            if(!collection.isEmpty()) {
-                if (recordTimerCounter < SECONDS_IN_ONE_MINUTE) {
-                    sec = recordTimerCounter;
-                } else if (recordTimerCounter < SECONDS_IN_ONE_HOUR) {
-                    min = recordTimerCounter / SECONDS_IN_ONE_MINUTE;
-                    sec = recordTimerCounter % SECONDS_IN_ONE_MINUTE;
+            if(!mCollection.isEmpty()) {
+                if (mRecTimerCounter < SECONDS_IN_ONE_MINUTE) {
+                    sec = mRecTimerCounter;
+                } else if (mRecTimerCounter < SECONDS_IN_ONE_HOUR) {
+                    min = mRecTimerCounter / SECONDS_IN_ONE_MINUTE;
+                    sec = mRecTimerCounter % SECONDS_IN_ONE_MINUTE;
                 } else {
-                    hr = recordTimerCounter / SECONDS_IN_ONE_HOUR;
-                    min = (recordTimerCounter % SECONDS_IN_ONE_HOUR) / SECONDS_IN_ONE_MINUTE;
-                    min = (recordTimerCounter % SECONDS_IN_ONE_HOUR) % SECONDS_IN_ONE_MINUTE;
+                    hr = mRecTimerCounter / SECONDS_IN_ONE_HOUR;
+                    min = (mRecTimerCounter % SECONDS_IN_ONE_HOUR) / SECONDS_IN_ONE_MINUTE;
+                    min = (mRecTimerCounter % SECONDS_IN_ONE_HOUR) % SECONDS_IN_ONE_MINUTE;
                 }
                 updateTimer();
-                if (recordTimerCounter >= MAX_DATA_RECORDING_TIME) {
+                if (mRecTimerCounter >= MAX_DATA_RECORDING_TIME) {
                     stopRecordingData();
-                    if (showGraph) {
+                    if (mShowGraph) {
                         stopGraph();
                     }
                     return;
                 }
-                if ((MAX_DATA_RECORDING_TIME - recordTimerCounter) < 5)//Five seconds to the end of timer
+                if ((MAX_DATA_RECORDING_TIME - mRecTimerCounter) < 5)//Five seconds to the end of timer
                     ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.green));
-                recordTimerCounter++;
+                mRecTimerCounter++;
             }
             mHandler.postDelayed(mRecordTimer, ONE_SECOND);
         }
     };
 
     private void refreshTimer(){
-        recordTimerCounter = 1;
+        mRecTimerCounter = 1;
         hr = min = sec = 0;
         ((TextView) findViewById(R.id.timer_view)).setTextColor(getResources().getColor(R.color.red));
     }
 
     private void updateTimer(){
-        timerString = timerString.format("%02d:%02d:%02d", hr,min,sec);
-        ((TextView) findViewById(R.id.timer_view)).setText(timerString);
+        mTimerString = mTimerString.format("%02d:%02d:%02d", hr,min,sec);
+        ((TextView) findViewById(R.id.timer_view)).setText(mTimerString);
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
@@ -565,7 +565,7 @@ public class MainActivity extends Activity {
     protected void onStop() {
         Log.d(TAG, "onStop");
         super.onStop();
-        if (showGraph) {
+        if (mShowGraph) {
             stopGraph();
         }
     }

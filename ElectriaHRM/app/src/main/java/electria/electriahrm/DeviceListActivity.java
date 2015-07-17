@@ -22,8 +22,6 @@ package electria.electriahrm;
         import java.util.List;
         import java.util.Map;
 
-
-
         import android.app.Activity;
         import android.bluetooth.BluetoothAdapter;
         import android.bluetooth.BluetoothDevice;
@@ -57,9 +55,9 @@ public class DeviceListActivity extends Activity {
     private TextView mEmptyList;
     public static final String TAG = "DeviceListActivity";
 
-    List<BluetoothDevice> deviceList;
-    private DeviceAdapter deviceAdapter;
-    Map<String, Integer> devRssiValues;
+    List<BluetoothDevice> mDeviceList;
+    private DeviceAdapter mDeviceAdapter;
+    Map<String, Integer> mDevRssiValues;
     private static final long SCAN_PERIOD = 10000; //10 seconds
     private Handler mHandler;
     private boolean mScanning;
@@ -113,12 +111,12 @@ public class DeviceListActivity extends Activity {
     private void populateList() {
         /* Initialize device list container */
         Log.d(TAG, "populateList");
-        deviceList = new ArrayList<BluetoothDevice>();
-        deviceAdapter = new DeviceAdapter(this, deviceList);
-        devRssiValues = new HashMap<String, Integer>();
+        mDeviceList = new ArrayList<BluetoothDevice>();
+        mDeviceAdapter = new DeviceAdapter(this, mDeviceList);
+        mDevRssiValues = new HashMap<String, Integer>();
 
         ListView newDevicesListView = (ListView) findViewById(R.id.new_devices);
-        newDevicesListView.setAdapter(deviceAdapter);
+        newDevicesListView.setAdapter(mDeviceAdapter);
         newDevicesListView.setOnItemClickListener(mDeviceClickListener);
 
         scanLeDevice(true);
@@ -175,7 +173,7 @@ public class DeviceListActivity extends Activity {
     private void addDevice(BluetoothDevice device, int rssi) {
         boolean deviceFound = false;
 
-        for (BluetoothDevice listDev : deviceList) {
+        for (BluetoothDevice listDev : mDeviceList) {
             if (listDev.getAddress().equals(device.getAddress())) {
                 deviceFound = true;
                 break;
@@ -183,15 +181,15 @@ public class DeviceListActivity extends Activity {
         }
 
 
-        devRssiValues.put(device.getAddress(), rssi);
+        mDevRssiValues.put(device.getAddress(), rssi);
         if (!deviceFound) {
-            deviceList.add(device);
+            mDeviceList.add(device);
             mEmptyList.setVisibility(View.GONE);
 
 
 
 
-            deviceAdapter.notifyDataSetChanged();
+            mDeviceAdapter.notifyDataSetChanged();
         }
     }
 
@@ -225,7 +223,7 @@ public class DeviceListActivity extends Activity {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
             Bundle b = new Bundle();
-            b.putString(BluetoothDevice.EXTRA_DEVICE, deviceList.get(position).getAddress());
+            b.putString(BluetoothDevice.EXTRA_DEVICE, mDeviceList.get(position).getAddress());
 
             Intent result = new Intent();
             result.putExtras(b);
@@ -285,7 +283,7 @@ public class DeviceListActivity extends Activity {
             final TextView tvrssi = (TextView) vg.findViewById(R.id.rssi);
 
             tvrssi.setVisibility(View.VISIBLE);
-            byte rssival = (byte) devRssiValues.get(device.getAddress()).intValue();
+            byte rssival = (byte) mDevRssiValues.get(device.getAddress()).intValue();
             if (rssival != 0) {
                 tvrssi.setText("Rssi = " + String.valueOf(rssival));
             }
