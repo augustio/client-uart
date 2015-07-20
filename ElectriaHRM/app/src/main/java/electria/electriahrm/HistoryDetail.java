@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,23 +52,23 @@ public class HistoryDetail extends Activity {
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
     private ViewGroup mHistLayout;
-    private Button btnSend;
+    private Button btnSendEmail, btnSendCloud;
     private TextView accessStatus;
     private String mFPath;
     private File mFile;
     private List<String> mCollection;
     private ECGMeasurement ecgM;
-    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
         mCollection = new ArrayList<String>();
-        mHandler = new Handler();
-        btnSend = (Button)findViewById(R.id.send_data);
+        btnSendEmail = (Button)findViewById(R.id.send_email);
+        btnSendCloud = (Button)findViewById(R.id.send_cloud);
         accessStatus = (TextView)findViewById(R.id.server_access_status);
-        btnSend.setEnabled(false);
+        btnSendEmail.setEnabled(false);
+        btnSendCloud.setEnabled(false);
         mFile = null;
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -89,7 +89,18 @@ public class HistoryDetail extends Activity {
             finish();
         }
 
-        btnSend.setOnClickListener(new View.OnClickListener() {
+        btnSendEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(hasNetworkConnection())
+                    // call AsynTask to perform network operation on separate thread
+                    sendAttachment();
+                else
+                    showMessage(NO_NETWORK_CONNECTION);
+            }
+        });
+
+        btnSendCloud.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(hasNetworkConnection())
@@ -151,7 +162,8 @@ public class HistoryDetail extends Activity {
             }
             else {
                 Log.d(TAG, SUCCESS);
-                btnSend.setEnabled(true);
+                btnSendEmail.setEnabled(true);
+                btnSendCloud.setEnabled(true);
             }
         }
     }
@@ -164,22 +176,6 @@ public class HistoryDetail extends Activity {
             return true;
         }
         return false;
-    }
-
-    /*Checks if mFile is a text mFile and is not empty*/
-    private File validateFile(String path){
-        File f = null;
-        if(path.endsWith(("txt"))){
-            f = new File(path);
-            //File is considered empty if less than or equal to the size of a character
-            if(f.length() <= Character.SIZE) {
-                showMessage("Empty File");
-                return null;
-            }
-        }
-        else
-            showMessage("Invalid File Format");
-        return f;
     }
 
     //Add a point to the graph
@@ -261,6 +257,38 @@ public class HistoryDetail extends Activity {
             finish();
         }
 
+    }
+
+    //Send ECG data as attachment to a specified Email address
+    private void sendAttachment(){
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "ECG Data");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Attached is a copy of ECG samples");
+        emailIntent.setData(Uri.parse("mailto:electria.metropolia@gmail.com"));
+        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse( "file://"+mFPath));
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Sending Email...."));
+        }catch (android.content.ActivityNotFoundException ex) {
+            showMessage("No email clients installed.");
+        }
+        finish();
+    }
+
+    /*Checks if mFile is a text mFile and is not empty*/
+    private File validateFile(String path){
+        File f = null;
+        if(path.endsWith(("txt"))){
+            f = new File(path);
+            //File is considered empty if less than or equal to the size of a character
+            if(f.length() <= Character.SIZE) {
+                showMessage("Empty File");
+                return null;
+            }
+        }
+        else
+            showMessage("Invalid File Format");
+        return f;
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {

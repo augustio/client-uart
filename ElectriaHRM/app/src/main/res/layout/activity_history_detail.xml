@@ -19,13 +19,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/send_data"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@color/green"
-        android:text="Send"/>
+        android:orientation="horizontal">
 
+        <Button
+            android:id="@+id/send_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:background="@color/green"
+            android:text="Send to Email"/>
+
+        <Button
+            android:id="@+id/send_cloud"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="@color/blue"
+            android:text="Send to Cloud"/>
+
+        </RelativeLayout>
 
 </LinearLayout>
