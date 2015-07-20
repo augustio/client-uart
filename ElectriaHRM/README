@@ -18,7 +18,8 @@ The recording is set to last for two minutes if the user does not stop it by pre
 While recording, a timer is displayed to show the duration of the recording. 
 When the recording time elapses, the timer and the graph display are turned off.
 Recorded sensor data is stored in the devices internal storage location within a folder, ECGDATA after two minutes of recording or by pressing the stop button. 
-The History button is used to display a list of files containing recorded sensor data. Each item in this list is the name of the file where the data is saved and the size of the file. Each file name is in the format deviceName_YYMMddHHmmss.txt and is a link to a details view which is basically a graphical display of a portion of the recorded data.
+The History button is used to display a list of files containing recorded sensor data. Each item in this list is the name of the file where the data is saved and the size of the file. Each file name is in the format sensorName_YYMMddHHmmss.txt and is a link to a details view which is basically a graphical display of a portion of the recorded data. A long press on any of these links would pop up an edit menu to delete the associated file from the record and the phone storage.
+On the history_details view, ECG data could be sent either to the cloud service or to a designated email address by pressing the corresponding button.
 
 #Android Device Requirements
 Minimum memory size: 2G ?
