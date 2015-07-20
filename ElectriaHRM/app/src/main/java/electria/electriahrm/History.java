@@ -62,6 +62,7 @@ public class History extends Activity {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_history, menu);
+        menu.setHeaderTitle("Edit");
     }
 
     @Override

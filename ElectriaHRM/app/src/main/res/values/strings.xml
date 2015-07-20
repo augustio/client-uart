@@ -22,6 +22,7 @@
     <string name="text_hint">Click here to write text</string>
     <string name="sensor_position_label">sensor position </string>
     <string name="location_other">Reserved</string>
+    <string name="ecg_files_list">ECG MEASUREMENT FILES</string>
     <string-array name="sensor_locations">
         <item>Other</item>
         <item>Chest</item>
