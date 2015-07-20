@@ -8,10 +8,12 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.achartengine.GraphicalView;
@@ -39,8 +41,9 @@ public class HistoryDetail extends Activity {
     private static final String TAG = HistoryDetail.class.getSimpleName();
     private static final String SUCCESS = "File Access Successful";
     private static final String SERVER_ERROR = "No Response From Server!";
-    private static final String SERVER_EXCEPTION = "Exception from Server Access";
-    private static final String NOT_CONNECTED = "NOt Connected to Internet";
+    private static final String NO_NETWORK_CONNECTION = "Not Connected to Network";
+    private static final String CONNECTION_ERROR= "Server Not Reachable, Check Internet Connection";
+    private static final String SERVER_URL = "http://52.18.112.240:3000/records";
     private static final int X_RANGE = 500;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
@@ -50,17 +53,21 @@ public class HistoryDetail extends Activity {
     private LineGraphView mLineGraph;
     private ViewGroup mHistLayout;
     private Button btnSend;
+    private TextView accessStatus;
     private String mFPath;
     private File mFile;
     private List<String> mCollection;
     private ECGMeasurement ecgM;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
         mCollection = new ArrayList<String>();
+        mHandler = new Handler();
         btnSend = (Button)findViewById(R.id.send_data);
+        accessStatus = (TextView)findViewById(R.id.server_access_status);
         btnSend.setEnabled(false);
         mFile = null;
         Bundle extras = getIntent().getExtras();
@@ -85,11 +92,11 @@ public class HistoryDetail extends Activity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isNetworkAvailable())
+                if(hasNetworkConnection())
                     // call AsynTask to perform network operation on separate thread
-                    new HttpAsyncTask().execute("http://52.18.112.240:3000/records");
+                    new HttpAsyncTask().execute(SERVER_URL);
                 else
-                    showMessage(NOT_CONNECTED);
+                    showMessage(NO_NETWORK_CONNECTION);
             }
         });
     }
@@ -217,13 +224,13 @@ public class HistoryDetail extends Activity {
 
         } catch (Exception e) {
             Log.d("InputStream", e.getLocalizedMessage());
-            result =  SERVER_EXCEPTION;
+            result =  CONNECTION_ERROR;
         }
 
         return result;
     }
 
-    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+    private class HttpAsyncTask extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... urls) {
 
@@ -232,16 +239,22 @@ public class HistoryDetail extends Activity {
             ecgM.setTimeStamp(mFPath.substring(mFPath.lastIndexOf("_") + 1, mFPath.lastIndexOf(".")));
             ecgM.setData(Arrays.toString(mCollection.toArray(new String[mCollection.size()])));
 
+            publishProgress("Sending Data to Server ...");
             return POST(urls[0], ecgM);
+        }
+
+        protected void onProgressUpdate(String... value) {
+            accessStatus.setText(value[0]);
         }
 
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
+            accessStatus.setText("");
             if (result.equals(SERVER_ERROR))
                 showMessage("Error Connecting to Server");
-            else if (result.equals(SERVER_EXCEPTION))
-                showMessage("Data not Sent");
+            else if (result.equals(CONNECTION_ERROR))
+                showMessage(CONNECTION_ERROR);
             else
                 showMessage("Data Sent");
 
@@ -261,7 +274,7 @@ public class HistoryDetail extends Activity {
         return result;
     }
 
-    public boolean isNetworkAvailable(){
+    public boolean hasNetworkConnection(){
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected())
