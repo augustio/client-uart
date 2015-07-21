@@ -465,7 +465,7 @@ public class MainActivity extends Activity {
                         fw.append(str+"\n");
                         fw.flush();
                         fw.close();
-                        showMessage("Saved ECG data to SD card");
+                        showMessage("ECG Record Saved");
                     } catch (IOException e) {
                         Log.e(TAG, e.toString());
                         showMessage("Problem writing to Storage");
