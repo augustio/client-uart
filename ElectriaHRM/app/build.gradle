@@ -19,8 +19,13 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile files('src/main/java/electria/achartengine-1.1.0.jar')
+    compile 'com.google.code.gson:gson:2.2.4'
 }
