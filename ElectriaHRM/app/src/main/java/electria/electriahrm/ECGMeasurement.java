@@ -41,10 +41,6 @@ public class ECGMeasurement {
         this.data = data;
     }
 
-    protected void addValue(String value){
-        data = data + value + "\n";
-    }
-
     protected String toJson(){
 
         Gson gson = new Gson();

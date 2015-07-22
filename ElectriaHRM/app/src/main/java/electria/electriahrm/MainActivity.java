@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
     private LinearLayout.LayoutParams mParamEnable, mParamDisable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
     private ViewGroup mainLayout;
-    private List<String> mCollection;
+    private List<String> mCollection, mData;
 
     private int mCounter;
     private int mLastBatLevel;
@@ -81,7 +81,6 @@ public class MainActivity extends Activity {
     private int mState;
     private double mAvHeartRate, mHeartRateCount;
     private String mTimerString;
-    private String mRecStartTime;
     private String mSensorPos;
     private Handler mHandler;
     private BluetoothDevice mDevice;
@@ -116,6 +115,7 @@ public class MainActivity extends Activity {
         mParamEnable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
         mParamDisable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
         mCollection = new ArrayList<String>();
+        mData = new ArrayList<String>();
 
         mDataRecording = false;
         mShowGraph = false;
@@ -401,16 +401,15 @@ public class MainActivity extends Activity {
                 String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
                 if (rxString != null){
                     String [] ECGData = rxString.split("-");
-                    if(ECGData != null && ECGData.length >= 2 ) {
-                        String d1 = ECGData[0],
-                                d2 = ECGData[1];
+                    if(ECGData.length >= 2 ) {
 
                         if (mDataRecording) {
-                            ecgM.addValue(d1+"\n"+d2);
+                            mData.add(ECGData[0]);
+                            mData.add(ECGData[1]);
                         }
                         if (mShowGraph) {
-                            mCollection.add(d1);
-                            mCollection.add(d2);
+                            mCollection.add(ECGData[0]);
+                            mCollection.add(ECGData[1]);
                         }
                     }
                 }
@@ -464,7 +463,7 @@ public class MainActivity extends Activity {
     }
 
     private void saveToDisk(){
-        if(ecgM.getData() == null){
+        if(mData.isEmpty()){
             showMessage("No data recorded");
             return;
         }
@@ -479,7 +478,9 @@ public class MainActivity extends Activity {
                     File file;
                     String fileName = ecgM.getId()+"_"+ecgM.getTimeStamp()+".txt";
                     file = new File(dir, fileName);
-                    mCollection.clear();
+                    String str = Arrays.toString(mData.toArray(new String[mData.size()]));
+                    str = str.replaceAll(",", "\n");
+                    ecgM.setData(str);
                     try {
                         FileWriter fw = new FileWriter(file, true);
                         fw.append(ecgM.toJson());
@@ -510,7 +511,7 @@ public class MainActivity extends Activity {
     private Runnable mRecordTimer = new Runnable() {
         @Override
         public void run() {
-            if(!mCollection.isEmpty()) {
+            if(!mData.isEmpty()) {
                 if (mRecTimerCounter < SECONDS_IN_ONE_MINUTE) {
                     sec = mRecTimerCounter;
                 } else if (mRecTimerCounter < SECONDS_IN_ONE_HOUR) {
