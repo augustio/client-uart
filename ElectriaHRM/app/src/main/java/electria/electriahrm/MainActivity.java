@@ -85,6 +85,7 @@ public class MainActivity extends Activity {
     private String mSensorPos;
     private Handler mHandler;
     private BluetoothDevice mDevice;
+    private ECGMeasurement ecgM;
     private BluetoothAdapter mBtAdapter = null;
 
     @Override
@@ -214,8 +215,9 @@ public class MainActivity extends Activity {
                         stopRecordingData();
                     }
                     else{
+                        ecgM = new ECGMeasurement(mDevice.getName(),
+                                new SimpleDateFormat("yyMMddHHmmss", Locale.US).format(new Date()));
                         mDataRecording = true;
-                        mRecStartTime = new SimpleDateFormat("yyMMddHHmmss", Locale.US).format(new Date());
                         btnStore.setText("Stop");
                         mRecordTimer.run();
                     }
@@ -287,12 +289,6 @@ public class MainActivity extends Activity {
         }
     };
 
-    //Add a set of two ECG values to mCollection buffer
-    private void recordData(String value1, String value2){
-        mCollection.add(value1);
-        mCollection.add(value2);
-    }
-
     private void updateBatteryLevel(int level) {
         if(mLastBatLevel != level)
             mLastBatLevel = level;
@@ -333,7 +329,7 @@ public class MainActivity extends Activity {
             mHandler.removeCallbacks(mGraphTask);
         }
     }
-;
+    ;
     private void resetGUIComponents(){
         btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
         btnShow.setText("Show");
@@ -407,10 +403,10 @@ public class MainActivity extends Activity {
                     String [] ECGData = rxString.split("-");
                     if(ECGData != null && ECGData.length >= 2 ) {
                         String d1 = ECGData[0],
-                               d2 = ECGData[1];
+                                d2 = ECGData[1];
 
                         if (mDataRecording) {
-                            recordData(ECGData[0], ECGData[1]);
+                            ecgM.addValue(d1+"\n"+d2);
                         }
                         if (mShowGraph) {
                             mCollection.add(d1);
@@ -468,6 +464,11 @@ public class MainActivity extends Activity {
     }
 
     private void saveToDisk(){
+        if(ecgM.getData() == null){
+            showMessage("No data recorded");
+            return;
+        }
+
         if(isExternalStorageWritable()){
             new Thread(new Runnable(){
                 public void run(){
@@ -476,18 +477,13 @@ public class MainActivity extends Activity {
                     if(!dir.isDirectory())
                         dir.mkdirs();
                     File file;
-                    String fileName = mDevice.getName()+"_"+mRecStartTime+".txt";
+                    String fileName = ecgM.getId()+"_"+ecgM.getTimeStamp()+".txt";
                     file = new File(dir, fileName);
-                    String str = Arrays.toString(mCollection.toArray(new String[mCollection.size()]));
                     mCollection.clear();
-                    if(str.isEmpty() || str.length() <= 1){
-                        showMessage("No data recorded");
-                        return;
-                    }
-                    str = str.substring(1, str.length()-1).replaceAll("\\s+","").replaceAll(",", "\n");
                     try {
                         FileWriter fw = new FileWriter(file, true);
-                        fw.append(str+"\n");
+                        fw.append(ecgM.toJson());
+                        ecgM = null;
                         fw.flush();
                         fw.close();
                         showMessage("ECG Record Saved");
@@ -642,7 +638,7 @@ public class MainActivity extends Activity {
             case REQUEST_ENABLE_BT:
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
-                   showMessage("Bluetooth has turned on ");
+                    showMessage("Bluetooth has turned on ");
 
                 } else {
                     // User did not enable Bluetooth or an error occurred
