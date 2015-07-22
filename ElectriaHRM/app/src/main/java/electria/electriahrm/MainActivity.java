@@ -53,14 +53,13 @@ public class MainActivity extends Activity {
     private static final int CONNECTED = 20;
     private static final int DISCONNECTED = 21;
     private static final int CONNECTING = 22;
-    private static final int X_RANGE = 500;
+    private static final int X_RANGE = 200;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
     private static final long MAX_DATA_RECORDING_TIME = 120;//Two minutes(60 seconds)
     private static final int SECONDS_IN_ONE_MINUTE = 60;
     private static final int SECONDS_IN_ONE_HOUR = 3600;
     private static final int ONE_SECOND = 1000;// 1000 milliseconds in one second
-    private static final int X_SCALE = 10;//Ten milliseconds interval for X axis
 
     private boolean mShowGraph;
     private boolean mGraphViewActive;
@@ -200,9 +199,7 @@ public class MainActivity extends Activity {
                     if (mShowGraph) {
                         stopGraph();
                     }else{
-                        setGraphView();
-                        mShowGraph = true;
-                        btnShow.setText("Stop");
+                        startGraph();
                     }
                 }
             }
@@ -250,25 +247,45 @@ public class MainActivity extends Activity {
     }
 
     //Plot a new set of two ECG values on the graph and present on the GUI
-    private void updateGraph(final int value1, final int value2) {
-        Runnable graphUpdate = new Runnable() {
-            public void run() {
-                double maxX = mCounter;
-                double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-                mLineGraph.setXRange(minX, maxX);
-                mLineGraph.addValue(new Point(mCounter, value1));
-                mLineGraph.addValue(new Point(++mCounter, value2));
-                mGraphView.repaint();
-                mCounter ++;
-            }
-        };
-        mHandler.postDelayed(graphUpdate, X_SCALE);
+    private void updateGraph(String value1, String value2) {
+        double maxX = mCounter;
+        boolean redraw = false;
+        double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+        mLineGraph.setXRange(minX, maxX);
+        if(android.text.TextUtils.isDigitsOnly(value1)) {
+            mLineGraph.addValue(new Point(mCounter, Integer.parseInt(value1)));
+            mCounter++;
+            redraw = true;
+        }
+        if(android.text.TextUtils.isDigitsOnly(value2)) {
+            mLineGraph.addValue(new Point(mCounter, Integer.parseInt(value2)));
+            mCounter++;
+            redraw = true;
+        }
+        if(redraw)
+            mGraphView.repaint();
+    }
+
+    private void startGraph(){
+        setGraphView();
+        mShowGraph = true;
+        btnShow.setText("Stop");
+        mGraphTask.run();
     }
 
     private void stopGraph(){
         clearGraph();
         btnShow.setText("Show");
     }
+
+    private Runnable mGraphTask = new Runnable() {
+        @Override
+        public void run() {
+            if(mShowGraph && (mCollection.size() > (mCounter+1)))
+                updateGraph(mCollection.get(mCounter), mCollection.get(mCounter+1));
+            mHandler.post(mGraphTask);
+        }
+    };
 
     //Add a set of two ECG values to mCollection buffer
     private void recordData(String value1, String value2){
@@ -312,6 +329,8 @@ public class MainActivity extends Activity {
             setHeartRateValue(0);
             mAvHeartRate = 0;
             mHeartRateCount = 0;
+            mCollection.clear();
+            mHandler.removeCallbacks(mGraphTask);
         }
     }
 ;
@@ -386,11 +405,17 @@ public class MainActivity extends Activity {
                 String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
                 if (rxString != null){
                     String [] ECGData = rxString.split("-");
-                    if(mDataRecording) {
-                        recordData(ECGData[0], ECGData[1]);
-                    }
-                    if(mShowGraph) {
-                        updateGraph(Integer.parseInt(ECGData[0]), Integer.parseInt(ECGData[1]));
+                    if(ECGData != null && ECGData.length >= 2 ) {
+                        String d1 = ECGData[0],
+                               d2 = ECGData[1];
+
+                        if (mDataRecording) {
+                            recordData(ECGData[0], ECGData[1]);
+                        }
+                        if (mShowGraph) {
+                            mCollection.add(d1);
+                            mCollection.add(d2);
+                        }
                     }
                 }
             }
