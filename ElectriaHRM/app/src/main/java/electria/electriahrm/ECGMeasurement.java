@@ -9,9 +9,12 @@ public class ECGMeasurement {
     private String timeStamp;
     private String data;
 
-    public void ECGMeasurement(String id, String timeStamp){
+    public ECGMeasurement(){}
+
+    public ECGMeasurement(String id, String timeStamp){
         this.id = id;
         this.timeStamp = timeStamp;
+        data = "";
     }
 
     protected String getId() {
@@ -39,7 +42,7 @@ public class ECGMeasurement {
     }
 
     protected void addValue(String value){
-        data = value + "\n";
+        data = data + value + "\n";
     }
 
     protected String toJson(){
