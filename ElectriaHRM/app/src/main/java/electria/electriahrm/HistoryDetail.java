@@ -23,7 +23,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,10 +30,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 
 public class HistoryDetail extends Activity {
 
@@ -56,20 +51,22 @@ public class HistoryDetail extends Activity {
     private TextView accessStatus;
     private String mFPath;
     private File mFile;
-    private List<String> mCollection;
     private ECGMeasurement ecgM;
+    private int minY, maxY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
-        mCollection = new ArrayList<String>();
         btnSendEmail = (Button)findViewById(R.id.send_email);
         btnSendCloud = (Button)findViewById(R.id.send_cloud);
         accessStatus = (TextView)findViewById(R.id.server_access_status);
         btnSendEmail.setEnabled(false);
         btnSendCloud.setEnabled(false);
         mFile = null;
+        ecgM = new ECGMeasurement();
+        minY = MAX_Y;
+        maxY = MIN_Y;
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finish();
@@ -131,14 +128,18 @@ public class HistoryDetail extends Activity {
         protected String doInBackground(File... mFiles) {
             try {
                 BufferedReader buf = new BufferedReader(new FileReader(mFiles[0]));
-                String line;
-                while ( (line = buf.readLine()) != null){
-                    if(android.text.TextUtils.isDigitsOnly(line)) {
-                        mCollection.add(line);
-                        publishProgress(Integer.parseInt(line));
-                    }
-                }
+                ecgM.fromJson(buf.readLine());
                 buf.close();
+                String data = ecgM.getData().substring(1);//Remove opening square bracket
+                data = data.substring(1).replace("]", "");//Remove closing square bracket
+                String[] dataArray = data.split(",");
+                for( int counter = 0; counter < dataArray.length; counter++){
+                    String ecgSample = dataArray[counter].trim();
+                    if(android.text.TextUtils.isDigitsOnly(ecgSample)) {
+                        publishProgress(Integer.parseInt(ecgSample));
+                    }
+                    counter++;
+                }
             } catch (Exception e) {
                 exception = e;
                 return null;
@@ -159,6 +160,7 @@ public class HistoryDetail extends Activity {
             if(exception != null){
                 Log.e(TAG, exception.toString());
                 showMessage("Problem accessing mFile");
+                finish();
             }
             else {
                 Log.d(TAG, SUCCESS);
@@ -182,6 +184,9 @@ public class HistoryDetail extends Activity {
     private void updateGraph(int x, int y){
         double maxX = x;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+        minY = (y < minY)? y: minY;
+        maxY = (y > maxY)? y: maxY;
+        mLineGraph.setPanLimits(MIN_X, MAX_X,minY, maxY);
         mLineGraph.setXRange(minX, maxX);
         mLineGraph.addValue(new Point(x, y));
         mGraphView.repaint();
@@ -193,14 +198,7 @@ public class HistoryDetail extends Activity {
         try {
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost(url);
-            String json;
-
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.accumulate("sensor", ecgM.getId());
-            jsonObject.accumulate("timestamp", ecgM.getTimeStamp());
-            jsonObject.accumulate("data", ecgM.getData());
-
-            json = jsonObject.toString();
+            String json = ecgM.toJson();
 
             StringEntity se = new StringEntity(json);
             httpPost.setEntity(se);
@@ -229,12 +227,6 @@ public class HistoryDetail extends Activity {
     private class HttpAsyncTask extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... urls) {
-
-            ecgM = new ECGMeasurement();
-            ecgM.setId(mFPath.substring(mFPath.lastIndexOf("/") + 1, mFPath.lastIndexOf("_")));
-            ecgM.setTimeStamp(mFPath.substring(mFPath.lastIndexOf("_") + 1, mFPath.lastIndexOf(".")));
-            ecgM.setData(Arrays.toString(mCollection.toArray(new String[mCollection.size()])));
-
             publishProgress("Sending Data to Server ...");
             return POST(urls[0], ecgM);
         }
@@ -251,8 +243,9 @@ public class HistoryDetail extends Activity {
                 showMessage("Error Connecting to Server");
             else if (result.equals(CONNECTION_ERROR))
                 showMessage(CONNECTION_ERROR);
-            else
+            else {
                 showMessage("Data Sent");
+            }
 
             finish();
         }
