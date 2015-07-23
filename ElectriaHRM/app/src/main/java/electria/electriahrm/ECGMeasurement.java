@@ -5,24 +5,24 @@ import com.google.gson.Gson;
 
 public class ECGMeasurement {
 
-    private String id;
+    private String sensor;
     private String timeStamp;
     private String data;
 
     public ECGMeasurement(){}
 
-    public ECGMeasurement(String id, String timeStamp){
-        this.id = id;
+    public ECGMeasurement(String sensor, String timeStamp){
+        this.sensor = sensor;
         this.timeStamp = timeStamp;
         data = "";
     }
 
-    protected String getId() {
-        return id;
+    protected String getSensor() {
+        return sensor;
     }
 
-    protected void setId(String id) {
-        this.id = id;
+    protected void setSensor(String sensor) {
+        this.sensor = sensor;
     }
 
     protected String getTimeStamp() {
@@ -50,7 +50,7 @@ public class ECGMeasurement {
     protected void fromJson(String json){
         Gson gson = new Gson();
         ECGMeasurement ecgM = gson.fromJson(json, ECGMeasurement.class);
-        this.id = ecgM.getId();
+        this.sensor = ecgM.getSensor();
         this.timeStamp = ecgM.getTimeStamp();
         this.data = ecgM.getData();
     }

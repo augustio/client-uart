@@ -476,7 +476,7 @@ public class MainActivity extends Activity {
                     if(!dir.isDirectory())
                         dir.mkdirs();
                     File file;
-                    String fileName = ecgM.getId()+"_"+ecgM.getTimeStamp()+".txt";
+                    String fileName = ecgM.getSensor()+"_"+ecgM.getTimeStamp()+".txt";
                     file = new File(dir, fileName);
                     ecgM.setData(Arrays.toString(mData.toArray(new String[mData.size()])));
                     mData.clear();
