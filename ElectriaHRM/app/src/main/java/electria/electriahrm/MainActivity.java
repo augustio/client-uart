@@ -478,9 +478,8 @@ public class MainActivity extends Activity {
                     File file;
                     String fileName = ecgM.getId()+"_"+ecgM.getTimeStamp()+".txt";
                     file = new File(dir, fileName);
-                    String str = Arrays.toString(mData.toArray(new String[mData.size()]));
-                    str = str.replaceAll(",", "\n");
-                    ecgM.setData(str);
+                    ecgM.setData(Arrays.toString(mData.toArray(new String[mData.size()])));
+                    mData.clear();
                     try {
                         FileWriter fw = new FileWriter(file, true);
                         fw.append(ecgM.toJson());
