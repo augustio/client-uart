@@ -246,8 +246,6 @@ public class HistoryDetail extends Activity {
             else {
                 showMessage("Data Sent");
             }
-
-            finish();
         }
 
     }
@@ -265,7 +263,6 @@ public class HistoryDetail extends Activity {
         }catch (android.content.ActivityNotFoundException ex) {
             showMessage("No email clients installed.");
         }
-        finish();
     }
 
     /*Checks if mFile is a text mFile and is not empty*/
