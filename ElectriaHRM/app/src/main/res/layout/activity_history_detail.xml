@@ -26,19 +26,17 @@
 
         <Button
             android:id="@+id/send_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="80dp"
             android:layout_alignParentStart="true"
-            android:background="@color/green"
-            android:text="Send to Email"/>
+            android:background="@drawable/ic_email_send" />
 
         <Button
             android:id="@+id/send_cloud"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="80dp"
             android:layout_alignParentEnd="true"
-            android:background="@color/blue"
-            android:text="Send to Cloud"/>
+            android:background="@drawable/ic_coud_send" />
 
         </RelativeLayout>
 
