@@ -272,13 +272,13 @@ public class MainActivity extends Activity {
     private void startGraph(){
         setGraphView();
         mShowGraph = true;
-        btnShow.setText("Stop");
+        btnShow.setText("Close");
         mGraphTask.run();
     }
 
     private void stopGraph(){
         clearGraph();
-        btnShow.setText("Show");
+        btnShow.setText("View");
     }
 
     private Runnable mGraphTask = new Runnable() {

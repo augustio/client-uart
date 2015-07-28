@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:padding="2dp"
-            android:text="Show"/>
+            android:text="View"/>
 
         <Button
             android:id="@+id/btn_store"
