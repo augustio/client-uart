@@ -56,7 +56,8 @@ public class MainActivity extends Activity {
     private static final int X_RANGE = 200;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
-    private static final long MAX_DATA_RECORDING_TIME = 120;//Two minutes(60 seconds)
+    private static final int MAX_DATA_RECORDING_TIME = 120;//Two minutes(60 seconds)
+    private static final int MAX_COLLECTION_SIZE = 12000;
     private static final int SECONDS_IN_ONE_MINUTE = 60;
     private static final int SECONDS_IN_ONE_HOUR = 3600;
     private static final int ONE_SECOND = 1000;// 1000 milliseconds in one second
@@ -408,6 +409,8 @@ public class MainActivity extends Activity {
                             mData.add(ECGData[1]);
                         }
                         if (mShowGraph) {
+                            if(mCollection.size() >= MAX_COLLECTION_SIZE)
+                                stopGraph();
                             mCollection.add(ECGData[0]);
                             mCollection.add(ECGData[1]);
                         }
