@@ -333,7 +333,7 @@ public class MainActivity extends Activity {
     ;
     private void resetGUIComponents(){
         btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
-        btnShow.setText("Show");
+        btnShow.setText("View");
         btnStore.setText("Record");
         btnConnectDisconnect.setText("Connect");
         btnConnectDisconnect.setBackgroundColor(getResources().getColor(R.color.green));
