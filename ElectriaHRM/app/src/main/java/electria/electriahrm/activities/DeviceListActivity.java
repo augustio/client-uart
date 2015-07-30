@@ -1,4 +1,4 @@
-package electria.electriahrm;
+package electria.electriahrm.activities;
 
 /*
  * Copyright (C) 2013 The Android Open Source Project
@@ -47,6 +47,8 @@ package electria.electriahrm;
         import android.widget.ListView;
         import android.widget.TextView;
         import android.widget.Toast;
+
+        import electria.electriahrm.R;
 
 public class DeviceListActivity extends Activity {
     private BluetoothAdapter mBluetoothAdapter;

@@ -1,4 +1,4 @@
-package electria.electriahrm;
+package electria.electriahrm.activities;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -42,6 +42,11 @@ import android.view.ViewGroup;
 import android.graphics.Point;
 
 import org.achartengine.GraphicalView;
+
+import electria.electriahrm.measurements.ECGMeasurement;
+import electria.electriahrm.LineGraphView;
+import electria.electriahrm.R;
+import electria.electriahrm.services.BleService;
 
 
 public class MainActivity extends Activity {

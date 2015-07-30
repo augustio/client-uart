@@ -1,4 +1,4 @@
-package electria.electriahrm;
+package electria.electriahrm.measurements;
 
 import com.google.gson.Gson;
 
@@ -17,37 +17,37 @@ public class ECGMeasurement {
         data = "";
     }
 
-    protected String getSensor() {
+    public String getSensor() {
         return sensor;
     }
 
-    protected void setSensor(String sensor) {
+    public void setSensor(String sensor) {
         this.sensor = sensor;
     }
 
-    protected String getTimeStamp() {
+    public String getTimeStamp() {
         return timeStamp;
     }
 
-    protected void setTimeStamp(String timeStamp) {
+    public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
     }
 
-    protected String getData() {
+    public String getData() {
         return data;
     }
 
-    protected void setData(String data) {
+    public void setData(String data) {
         this.data = data;
     }
 
-    protected String toJson(){
+    public String toJson(){
 
         Gson gson = new Gson();
         return gson.toJson(this);
     }
 
-    protected void fromJson(String json){
+    public void fromJson(String json){
         Gson gson = new Gson();
         ECGMeasurement ecgM = gson.fromJson(json, ECGMeasurement.class);
         this.sensor = ecgM.getSensor();

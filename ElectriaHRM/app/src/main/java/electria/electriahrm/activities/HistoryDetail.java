@@ -1,4 +1,4 @@
-package electria.electriahrm;
+package electria.electriahrm.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -30,6 +30,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import electria.electriahrm.LineGraphView;
+import electria.electriahrm.R;
+import electria.electriahrm.measurements.ECGMeasurement;
 
 public class HistoryDetail extends Activity {
 

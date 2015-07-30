@@ -1,4 +1,4 @@
-package electria.electriahrm;
+package electria.electriahrm.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,6 +16,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
 import java.io.File;
+
+import electria.electriahrm.R;
+import electria.electriahrm.measurements.ECGMeasurement;
 
 public class History extends Activity {
 

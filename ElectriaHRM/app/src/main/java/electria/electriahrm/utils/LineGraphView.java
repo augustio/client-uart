@@ -11,7 +11,6 @@ package electria.electriahrm;
 
         import org.achartengine.ChartFactory;
         import org.achartengine.GraphicalView;
-        import org.achartengine.chart.PointStyle;
         import org.achartengine.model.TimeSeries;
         import org.achartengine.model.XYMultipleSeriesDataset;
         import org.achartengine.renderer.XYMultipleSeriesRenderer;

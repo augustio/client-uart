@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package electria.electriahrm;
+package electria.electriahrm.services;
 
         import android.app.Service;
         import android.bluetooth.BluetoothAdapter;
@@ -37,6 +37,8 @@ package electria.electriahrm;
 
         import java.util.List;
         import java.util.UUID;
+
+        import electria.electriahrm.R;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
@@ -239,7 +241,7 @@ public class BleService extends Service {
     }
 
     public class LocalBinder extends Binder {
-        BleService getService() {
+        public BleService getService() {
             return BleService.this;
         }
     }
