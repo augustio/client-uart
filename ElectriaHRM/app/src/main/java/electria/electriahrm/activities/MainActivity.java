@@ -44,7 +44,7 @@ import android.graphics.Point;
 import org.achartengine.GraphicalView;
 
 import electria.electriahrm.measurements.ECGMeasurement;
-import electria.electriahrm.LineGraphView;
+import electria.electriahrm.utils.LineGraphView;
 import electria.electriahrm.R;
 import electria.electriahrm.services.BleService;
 
