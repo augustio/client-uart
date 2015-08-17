@@ -257,21 +257,13 @@ public class MainActivity extends Activity {
     //Plot a new set of two ECG values on the graph and present on the GUI
     private void updateGraph(String value1, String value2) {
         double maxX = mCounter;
-        boolean redraw = false;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setXRange(minX, maxX);
-        if(android.text.TextUtils.isDigitsOnly(value1)) {
-            mLineGraph.addValue(new Point(mCounter, Integer.parseInt(value1)));
-            mCounter++;
-            redraw = true;
-        }
-        if(android.text.TextUtils.isDigitsOnly(value2)) {
-            mLineGraph.addValue(new Point(mCounter, Integer.parseInt(value2)));
-            mCounter++;
-            redraw = true;
-        }
-        if(redraw)
-            mGraphView.repaint();
+        mLineGraph.addValue(new Point(mCounter, Integer.parseInt(value1)));
+        mCounter++;
+        mLineGraph.addValue(new Point(mCounter, Integer.parseInt(value2)));
+        mCounter++;
+        mGraphView.repaint();
     }
 
     private void startGraph(){
@@ -289,9 +281,11 @@ public class MainActivity extends Activity {
     private Runnable mGraphTask = new Runnable() {
         @Override
         public void run() {
-            if(mShowGraph && (mCollection.size() > (mCounter+1)))
-                updateGraph(mCollection.get(mCounter), mCollection.get(mCounter+1));
-            mHandler.post(mGraphTask);
+            if(mShowGraph && (mCollection.size() > (mCounter+1))) {
+                updateGraph(mCollection.get(mCounter), mCollection.get(mCounter + 1));
+            }
+            //mHandler.post(mGraphTask);
+            mHandler.postDelayed(mGraphTask, 5);
         }
     };
 
@@ -416,8 +410,10 @@ public class MainActivity extends Activity {
                         if (mShowGraph) {
                             if(mCollection.size() >= MAX_COLLECTION_SIZE)
                                 stopGraph();
-                            mCollection.add(ECGData[0]);
-                            mCollection.add(ECGData[1]);
+                            if(android.text.TextUtils.isDigitsOnly(ECGData[0]))
+                                mCollection.add(ECGData[0]);
+                            if(android.text.TextUtils.isDigitsOnly(ECGData[1]))
+                                mCollection.add(ECGData[1]);
                         }
                     }
                 }
