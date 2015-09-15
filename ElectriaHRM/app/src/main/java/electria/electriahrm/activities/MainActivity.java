@@ -410,9 +410,9 @@ public class MainActivity extends Activity {
                         if (mShowGraph) {
                             if(mCollection.size() >= MAX_COLLECTION_SIZE)
                                 stopGraph();
-                            if(android.text.TextUtils.isDigitsOnly(ECGData[0]))
+                            if(android.text.TextUtils.isDigitsOnly(ECGData[0]) && isValid(Integer.parseInt(ECGData[0])))
                                 mCollection.add(ECGData[0]);
-                            if(android.text.TextUtils.isDigitsOnly(ECGData[1]))
+                            if(android.text.TextUtils.isDigitsOnly(ECGData[1]) && isValid(Integer.parseInt(ECGData[1])))
                                 mCollection.add(ECGData[1]);
                         }
                     }
@@ -550,6 +550,13 @@ public class MainActivity extends Activity {
     private void updateTimer(){
         mTimerString = mTimerString.format("%02d:%02d:%02d", hr,min,sec);
         ((TextView) findViewById(R.id.timer_view)).setText(mTimerString);
+    }
+
+    private boolean isValid(int data){
+        if(data >= MIN_Y && data <= MAX_Y)
+            return true;
+        else
+            return false;
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
