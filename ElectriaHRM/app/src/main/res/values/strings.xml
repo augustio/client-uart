@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ElectriaHRM</string>
+    <string name="app_name">ElectriaECG</string>
 
     <string name="select_device">Select a device</string>
     <string name="scanning">Scanning for devices...</string>
