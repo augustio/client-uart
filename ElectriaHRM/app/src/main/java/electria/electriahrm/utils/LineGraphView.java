@@ -119,4 +119,8 @@ public class LineGraphView {
         mMultiRenderer.setPanLimits(new double[]{minX, maxX, minY, maxY});
     }
 
+    public void enableZoom(){
+        mMultiRenderer.setZoomEnabled(true, true);
+    }
+
 }
