@@ -118,6 +118,7 @@ public class HistoryDetail extends Activity {
         mLineGraph = new LineGraphView();
         mLineGraph.setYRange(MIN_Y, MAX_Y);
         mLineGraph.setPanLimits(MIN_X, MAX_X, MIN_Y, MAX_Y);
+        mLineGraph.enableZoom();
         mGraphView = mLineGraph.getView(this);
         mHistLayout = (ViewGroup) findViewById(R.id.history_detail);
         mHistLayout.addView(mGraphView);
