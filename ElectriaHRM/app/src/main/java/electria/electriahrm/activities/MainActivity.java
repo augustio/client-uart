@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Semaphore;
 
 
 import android.app.Activity;
@@ -92,6 +93,7 @@ public class MainActivity extends Activity {
     private BluetoothDevice mDevice;
     private ECGMeasurement ecgM;
     private BluetoothAdapter mBtAdapter = null;
+    private Semaphore mCollectionKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +141,7 @@ public class MainActivity extends Activity {
         mTimerString = "";
         mState = DISCONNECTED;
         mHandler = new Handler();
+        mCollectionKey= new Semaphore(1, true);
 
         service_init();
 
@@ -281,8 +284,19 @@ public class MainActivity extends Activity {
     private Runnable mGraphTask = new Runnable() {
         @Override
         public void run() {
-            if(mShowGraph && (mCollection.size() > (mCounter+1))) {
-                updateGraph(mCollection.get(mCounter), mCollection.get(mCounter + 1));
+            try
+            {
+                mCollectionKey.acquire(1);
+                if(mShowGraph && (mCollection.size() > (mCounter+1))) {
+                    updateGraph(mCollection.get(mCounter), mCollection.get(mCounter + 1));
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+            finally {
+                mCollectionKey.release(1);
             }
             //mHandler.post(mGraphTask);
             mHandler.postDelayed(mGraphTask, 5);
@@ -408,12 +422,25 @@ public class MainActivity extends Activity {
                             mData.add(ECGData[1]);
                         }
                         if (mShowGraph) {
-                            if(mCollection.size() >= MAX_COLLECTION_SIZE)
-                                stopGraph();
-                            if(android.text.TextUtils.isDigitsOnly(ECGData[0]) && isValid(Integer.parseInt(ECGData[0])))
-                                mCollection.add(ECGData[0]);
-                            if(android.text.TextUtils.isDigitsOnly(ECGData[1]) && isValid(Integer.parseInt(ECGData[1])))
-                                mCollection.add(ECGData[1]);
+                            try
+                            {
+                                mCollectionKey.acquire(1);
+                                if(mCollection.size() >= MAX_COLLECTION_SIZE)
+                                    stopGraph();
+                                else {
+                                    if (android.text.TextUtils.isDigitsOnly(ECGData[0]) && isValid(Integer.parseInt(ECGData[0])))
+                                        mCollection.add(ECGData[0]);
+                                    if (android.text.TextUtils.isDigitsOnly(ECGData[1]) && isValid(Integer.parseInt(ECGData[1])))
+                                        mCollection.add(ECGData[1]);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Log.e(TAG, e.getMessage());
+                            }
+                            finally {
+                                mCollectionKey.release(1);
+                            }
                         }
                     }
                 }
