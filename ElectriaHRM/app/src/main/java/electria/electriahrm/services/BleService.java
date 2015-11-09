@@ -175,7 +175,8 @@ public class BleService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             if(characteristic.getUuid().equals(RX_CHAR_UUID)) {
-                broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic.getStringValue(0));
+                Log.w("TEST", characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0).toString());
+                broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
             }
             else if (characteristic.getUuid().equals(HRM_CHARACTERISTIC_UUID)) {
                 int hrValue = 0;
@@ -235,8 +236,9 @@ public class BleService extends Service {
     }
 
     private void broadcastUpdate(final String action, final int intValue){
+        int newintValue = ((intValue & 0xFF00) >> 8) | ((intValue & 0xFF) << 8);
         final Intent intent = new Intent(action);
-        intent.putExtra(EXTRA_DATA, intValue);
+        intent.putExtra(EXTRA_DATA, newintValue);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

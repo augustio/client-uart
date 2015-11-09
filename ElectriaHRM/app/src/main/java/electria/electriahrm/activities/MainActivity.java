@@ -258,13 +258,11 @@ public class MainActivity extends Activity {
     }
 
     //Plot a new set of two ECG values on the graph and present on the GUI
-    private void updateGraph(String value1, String value2) {
+    private void updateGraph(int value1) {
         double maxX = mCounter;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setXRange(minX, maxX);
-        mLineGraph.addValue(new Point(mCounter, Integer.parseInt(value1)));
-        mCounter++;
-        mLineGraph.addValue(new Point(mCounter, Integer.parseInt(value2)));
+        mLineGraph.addValue(new Point(mCounter, value1));
         mCounter++;
         mGraphView.repaint();
     }
@@ -273,7 +271,6 @@ public class MainActivity extends Activity {
         setGraphView();
         mShowGraph = true;
         btnShow.setText("Close");
-        mGraphTask.run();
     }
 
     private void stopGraph(){
@@ -281,27 +278,6 @@ public class MainActivity extends Activity {
         btnShow.setText("View");
     }
 
-    private Runnable mGraphTask = new Runnable() {
-        @Override
-        public void run() {
-            try
-            {
-                mCollectionKey.acquire(1);
-                if(mShowGraph && (mCollection.size() > (mCounter+1))) {
-                    updateGraph(mCollection.get(mCounter), mCollection.get(mCounter + 1));
-                }
-            }
-            catch (Exception e)
-            {
-                Log.e(TAG, e.getMessage());
-            }
-            finally {
-                mCollectionKey.release(1);
-            }
-            //mHandler.post(mGraphTask);
-            mHandler.postDelayed(mGraphTask, 5);
-        }
-    };
 
     private void updateBatteryLevel(int level) {
         if(mLastBatLevel != level)
@@ -340,7 +316,6 @@ public class MainActivity extends Activity {
             mAvHeartRate = 0;
             mHeartRateCount = 0;
             mCollection.clear();
-            mHandler.removeCallbacks(mGraphTask);
         }
     }
     ;
@@ -412,35 +387,17 @@ public class MainActivity extends Activity {
             }
 
             if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
-                String rxString = intent.getStringExtra(BleService.EXTRA_DATA);
-                if (rxString != null){
-                    String [] ECGData = rxString.split("-");
-                    if(ECGData.length >= 2 ) {
+                int rxString = intent.getIntExtra(BleService.EXTRA_DATA, 0) ;
+                if (rxString != 0){
 
-                        if (mDataRecording) {
-                            mData.add(ECGData[0]);
-                            mData.add(ECGData[1]);
-                        }
-                        if (mShowGraph) {
-                            try
-                            {
-                                mCollectionKey.acquire(1);
-                                if(mCollection.size() >= MAX_COLLECTION_SIZE)
-                                    stopGraph();
-                                else {
-                                    if (android.text.TextUtils.isDigitsOnly(ECGData[0]) && isValid(Integer.parseInt(ECGData[0])))
-                                        mCollection.add(ECGData[0]);
-                                    if (android.text.TextUtils.isDigitsOnly(ECGData[1]) && isValid(Integer.parseInt(ECGData[1])))
-                                        mCollection.add(ECGData[1]);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Log.e(TAG, e.getMessage());
-                            }
-                            finally {
-                                mCollectionKey.release(1);
-                            }
+                    if (mDataRecording) {
+                        //mData.add(rxString);
+                    }
+                    if (mShowGraph) {
+                        if(mCollection.size() >= MAX_COLLECTION_SIZE)
+                            stopGraph();
+                        else {
+                                updateGraph(rxString);
                         }
                     }
                 }
