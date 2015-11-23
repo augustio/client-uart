@@ -58,3 +58,26 @@ You'll get a short pop-up in the lower area of your display saying that you're n
 -Ensure that the Android SDK platform-tools/ directory is included in your PATH environment variable and then execute:
 $ adb install app/build/outputs/apk/app-debug.apk
 If you get an error message saying that the application already exists, then unistall the existing application that has the same application name "ElectriaHRM" from your phone and execute the command again. The application should be installed on your phone.
+
+#Requirements for building and installing the app on Windows platform
+-Download and install Java Runtime Environment (JRE) latest version and Java Development Kit (JDK) version 6 or later.
+
+#Using Android Studio
+1. Download and install android studio following the instructions on this link: http://developer.android.com/sdk/index.html
+2. Add sdk packages (You must install at least sdk version 21 since it is the target sdk for the app) following instructions on this link: http://developer.android.com/sdk/installing/adding-packages.html
+3. Open the application (ElectriaHRM) with android studio
+4. Add dependencies (achartengine, gson, appcompat-v7):
+ -from project section, right-click on app
+ -select Open Module Settings (the last option in the drop down menu)
+ -select Dependencies
+ -select the + sign at the upper right of the window to add dependencies
+ -To add achartengine and gson, select File Dependency->src->main->libs-> and select
+  the files.
+ -To add appcompat-v7, select Library Dependency->appcompat-v7.
+5. enable usb debugging on Android device following #Install 1. and 2. above.
+6. connect the android device to Windows machine and run the application from android studio.
+
+#From command Line
+1. Download and install sdk tools following instructions on the link in #Using Android Studio 1.
+2. Add sdk packages this time from the command line following the same link in #Using Android Studio 2. above.
+3. Build and run the app following instructions on this link: http://developer.android.com/tools/building/building-cmdline.html
