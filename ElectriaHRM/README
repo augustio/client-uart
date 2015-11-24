@@ -80,4 +80,4 @@ If you get an error message saying that the application already exists, then uni
 #From command Line
 1. Download and install sdk tools following instructions on the link in #Using Android Studio 1.
 2. Add sdk packages this time from the command line following the same link in #Using Android Studio 2. above.
-3. Build and run the app following instructions on this link: http://developer.android.com/tools/building/building-cmdline.html
+3. Build and run the app following instructions on this link: http://developer.android.com/tools/building/building-cmdline.html (Build in Debug Mode)
