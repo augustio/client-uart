@@ -28,6 +28,7 @@
     <string name="record">Record</string>
     <string name="history">History</string>
     <string name="send">Send</string>
+    <string name="tx_message">Send message to sensor</string>
     <string-array name="sensor_locations">
         <item>Other</item>
         <item>Chest</item>
