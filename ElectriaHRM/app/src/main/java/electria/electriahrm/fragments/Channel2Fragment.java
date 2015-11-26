@@ -8,7 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.achartengine.GraphicalView;
+
 import electria.electriahrm.R;
+import electria.electriahrm.utils.LineGraphView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +26,10 @@ public class Channel2Fragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final int MIN_Y = 0;//Minimum ECG data value
+    private static final int MAX_Y = 1023;//Maximum ECG data value
+
+    private LineGraphView mLineGraph;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -64,8 +71,9 @@ public class Channel2Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_channel2, container, false);
+        mLineGraph = LineGraphView.getLineGraphView();
+        mLineGraph.setYRange(MIN_Y, MAX_Y);
+        return mLineGraph.getView(getActivity());
     }
 
     // TODO: Rename method, update argument and hook method into UI event

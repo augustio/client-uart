@@ -82,24 +82,21 @@
             android:id="@+id/channel1_fragment"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            tools:layout="@layout/fragment_channel1" />
+            android:layout_height="match_parent"/>
 
         <fragment
             android:name="electria.electriahrm.fragments.Channel2Fragment"
             android:id="@+id/channel2_fragment"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            tools:layout="@layout/fragment_channel2" />
+            android:layout_height="match_parent"/>
 
         <fragment
             android:name="electria.electriahrm.fragments.Channel3Fragment"
             android:id="@+id/channel3_fragment"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            tools:layout="@layout/fragment_channel3" />
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 
