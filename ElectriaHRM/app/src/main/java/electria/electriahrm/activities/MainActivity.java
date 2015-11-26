@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -44,13 +45,19 @@ import android.graphics.Point;
 
 import org.achartengine.GraphicalView;
 
+import electria.electriahrm.fragments.Channel1Fragment;
+import electria.electriahrm.fragments.Channel2Fragment;
+import electria.electriahrm.fragments.Channel3Fragment;
 import electria.electriahrm.measurements.ECGMeasurement;
 import electria.electriahrm.utils.LineGraphView;
 import electria.electriahrm.R;
 import electria.electriahrm.services.BleService;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements
+        Channel1Fragment.OnFragmentInteractionListener,
+        Channel2Fragment.OnFragmentInteractionListener,
+        Channel3Fragment.OnFragmentInteractionListener {
 
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -355,7 +362,7 @@ public class MainActivity extends Activity {
                         btnShow.setLayoutParams(mParamEnable);
                         btnStore.setLayoutParams(mParamEnable);
                         btnHistory.setLayoutParams(mParamDisable);
-                        ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ "- Connected");
+                        ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName() + "- Connected");
                         mState = CONNECTED;
                     }
                 });
@@ -654,6 +661,21 @@ public class MainActivity extends Activity {
                     .setNegativeButton(R.string.popup_no, null)
                     .show();
         }
+    }
+
+    @Override
+    public void onChannel1Interaction(Uri uri) {
+
+    }
+
+    @Override
+    public void onChannel2Interaction(Uri uri) {
+
+    }
+
+    @Override
+    public void onChannel3Interaction(Uri uri) {
+
     }
 
     private void showMessage(final String msg) {
