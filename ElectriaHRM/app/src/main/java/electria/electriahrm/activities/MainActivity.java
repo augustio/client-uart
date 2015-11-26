@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
 
     private GraphicalView mGraphView;
     private LineGraphView mLineGraph;
-    private TextView batLevelView,sensorPosView, hrView, avHRView;
+    private TextView sensorPosView, hrView, avHRView;
     private EditText editMessage;
     private LinearLayout.LayoutParams mParamEnable, mParamDisable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
@@ -82,7 +82,6 @@ public class MainActivity extends Activity {
     private List<String> mCollection, mData;
 
     private int mCounter;
-    private int mLastBatLevel;
     private int mRecTimerCounter, min, sec, hr;
     private BleService mService;
     private int mState;
@@ -116,7 +115,6 @@ public class MainActivity extends Activity {
         btnHistory = (Button)findViewById(R.id.btn_history);
         btnHistory.setBackgroundColor(getResources().getColor(R.color.blue));
         editMessage=(EditText) findViewById(R.id.sendText);
-        batLevelView = (TextView) findViewById(R.id.bat_level);
         sensorPosView = (TextView) findViewById(R.id.sensor_position);
         hrView = (TextView) findViewById(R.id.heart_rate);
         avHRView = (TextView) findViewById(R.id.av_heart_rate);
@@ -131,7 +129,6 @@ public class MainActivity extends Activity {
 
         mCollection = new ArrayList<String>();
         mCounter = 0;
-        mLastBatLevel = 0;
         mRecTimerCounter = 1;
         min = sec =  hr = 0;
         mAvHeartRate = 0;
@@ -278,13 +275,6 @@ public class MainActivity extends Activity {
         btnShow.setText("View");
     }
 
-
-    private void updateBatteryLevel(int level) {
-        if(mLastBatLevel != level)
-            mLastBatLevel = level;
-        batLevelView.setText("Battery Level: " + mLastBatLevel + "%");
-    }
-
     private void setSensorPosition(final String position) {
         if (position != null) {
             sensorPosView.setText("Position " + position.toUpperCase());
@@ -330,7 +320,6 @@ public class MainActivity extends Activity {
         btnShow.setLayoutParams(mParamDisable);
         btnStore.setLayoutParams(mParamDisable);
         btnHistory.setLayoutParams(mParamEnable);
-        batLevelView.setText("");
         ((TextView) findViewById(R.id.deviceName)).setText(R.string.no_device);
     }
 
@@ -401,15 +390,6 @@ public class MainActivity extends Activity {
                         }
                     }
                 }
-            }
-
-            if (action.equals(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE)){
-                final int batValue = intent.getIntExtra(BleService.EXTRA_DATA, 0);
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        updateBatteryLevel(batValue);
-                    }
-                });
             }
 
             if (action.equals(BleService.DEVICE_DOES_NOT_SUPPORT_UART)){
@@ -549,7 +529,6 @@ public class MainActivity extends Activity {
         intentFilter.addAction(BleService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BleService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BleService.ACTION_RX_DATA_AVAILABLE);
-        intentFilter.addAction(BleService.ACTION_BATTERY_LEVEL_DATA_AVAILABLE);
         intentFilter.addAction(BleService.DEVICE_DOES_NOT_SUPPORT_UART);
         intentFilter.addAction(BleService.ACTION_TX_CHAR_WRITE);
         intentFilter.addAction(BleService.ACTION_SENSOR_POSITION_READ);

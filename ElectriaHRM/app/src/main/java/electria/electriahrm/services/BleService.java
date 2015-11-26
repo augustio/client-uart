@@ -52,22 +52,15 @@ public class BleService extends Service {
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
-    private BluetoothGattCharacteristic mBatteryCharacteristic;
     private BluetoothGattCharacteristic mHRLocationCharacteristic;
     private BluetoothGattCharacteristic mRXCharacteristic;
     private BluetoothGattCharacteristic mTXCharacteristic;
     private BluetoothGattCharacteristic mHRMCharacteristic;
     private int mConnectionState = STATE_DISCONNECTED;
-    private int readBatteryInterval;
-    private Handler mHandler = new Handler();
-    private int initBatteryLevel = INVALID_LEVEL;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
-    private static final int SHORT_INTERVAL = 500;
-    private static final int LONG_INTERVAL = 60000;
-    private static final int INVALID_LEVEL = 255;
 
     public final static String ACTION_GATT_CONNECTED =
             "electria.electriahrm.ACTION_GATT_CONNECTED";
@@ -77,8 +70,6 @@ public class BleService extends Service {
             "electria.electriahrm.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_RX_DATA_AVAILABLE =
             "electria.electriahrm.ACTION_DATA_AVAILABLE";
-    public final static String ACTION_BATTERY_LEVEL_DATA_AVAILABLE =
-            "electria.electriahrm.ACTION_BATTERY_LEVEL_DATA_AVAILABLE";
     public final static String ACTION_TX_CHAR_WRITE =
             "electria.electriahrm.ACTION_TX_CHAR_WRITE";
     public final static String EXTRA_DATA =
@@ -94,8 +85,6 @@ public class BleService extends Service {
     private final static UUID UART_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
     private final static UUID TX_CHAR_UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
     private final static UUID RX_CHAR_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
-    private final static UUID BATTERY_SERVICE_UUID = UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb");
-    private final static UUID BATTERY_LEVEL_CHAR_UUID = UUID.fromString("00002A19-0000-1000-8000-00805f9b34fb");
     private final static UUID HR_SERVICE_UUID = UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb");
     private static final UUID HRM_CHARACTERISTIC_UUID = UUID.fromString("00002A37-0000-1000-8000-00805f9b34fb");
     private static final UUID ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID = UUID.fromString("00002A38-0000-1000-8000-00805f9b34fb");
@@ -119,7 +108,6 @@ public class BleService extends Service {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
-                initBatteryLevel = INVALID_LEVEL;
                 Log.d(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
@@ -139,10 +127,6 @@ public class BleService extends Service {
                         mHRLocationCharacteristic = service.getCharacteristic(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID);
                         //Read sensor location
                         readECGSensorLocation();
-                    }else if (service.getUuid().equals(BATTERY_SERVICE_UUID)) {
-                        mBatteryCharacteristic = service.getCharacteristic(BATTERY_LEVEL_CHAR_UUID);
-                        //Start reading battery characteristic every minute
-                        mReadBatteryLevel.run();
                     }
                 }
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
@@ -156,14 +140,7 @@ public class BleService extends Service {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (mBatteryCharacteristic != null &&
-                        characteristic.getUuid().equals(BATTERY_LEVEL_CHAR_UUID)) {
-                    int level = characteristic.getValue()[0];
-                    broadcastUpdate(ACTION_BATTERY_LEVEL_DATA_AVAILABLE, level);
-                    if(initBatteryLevel == INVALID_LEVEL)
-                        initBatteryLevel = level;
-                }
-                else if (characteristic.getUuid().equals(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID)) {
+                if (characteristic.getUuid().equals(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID)) {
                     final String sensorPosition = getBodySensorPosition(characteristic.getValue()[0]);
                     broadcastUpdate(ACTION_SENSOR_POSITION_READ, sensorPosition);
                     enableRXNotification();
@@ -205,20 +182,6 @@ public class BleService extends Service {
                 if(descriptor.getCharacteristic().getUuid().equals(RX_CHAR_UUID)) {
                     enableHRNotification();
                 }
-            }
-        }
-    };
-
-    private Runnable mReadBatteryLevel = new Runnable() {
-        @Override
-        public void run() {
-            if (mBluetoothGatt != null && mBatteryCharacteristic != null) {
-                mBluetoothGatt.readCharacteristic(mBatteryCharacteristic);
-                if(initBatteryLevel == INVALID_LEVEL)
-                    readBatteryInterval = SHORT_INTERVAL;
-                else
-                    readBatteryInterval = LONG_INTERVAL;
-                mHandler.postDelayed(mReadBatteryLevel, readBatteryInterval);
             }
         }
     };
@@ -356,7 +319,6 @@ public class BleService extends Service {
         Log.d(TAG, "mBluetoothGatt closed");
         mBluetoothGatt = null;
         mBluetoothDeviceAddress = null;
-        mHandler.removeCallbacks(mReadBatteryLevel);
     }
 
     /**
