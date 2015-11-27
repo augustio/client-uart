@@ -23,11 +23,6 @@ public class Channel1Fragment extends Fragment {
 
     private int xValueCounter;
 
-    private void setGraphView(Context context) {
-
-    }
-
-
     public Channel1Fragment() {
     }
 

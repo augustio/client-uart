@@ -25,12 +25,7 @@ public class Channel3Fragment extends Fragment {
     private GraphicalView mGraphView;
 
     private int xValueCounter;
-
-    private void setGraphView(Context context) {
-
-    }
-
-
+    
     public Channel3Fragment() {
     }
 
