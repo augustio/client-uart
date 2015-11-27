@@ -365,7 +365,7 @@ public class MainActivity extends Activity {
             }
 
             if(action.equals(BleService.ACTION_HEART_RATE_READ)){
-                if(mShowGraph == true)
+                if(mShowGraph)
                     setHeartRateValue(intent.getIntExtra(BleService.EXTRA_DATA, 0));
             }
         }
@@ -428,11 +428,7 @@ public class MainActivity extends Activity {
 
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }
 
     private Runnable mRecordTimer = new Runnable() {
@@ -472,7 +468,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateTimer(){
-        mTimerString = mTimerString.format("%02d:%02d:%02d", hr,min,sec);
+        mTimerString = String.format("%02d:%02d:%02d", hr,min,sec);
         ((TextView) findViewById(R.id.timer_view)).setText(mTimerString);
     }
 
