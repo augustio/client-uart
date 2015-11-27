@@ -34,18 +34,6 @@ public class LineGraphView {
     //XYMultipleSeriesRenderer will contain all XYSeriesRenderer and it can be used to set the properties of whole Graph
     private XYMultipleSeriesRenderer mMultiRenderer = new XYMultipleSeriesRenderer();
 
-    private static LineGraphView mInstance = null;
-
-    /**
-     * singleton implementation of LineGraphView class
-     */
-    public static synchronized LineGraphView getLineGraphView() {
-        if (mInstance == null) {
-            mInstance = new LineGraphView();
-        }
-        return mInstance;
-    }
-
     /**
      * This constructor will set some properties of single chart and some properties of whole graph
      */

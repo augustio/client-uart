@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Semaphore;
 
 
 import android.app.Activity;
@@ -26,7 +25,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -40,24 +38,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.ViewGroup;
-import android.graphics.Point;
 
-import org.achartengine.GraphicalView;
-
-import electria.electriahrm.fragments.Channel1Fragment;
-import electria.electriahrm.fragments.Channel2Fragment;
-import electria.electriahrm.fragments.Channel3Fragment;
 import electria.electriahrm.measurements.ECGMeasurement;
-import electria.electriahrm.utils.LineGraphView;
 import electria.electriahrm.R;
 import electria.electriahrm.services.BleService;
 
 
-public class MainActivity extends Activity implements
-        Channel1Fragment.OnFragmentInteractionListener,
-        Channel2Fragment.OnFragmentInteractionListener,
-        Channel3Fragment.OnFragmentInteractionListener {
+public class MainActivity extends Activity {
 
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -66,7 +53,6 @@ public class MainActivity extends Activity implements
     private static final int CONNECTED = 20;
     private static final int DISCONNECTED = 21;
     private static final int CONNECTING = 22;
-    private static final int X_RANGE = 200;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
     private static final int MAX_DATA_RECORDING_TIME = 120;//Two minutes(60 seconds)
@@ -76,19 +62,14 @@ public class MainActivity extends Activity implements
     private static final int ONE_SECOND = 1000;// 1000 milliseconds in one second
 
     private boolean mShowGraph;
-    private boolean mGraphViewActive;
     private boolean mDataRecording;
 
-    private GraphicalView mGraphView;
-    private LineGraphView mLineGraph;
     private TextView sensorPosView, hrView, avHRView;
     private EditText editMessage;
     private LinearLayout.LayoutParams mParamEnable, mParamDisable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
-    private ViewGroup mainLayout;
-    private List<String> mCollection, mData;
-
-    private int mCounter;
+    private List<String> mData;
+    private List<Integer> mCollection;
     private int mRecTimerCounter, min, sec, hr;
     private BleService mService;
     private int mState;
@@ -99,7 +80,6 @@ public class MainActivity extends Activity implements
     private BluetoothDevice mDevice;
     private ECGMeasurement ecgM;
     private BluetoothAdapter mBtAdapter = null;
-    private Semaphore mCollectionKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,15 +107,13 @@ public class MainActivity extends Activity implements
         avHRView = (TextView) findViewById(R.id.av_heart_rate);
         mParamEnable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
         mParamDisable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
-        mCollection = new ArrayList<String>();
-        mData = new ArrayList<String>();
+        mCollection = new ArrayList<>();
+        mData = new ArrayList<>();
 
         mDataRecording = false;
         mShowGraph = false;
-        mGraphViewActive = false;
 
-        mCollection = new ArrayList<String>();
-        mCounter = 0;
+        mCollection = new ArrayList<>();
         mRecTimerCounter = 1;
         min = sec =  hr = 0;
         mAvHeartRate = 0;
@@ -145,7 +123,6 @@ public class MainActivity extends Activity implements
         mTimerString = "";
         mState = DISCONNECTED;
         mHandler = new Handler();
-        mCollectionKey= new Semaphore(1, true);
 
         service_init();
 
@@ -251,28 +228,7 @@ public class MainActivity extends Activity implements
         });
     }
 
-    //Prepare the initial GUI for graph
-    private void setGraphView() {
-        mLineGraph = LineGraphView.getLineGraphView();
-        mLineGraph.setYRange(MIN_Y, MAX_Y);
-        mGraphView = mLineGraph.getView(this);
-        mainLayout = (ViewGroup) findViewById(R.id.graph_layout);
-        mainLayout.addView(mGraphView);
-        mGraphViewActive = true;
-    }
-
-    //Plot a new set of two ECG values on the graph and present on the GUI
-    private void updateGraph(int value1) {
-        double maxX = mCounter;
-        double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-        mLineGraph.setXRange(minX, maxX);
-        mLineGraph.addValue(new Point(mCounter, value1));
-        mCounter++;
-        mGraphView.repaint();
-    }
-
     private void startGraph(){
-        setGraphView();
         mShowGraph = true;
         btnShow.setText("Close");
     }
@@ -302,12 +258,8 @@ public class MainActivity extends Activity implements
     }
 
     private void clearGraph() {
-        if(mGraphViewActive) {
-            mGraphViewActive = false;
+        if(mShowGraph) {
             mShowGraph = false;
-            mLineGraph.clearGraph();
-            mCounter = 0;
-            mainLayout.removeView(mGraphView);
             setSensorPosition(null);
             setHeartRateValue(0);
             mAvHeartRate = 0;
@@ -315,7 +267,7 @@ public class MainActivity extends Activity implements
             mCollection.clear();
         }
     }
-    ;
+
     private void resetGUIComponents(){
         btnShow.setBackgroundColor(getResources().getColor(R.color.blue));
         btnShow.setText("View");
@@ -387,13 +339,13 @@ public class MainActivity extends Activity implements
                 if (rxString != 0){
 
                     if (mDataRecording) {
-                        //mData.add(rxString);
+                        mData.add(Integer.toString(rxString));
                     }
                     if (mShowGraph) {
                         if(mCollection.size() >= MAX_COLLECTION_SIZE)
                             stopGraph();
                         else {
-                                updateGraph(rxString);
+                            mCollection.add(rxString);
                         }
                     }
                 }
@@ -434,6 +386,7 @@ public class MainActivity extends Activity implements
             mHandler.removeCallbacks(mRecordTimer);
             ((TextView) findViewById(R.id.timer_view)).setText("");
             refreshTimer();
+            stopGraph();
         }
     }
 
@@ -521,13 +474,6 @@ public class MainActivity extends Activity implements
     private void updateTimer(){
         mTimerString = mTimerString.format("%02d:%02d:%02d", hr,min,sec);
         ((TextView) findViewById(R.id.timer_view)).setText(mTimerString);
-    }
-
-    private boolean isValid(int data){
-        if(data >= MIN_Y && data <= MAX_Y)
-            return true;
-        else
-            return false;
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
@@ -661,21 +607,6 @@ public class MainActivity extends Activity implements
                     .setNegativeButton(R.string.popup_no, null)
                     .show();
         }
-    }
-
-    @Override
-    public void onChannel1Interaction(Uri uri) {
-
-    }
-
-    @Override
-    public void onChannel2Interaction(Uri uri) {
-
-    }
-
-    @Override
-    public void onChannel3Interaction(Uri uri) {
-
     }
 
     private void showMessage(final String msg) {
