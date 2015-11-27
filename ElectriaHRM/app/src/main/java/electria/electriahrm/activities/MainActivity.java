@@ -39,6 +39,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import electria.electriahrm.fragments.Channel1Fragment;
+import electria.electriahrm.fragments.Channel2Fragment;
+import electria.electriahrm.fragments.Channel3Fragment;
 import electria.electriahrm.measurements.ECGMeasurement;
 import electria.electriahrm.R;
 import electria.electriahrm.services.BleService;
@@ -78,6 +81,10 @@ public class MainActivity extends Activity {
     private ECGMeasurement ecgM;
     private BluetoothAdapter mBtAdapter = null;
 
+    private Channel1Fragment ecgChannelOne;
+    private Channel2Fragment ecgChannelTwo;
+    private Channel3Fragment ecgChannelThree;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +113,12 @@ public class MainActivity extends Activity {
         mParamDisable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
         mCollection = new ArrayList<>();
         mData = new ArrayList<>();
+        ecgChannelOne = (Channel1Fragment)getFragmentManager()
+                .findFragmentById(R.id.channel1_fragment);
+        ecgChannelTwo = (Channel2Fragment)getFragmentManager()
+                .findFragmentById(R.id.channel2_fragment);
+        ecgChannelThree = (Channel3Fragment)getFragmentManager()
+                .findFragmentById(R.id.channel3_fragment);
 
         mDataRecording = false;
         mShowGraph = false;
@@ -262,6 +275,9 @@ public class MainActivity extends Activity {
             mAvHeartRate = 0;
             mHeartRateCount = 0;
             mCollection.clear();
+            ecgChannelOne.clearGraph();
+            ecgChannelTwo.clearGraph();
+            ecgChannelThree.clearGraph();
         }
     }
 
@@ -343,6 +359,9 @@ public class MainActivity extends Activity {
                             stopGraph();
                         else {
                             mCollection.add(rxString);
+                            ecgChannelOne.updateGraph(rxString);
+                            ecgChannelTwo.updateGraph(rxString);
+                            ecgChannelThree.updateGraph(rxString);
                         }
                     }
                 }

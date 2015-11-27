@@ -48,7 +48,7 @@ public class Channel1Fragment extends Fragment {
         return mGraphView;
     }
 
-    private void updateGraph(int value) {
+    public void updateGraph(int value) {
         double maxX = xValueCounter;
         double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
         mLineGraph.setXRange(minX, maxX);
@@ -58,6 +58,7 @@ public class Channel1Fragment extends Fragment {
     }
 
     public void clearGraph(){
+        mGraphView.repaint();
         mLineGraph.clearGraph();
         xValueCounter = 0;
     }
