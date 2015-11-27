@@ -52,9 +52,6 @@ public class MainActivity extends Activity {
     private static final String DIRECTORY_NAME = "/ECGDATA";
     private static final int CONNECTED = 20;
     private static final int DISCONNECTED = 21;
-    private static final int CONNECTING = 22;
-    private static final int MIN_Y = 0;//Minimum ECG data value
-    private static final int MAX_Y = 1023;//Maximum ECG data value
     private static final int MAX_DATA_RECORDING_TIME = 120;//Two minutes(60 seconds)
     private static final int MAX_COLLECTION_SIZE = 12000;
     private static final int SECONDS_IN_ONE_MINUTE = 60;
