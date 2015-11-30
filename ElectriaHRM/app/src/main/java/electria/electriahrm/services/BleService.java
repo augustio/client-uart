@@ -48,6 +48,9 @@ public class BleService extends Service {
     private final static String TAG = BleService.class.getSimpleName();
     private static final int FIRST_BITMASK = 0x01;
 
+    private static final byte[] TEST_DATA = {32, 0X02, 0X58, 0X01, 0X7C, 0X01, 0X58, 0X02, 0X7C,
+                                            0X03, 0X7C, 0X02, 0X6C, 0, 0, 0, 0};
+
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
@@ -172,8 +175,8 @@ public class BleService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             if(characteristic.getUuid().equals(RX_CHAR_UUID)) {
-                Log.w("TEST", characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0).toString());
-                broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
+                processRXData(TEST_DATA);
+                //broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
             }
             else if (characteristic.getUuid().equals(HRM_CHARACTERISTIC_UUID)) {
                 int hrValue = 0;
@@ -215,6 +218,13 @@ public class BleService extends Service {
                                  final String stringValue) {
         final Intent intent = new Intent(action);
         intent.putExtra(EXTRA_DATA, stringValue);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void broadcastUpdate(final String action,
+                                 final int[] value) {
+        final Intent intent = new Intent(action);
+        intent.putExtra(EXTRA_DATA, value);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -424,5 +434,38 @@ public class BleService extends Service {
             return true;
         return false;
     }
+
+    private void processRXData(byte[] data){
+        int header = (data[0] >> 5);
+        Log.w(TAG, "HEADER: " + header);
+        int[] ecgData =  {(((data[5] & 0X00FF) << 8) | data[6]), (((data[11] & 0X00FF) << 8) | data[12]),
+                (((data[3] & 0X00FF) << 8) | data[4]), (((data[9] & 0X00FF) << 8) | data[10]),
+                (((data[1] & 0X00FF) << 8) | data[2]), (((data[7] & 0X00FF) << 8) | data[8])};
+        for(int i = 0; i<ecgData.length; i++)
+            Log.w(TAG, "ecgData["+i+"]: "+ecgData[i]);
+        switch (header){
+            case ONE_CHANNEL_ECG:
+                broadcastUpdate(ACTION_ONE_CHANNEL_ECG, ecgData);
+                break;
+            case THREE_CHANNEL_ECG:
+                broadcastUpdate(ACTION_THREE_CHANNEL_ECG, ecgData);
+                break;
+            case ONE_CHANNEL_PPG:
+                broadcastUpdate(ACTION_ONE_CHANNEL_PPG, ecgData);
+                break;
+            case TWO_CHANNEL_PPG:
+                broadcastUpdate(ACTION_TWO_CHANNEL_PPG, ecgData);
+                break;
+            case THREE_CHANNEL_ACCELERATION:
+                broadcastUpdate(ACTION_THREE_CHANNEL_ACCELERATION, ecgData);
+                break;
+            case ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY:
+                broadcastUpdate(ACTION_ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY, ecgData);
+                break;
+            default:
+                break;
+        }
+    }
+
 
 }

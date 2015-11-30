@@ -347,24 +347,29 @@ public class MainActivity extends Activity {
                 });
             }
 
-            if (action.equals(BleService.ACTION_RX_DATA_AVAILABLE)) {
-                int rxString = intent.getIntExtra(BleService.EXTRA_DATA, 0) ;
-                if (rxString != 0){
-
-                    if (mDataRecording) {
-                        mData.add(Integer.toString(rxString));
-                    }
-                    if (mShowGraph) {
-                        if(mCollection.size() >= MAX_COLLECTION_SIZE)
-                            stopGraph();
-                        else {
-                            mCollection.add(rxString);
-                            ecgChannelOne.updateGraph(rxString);
-                            ecgChannelTwo.updateGraph(rxString);
-                            ecgChannelThree.updateGraph(rxString);
+            if (action.equals(BleService.ACTION_THREE_CHANNEL_ECG)) {
+                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                (new Runnable(){
+                    public void run(){
+                        if (ECGSamples != null && ECGSamples.length >= 6){
+                            if (mDataRecording) {
+                                mData.add(Integer.toString(ECGSamples[0]));
+                                mData.add(Integer.toString(ECGSamples[1]));
+                            }
+                            if (mShowGraph) {
+                                ecgChannelOne.updateGraph(ECGSamples[0]);
+                                ecgChannelOne.updateGraph(ECGSamples[1]);
+                                Log.w(TAG, "Channel1: " + ECGSamples[0] + "/" + ECGSamples[1]);
+                                ecgChannelTwo.updateGraph(ECGSamples[2]);
+                                ecgChannelTwo.updateGraph(ECGSamples[3]);
+                                Log.w(TAG, "Channel2: " + ECGSamples[2] + "/" + ECGSamples[3]);
+                                ecgChannelThree.updateGraph(ECGSamples[4]);
+                                ecgChannelThree.updateGraph(ECGSamples[5]);
+                                Log.w(TAG, "Channel3: " + ECGSamples[4] + "/" + ECGSamples[5]);
+                            }
                         }
                     }
-                }
+                }).run();
             }
 
             if (action.equals(BleService.DEVICE_DOES_NOT_SUPPORT_UART)){
@@ -498,6 +503,12 @@ public class MainActivity extends Activity {
         intentFilter.addAction(BleService.ACTION_TX_CHAR_WRITE);
         intentFilter.addAction(BleService.ACTION_SENSOR_POSITION_READ);
         intentFilter.addAction(BleService.ACTION_HEART_RATE_READ);
+        intentFilter.addAction(BleService.ACTION_ONE_CHANNEL_ECG);
+        intentFilter.addAction(BleService.ACTION_THREE_CHANNEL_ECG);
+        intentFilter.addAction(BleService.ACTION_ONE_CHANNEL_PPG);
+        intentFilter.addAction(BleService.ACTION_TWO_CHANNEL_PPG);
+        intentFilter.addAction(BleService.ACTION_THREE_CHANNEL_ACCELERATION);
+        intentFilter.addAction(BleService.ACTION_ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY);
         return intentFilter;
     }
 
