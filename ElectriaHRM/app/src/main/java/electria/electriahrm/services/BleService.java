@@ -61,6 +61,26 @@ public class BleService extends Service {
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
+    public static final int ONE_CHANNEL_ECG = 0;
+    public static final int THREE_CHANNEL_ECG = 1;
+    public static final int ONE_CHANNEL_PPG = 2;
+    public static final int TWO_CHANNEL_PPG = 3;
+    public static final int THREE_CHANNEL_ACCELERATION = 4;
+    public static final int ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY = 5;
+
+    public static final String ACTION_ONE_CHANNEL_ECG =
+            "electria.electriahrm.ACTION_ONE_CHANNEL_ECG";
+    public static final String ACTION_THREE_CHANNEL_ECG =
+            "electria.electriahrm.ACTION_THREE_CHANNEL_ECG";
+    public static final String ACTION_ONE_CHANNEL_PPG =
+            "electria.electriahrm.ACTION_ONE_CHANNEL_PPG";
+    public static final String ACTION_TWO_CHANNEL_PPG =
+            "electria.electriahrm.ACTION_TWO_CHANNEL_PPG";
+    public static final String ACTION_THREE_CHANNEL_ACCELERATION =
+            "electria.electriahrm.ACTION_THREE_CHANNEL_ACCELERATION";
+    public static final String ACTION_ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY =
+            "electria.electriahrm.ACTION_ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY";
+
 
     public final static String ACTION_GATT_CONNECTED =
             "electria.electriahrm.ACTION_GATT_CONNECTED";
