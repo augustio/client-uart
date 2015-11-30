@@ -1,9 +1,6 @@
 package electria.electriahrm.fragments;
 
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,7 +9,6 @@ import android.view.ViewGroup;
 
 import org.achartengine.GraphicalView;
 
-import electria.electriahrm.R;
 import electria.electriahrm.utils.LineGraphView;
 
 public class Channel3Fragment extends Fragment {
@@ -25,7 +21,7 @@ public class Channel3Fragment extends Fragment {
     private GraphicalView mGraphView;
 
     private int xValueCounter;
-    
+
     public Channel3Fragment() {
     }
 
@@ -39,7 +35,7 @@ public class Channel3Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mLineGraph = new LineGraphView();
+        mLineGraph = new LineGraphView("ECG Channel Two");
         mLineGraph.setYRange(MIN_Y, MAX_Y);
         mGraphView = mLineGraph.getView(getActivity());
 
@@ -60,5 +56,4 @@ public class Channel3Fragment extends Fragment {
         mLineGraph.clearGraph();
         xValueCounter = 0;
     }
-
 }

@@ -26,7 +26,7 @@ package electria.electriahrm.utils;
  */
 public class LineGraphView {
     //TimeSeries will hold the data in x,y format for single chart
-    private TimeSeries mSeries = new TimeSeries("ECG");
+    private TimeSeries mSeries;
     //XYSeriesRenderer is used to set the properties like chart color, style of each point, etc. of single chart
     private XYSeriesRenderer mRenderer = new XYSeriesRenderer();
     //XYMultipleSeriesDataset will contain all the TimeSeries
@@ -37,7 +37,8 @@ public class LineGraphView {
     /**
      * This constructor will set some properties of single chart and some properties of whole graph
      */
-    public LineGraphView() {
+    public LineGraphView(String title) {
+        mSeries = new TimeSeries(title);
         //add single line chart mSeries
         mDataset.addSeries(mSeries);
         //set line chart color to blue

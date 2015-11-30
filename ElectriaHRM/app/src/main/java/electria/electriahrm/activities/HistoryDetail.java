@@ -115,7 +115,7 @@ public class HistoryDetail extends Activity {
 
     //Prepare the initial GUI for graph
     private void setGraphView() {
-        mLineGraph = new LineGraphView();
+        mLineGraph = new LineGraphView("ECG");
         mLineGraph.setYRange(MIN_Y, MAX_Y);
         mLineGraph.setPanLimits(MIN_X, MAX_X, MIN_Y, MAX_Y);
         mLineGraph.enableZoom();
