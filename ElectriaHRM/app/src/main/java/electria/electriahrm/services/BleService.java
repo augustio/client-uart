@@ -198,10 +198,16 @@ public class BleService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    private void broadcastUpdate(final String action, final int intValue){
-        int newintValue = ((intValue & 0xFF00) >> 8) | ((intValue & 0xFF) << 8);
+    private void broadcastUpdate(final String action, final int value){
+        int newValue;
         final Intent intent = new Intent(action);
-        intent.putExtra(EXTRA_DATA, newintValue);
+        if(action.equalsIgnoreCase(ACTION_HEART_RATE_READ))
+            intent.putExtra(EXTRA_DATA, value);
+        else {
+            newValue = ((value & 0xFF00) >> 8) | ((value & 0xFF) << 8);
+            intent.putExtra(EXTRA_DATA, newValue);
+        }
+
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
