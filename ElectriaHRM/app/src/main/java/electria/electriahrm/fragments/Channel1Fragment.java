@@ -37,6 +37,7 @@ public class Channel1Fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mLineGraph = new LineGraphView("ECG Channel One");
+        mLineGraph.setXYTitle("    Time", "");
         mLineGraph.setYRange(MIN_Y, MAX_Y);
         mGraphView = mLineGraph.getView(getActivity());
 

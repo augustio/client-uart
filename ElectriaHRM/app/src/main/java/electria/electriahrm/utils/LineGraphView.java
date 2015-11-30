@@ -112,4 +112,9 @@ public class LineGraphView {
         mMultiRenderer.setZoomEnabled(true, true);
     }
 
+    public void setXYTitle(String x, String y){
+        mMultiRenderer.setXTitle(x);
+        mMultiRenderer.setYTitle(y);
+    }
+
 }
