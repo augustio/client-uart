@@ -75,28 +75,28 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="horizontal" >
+        android:orientation="vertical">
 
         <fragment
             android:name="electria.electriahrm.fragments.Channel1Fragment"
             android:id="@+id/channel1_fragment"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
         <fragment
             android:name="electria.electriahrm.fragments.Channel2Fragment"
             android:id="@+id/channel2_fragment"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
         <fragment
             android:name="electria.electriahrm.fragments.Channel3Fragment"
             android:id="@+id/channel3_fragment"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
     </LinearLayout>
 
