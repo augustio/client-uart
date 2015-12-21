@@ -34,6 +34,7 @@ package electria.electriahrm.services;
         import android.os.IBinder;
         import android.support.v4.content.LocalBroadcastManager;
         import android.util.Log;
+        import android.widget.Toast;
 
         import java.util.List;
         import java.util.UUID;
@@ -60,6 +61,10 @@ public class BleService extends Service {
     private BluetoothGattCharacteristic mTXCharacteristic;
     private BluetoothGattCharacteristic mHRMCharacteristic;
     private int mConnectionState = STATE_DISCONNECTED;
+    private int mPrevPacketNumber = 0;
+    private int mPacketNumber;
+
+    private Handler mHandler = new Handler();
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -175,7 +180,7 @@ public class BleService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             if(characteristic.getUuid().equals(RX_CHAR_UUID)) {
-                processRXData(TEST_DATA);
+                processRXData(characteristic.getValue());
                 //broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
             }
             else if (characteristic.getUuid().equals(HRM_CHARACTERISTIC_UUID)) {
@@ -437,12 +442,21 @@ public class BleService extends Service {
 
     private void processRXData(byte[] data){
         int header = (data[0] >> 5);
-        Log.w(TAG, "HEADER: " + header);
-        int[] ecgData =  {(((data[5] & 0X00FF) << 8) | data[6]), (((data[11] & 0X00FF) << 8) | data[12]),
-                (((data[3] & 0X00FF) << 8) | data[4]), (((data[9] & 0X00FF) << 8) | data[10]),
-                (((data[1] & 0X00FF) << 8) | data[2]), (((data[7] & 0X00FF) << 8) | data[8])};
-        for(int i = 0; i<ecgData.length; i++)
-            Log.w(TAG, "ecgData["+i+"]: "+ecgData[i]);
+        int packetLost;
+        //Log.w(TAG, "HEADER: " + header);
+        int[] ecgData =  {(((data[5] & 0X00FF) << 8) | data[6]), (((data[11] & 0X00FF) << 8) | (data[12] & 0XFF)),
+                (((data[3] & 0X00FF) << 8) | data[4]), (((data[9] & 0X00FF) << 8) | (data[10] & 0XFF)),
+                (((data[1] & 0X00FF) << 8) | data[2]), (((data[7] & 0X00FF) << 8) | (data[8] & 0XFF))};
+
+        mPacketNumber = (((data[13] & 0X0000FF) << 16) | ((data[14] & 0X00FF) << 8) | (data[15] & 0XFF));
+        Log.w(TAG, "Packet Number: " + mPacketNumber);
+        if(mPrevPacketNumber == 0)
+            mPrevPacketNumber = mPacketNumber;
+        else{
+            if((packetLost = mPacketNumber - mPrevPacketNumber) > 1)
+               Log.w(TAG, "Packet Lost: " + packetLost);
+            mPrevPacketNumber = mPacketNumber;
+        }
         switch (header){
             case ONE_CHANNEL_ECG:
                 broadcastUpdate(ACTION_ONE_CHANNEL_ECG, ecgData);
@@ -466,6 +480,4 @@ public class BleService extends Service {
                 break;
         }
     }
-
-
 }

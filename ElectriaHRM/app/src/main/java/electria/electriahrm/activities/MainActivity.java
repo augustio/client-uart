@@ -359,13 +359,13 @@ public class MainActivity extends Activity {
                             if (mShowGraph) {
                                 ecgChannelOne.updateGraph(ECGSamples[0]);
                                 ecgChannelOne.updateGraph(ECGSamples[1]);
-                                Log.w(TAG, "Channel1: " + ECGSamples[0] + "/" + ECGSamples[1]);
+                                //Log.w(TAG, "Channel1: " + ECGSamples[0] + "/" + ECGSamples[1]);
                                 ecgChannelTwo.updateGraph(ECGSamples[2]);
                                 ecgChannelTwo.updateGraph(ECGSamples[3]);
-                                Log.w(TAG, "Channel2: " + ECGSamples[2] + "/" + ECGSamples[3]);
+                                //Log.w(TAG, "Channel2: " + ECGSamples[2] + "/" + ECGSamples[3]);
                                 ecgChannelThree.updateGraph(ECGSamples[4]);
                                 ecgChannelThree.updateGraph(ECGSamples[5]);
-                                Log.w(TAG, "Channel3: " + ECGSamples[4] + "/" + ECGSamples[5]);
+                                //Log.w(TAG, "Channel3: " + ECGSamples[4] + "/" + ECGSamples[5]);
                             }
                         }
                     }
