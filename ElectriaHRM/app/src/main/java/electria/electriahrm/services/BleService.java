@@ -34,7 +34,6 @@ package electria.electriahrm.services;
         import android.os.IBinder;
         import android.support.v4.content.LocalBroadcastManager;
         import android.util.Log;
-        import android.widget.Toast;
 
         import java.util.List;
         import java.util.UUID;
@@ -69,25 +68,25 @@ public class BleService extends Service {
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
-    public static final int ONE_CHANNEL_ECG = 0;
-    public static final int THREE_CHANNEL_ECG = 1;
-    public static final int ONE_CHANNEL_PPG = 2;
-    public static final int TWO_CHANNEL_PPG = 3;
-    public static final int THREE_CHANNEL_ACCELERATION = 4;
-    public static final int ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY = 5;
+    public static final int ECG_ONE_CHANNEL = 0;
+    public static final int ECG_THREE_CHANNEL = 1;
+    public static final int PPG_ONE_CHANNEL = 2;
+    public static final int PPG_TWO_CHANNEL = 3;
+    public static final int ACCELERATION_THREE_CHANNEL = 4;
+    public static final int IMPEDANCE_PNEUMOGRAPHY_ONE_CHANNEL = 5;
 
-    public static final String ACTION_ONE_CHANNEL_ECG =
-            "electria.electriahrm.ACTION_ONE_CHANNEL_ECG";
-    public static final String ACTION_THREE_CHANNEL_ECG =
-            "electria.electriahrm.ACTION_THREE_CHANNEL_ECG";
-    public static final String ACTION_ONE_CHANNEL_PPG =
-            "electria.electriahrm.ACTION_ONE_CHANNEL_PPG";
-    public static final String ACTION_TWO_CHANNEL_PPG =
-            "electria.electriahrm.ACTION_TWO_CHANNEL_PPG";
-    public static final String ACTION_THREE_CHANNEL_ACCELERATION =
-            "electria.electriahrm.ACTION_THREE_CHANNEL_ACCELERATION";
-    public static final String ACTION_ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY =
-            "electria.electriahrm.ACTION_ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY";
+    public static final String ONE_CHANNEL_ECG =
+            "electria.electriahrm.ONE_CHANNEL_ECG";
+    public static final String THREE_CHANNEL_ECG =
+            "electria.electriahrm.THREE_CHANNEL_ECG";
+    public static final String ONE_CHANNEL_PPG =
+            "electria.electriahrm.ONE_CHANNEL_PPG";
+    public static final String TWO_CHANNEL_PPG =
+            "electria.electriahrm.TWO_CHANNEL_PPG";
+    public static final String THREE_CHANNEL_ACCELERATION =
+            "electria.electriahrm.THREE_CHANNEL_ACCELERATION";
+    public static final String ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY =
+            "electria.electriahrm.ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY";
 
 
     public final static String ACTION_GATT_CONNECTED =
@@ -443,38 +442,38 @@ public class BleService extends Service {
     private void processRXData(byte[] data){
         int header = (data[0] >> 5);
         int packetLost;
-        //Log.w(TAG, "HEADER: " + header);
+
+        mPacketNumber = (((data[13] & 0X0000FF) << 16) | ((data[14] & 0X00FF) << 8) | (data[15] & 0XFF));
+        Log.w(TAG, "Packet Number: " + mPacketNumber);
+
+        if(mPrevPacketNumber != 0)
+            if((packetLost = mPacketNumber - (mPrevPacketNumber + 1)) > 0)
+                Log.w(TAG, "Packet Lost: " + packetLost);
+
+        mPrevPacketNumber = mPacketNumber;
+
         int[] ecgData =  {(((data[5] & 0X00FF) << 8) | data[6]), (((data[11] & 0X00FF) << 8) | (data[12] & 0XFF)),
                 (((data[3] & 0X00FF) << 8) | data[4]), (((data[9] & 0X00FF) << 8) | (data[10] & 0XFF)),
                 (((data[1] & 0X00FF) << 8) | data[2]), (((data[7] & 0X00FF) << 8) | (data[8] & 0XFF))};
 
-        mPacketNumber = (((data[13] & 0X0000FF) << 16) | ((data[14] & 0X00FF) << 8) | (data[15] & 0XFF));
-        Log.w(TAG, "Packet Number: " + mPacketNumber);
-        if(mPrevPacketNumber == 0)
-            mPrevPacketNumber = mPacketNumber;
-        else{
-            if((packetLost = mPacketNumber - mPrevPacketNumber) > 1)
-               Log.w(TAG, "Packet Lost: " + packetLost);
-            mPrevPacketNumber = mPacketNumber;
-        }
         switch (header){
-            case ONE_CHANNEL_ECG:
-                broadcastUpdate(ACTION_ONE_CHANNEL_ECG, ecgData);
+            case ECG_ONE_CHANNEL:
+                broadcastUpdate(ONE_CHANNEL_ECG, ecgData);
                 break;
-            case THREE_CHANNEL_ECG:
-                broadcastUpdate(ACTION_THREE_CHANNEL_ECG, ecgData);
+            case ECG_THREE_CHANNEL:
+                broadcastUpdate(THREE_CHANNEL_ECG, ecgData);
                 break;
-            case ONE_CHANNEL_PPG:
-                broadcastUpdate(ACTION_ONE_CHANNEL_PPG, ecgData);
+            case PPG_ONE_CHANNEL:
+                broadcastUpdate(ONE_CHANNEL_PPG, ecgData);
                 break;
-            case TWO_CHANNEL_PPG:
-                broadcastUpdate(ACTION_TWO_CHANNEL_PPG, ecgData);
+            case PPG_TWO_CHANNEL:
+                broadcastUpdate(TWO_CHANNEL_PPG, ecgData);
                 break;
-            case THREE_CHANNEL_ACCELERATION:
-                broadcastUpdate(ACTION_THREE_CHANNEL_ACCELERATION, ecgData);
+            case ACCELERATION_THREE_CHANNEL:
+                broadcastUpdate(THREE_CHANNEL_ACCELERATION, ecgData);
                 break;
-            case ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY:
-                broadcastUpdate(ACTION_ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY, ecgData);
+            case IMPEDANCE_PNEUMOGRAPHY_ONE_CHANNEL:
+                broadcastUpdate(ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY, ecgData);
                 break;
             default:
                 break;

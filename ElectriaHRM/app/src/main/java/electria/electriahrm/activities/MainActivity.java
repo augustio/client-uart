@@ -347,7 +347,7 @@ public class MainActivity extends Activity {
                 });
             }
 
-            if (action.equals(BleService.ACTION_THREE_CHANNEL_ECG)) {
+            if (action.equals(BleService.THREE_CHANNEL_ECG)) {
                 final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
                 (new Runnable(){
                     public void run(){
@@ -359,13 +359,10 @@ public class MainActivity extends Activity {
                             if (mShowGraph) {
                                 ecgChannelOne.updateGraph(ECGSamples[0]);
                                 ecgChannelOne.updateGraph(ECGSamples[1]);
-                                //Log.w(TAG, "Channel1: " + ECGSamples[0] + "/" + ECGSamples[1]);
                                 ecgChannelTwo.updateGraph(ECGSamples[2]);
                                 ecgChannelTwo.updateGraph(ECGSamples[3]);
-                                //Log.w(TAG, "Channel2: " + ECGSamples[2] + "/" + ECGSamples[3]);
                                 ecgChannelThree.updateGraph(ECGSamples[4]);
                                 ecgChannelThree.updateGraph(ECGSamples[5]);
-                                //Log.w(TAG, "Channel3: " + ECGSamples[4] + "/" + ECGSamples[5]);
                             }
                         }
                     }
@@ -503,12 +500,12 @@ public class MainActivity extends Activity {
         intentFilter.addAction(BleService.ACTION_TX_CHAR_WRITE);
         intentFilter.addAction(BleService.ACTION_SENSOR_POSITION_READ);
         intentFilter.addAction(BleService.ACTION_HEART_RATE_READ);
-        intentFilter.addAction(BleService.ACTION_ONE_CHANNEL_ECG);
-        intentFilter.addAction(BleService.ACTION_THREE_CHANNEL_ECG);
-        intentFilter.addAction(BleService.ACTION_ONE_CHANNEL_PPG);
-        intentFilter.addAction(BleService.ACTION_TWO_CHANNEL_PPG);
-        intentFilter.addAction(BleService.ACTION_THREE_CHANNEL_ACCELERATION);
-        intentFilter.addAction(BleService.ACTION_ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY);
+        intentFilter.addAction(BleService.ONE_CHANNEL_ECG);
+        intentFilter.addAction(BleService.THREE_CHANNEL_ECG);
+        intentFilter.addAction(BleService.ONE_CHANNEL_PPG);
+        intentFilter.addAction(BleService.TWO_CHANNEL_PPG);
+        intentFilter.addAction(BleService.THREE_CHANNEL_ACCELERATION);
+        intentFilter.addAction(BleService.ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY);
         return intentFilter;
     }
 
