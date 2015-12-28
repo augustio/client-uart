@@ -363,8 +363,7 @@ public class MainActivity extends Activity {
                                 ecgChannelTwo.updateGraph(ECGSamples[3]);
                                 ecgChannelThree.updateGraph(ECGSamples[4]);
                                 ecgChannelThree.updateGraph(ECGSamples[5]);
-                                Log.w(TAG, "Samples: " + ECGSamples[0]+"/"+ECGSamples[1]+"/"+ECGSamples[2]+"/"+
-                                        ECGSamples[3]+"/"+ECGSamples[4]+"/"+ECGSamples[5]+"/");
+                                Log.w(TAG, "Sequence Number: " + ECGSamples[6]);
                             }
                         }
                     }

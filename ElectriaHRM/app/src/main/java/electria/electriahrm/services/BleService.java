@@ -444,12 +444,10 @@ public class BleService extends Service {
         int packetLost;
 
         mPacketNumber = (((data[13] & 0X0000FF) << 16) | ((data[14] & 0X00FF) << 8) | (data[15] & 0XFF));
-        Log.w(TAG, "Packet Number: " + mPacketNumber);
-        //Log.e(TAG, "Sequence Number: " + data[13] +"-" + data[14] + "_" + data[15]);
 
         if(mPrevPacketNumber != 0)
             if((packetLost = mPacketNumber - (mPrevPacketNumber + 1)) > 0)
-                Log.w(TAG, "Packet Lost: " + packetLost);
+                Log.e(TAG, "Packet Lost: " + packetLost);
 
         mPrevPacketNumber = mPacketNumber;
 
@@ -458,7 +456,8 @@ public class BleService extends Service {
                 (((data[3] & 0X00FF) << 8) | (data[4] & 0X00FF)),
                 (((data[9] & 0X00FF) << 8) | (data[10] & 0X00FF)),
                 (((data[1] & 0X00FF) << 8) | (data[2] & 0X00FF)),
-                (((data[7] & 0X00FF) << 8) | (data[8] & 0X00FF))};
+                (((data[7] & 0X00FF) << 8) | (data[8] & 0X00FF)),
+                (mPacketNumber)};
 
         switch (header){
             case ECG_ONE_CHANNEL:
