@@ -43,9 +43,10 @@ public class History extends Activity {
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finish();
+        }else {
+            mDirName = extras.getString(Intent.EXTRA_TEXT);
+            readDirectory(mDirName);
         }
-        mDirName = extras.getString(Intent.EXTRA_TEXT);
-        readDirectory(mDirName);
     }
 
     private OnItemClickListener mFileClickListener = new OnItemClickListener() {
