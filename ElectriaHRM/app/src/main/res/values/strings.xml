@@ -18,6 +18,8 @@
     <string name="popup_no">NO</string>
     <string name="not_available">NA</string>
     <string name="action_delete">Delete</string>
+    <string name="action_send_to_cloud">Send To Cloud</string>
+    <string name="action_send_to_email">Send To Email</string>
     <string name="action_settings">Settings</string>
     <string name="text_hint">Click here to write text</string>
     <string name="sensor_position_label">sensor position </string>

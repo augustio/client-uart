@@ -3,4 +3,8 @@
     tools:context="electria.electriahrm.History">
     <item android:id="@+id/delete"
         android:title="@string/action_delete" />
+    <item android:id="@+id/send_cloud"
+        android:title="@string/action_send_to_cloud" />
+    <item android:id="@+id/send_email"
+        android:title="@string/action_send_to_email" />
 </menu>
