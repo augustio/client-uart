@@ -2,20 +2,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
-            android:textSize="20sp"
-            android:text="@string/ecg_files_list"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:textSize="20sp"
+        android:text="@string/ecg_files_list"/>
 
-        <ListView
-            android:id="@+id/historyListView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:stackFromBottom="false"
-            android:divider="@android:color/holo_green_light"
-            android:dividerHeight="2dp"/>
+    <ListView
+        android:id="@+id/historyListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:stackFromBottom="false"
+        android:divider="@android:color/holo_green_light"
+        android:dividerHeight="2dp"/>
+
+    <TextView
+        android:id="@+id/server_access_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"/>
 
 </LinearLayout>
