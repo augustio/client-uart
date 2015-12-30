@@ -137,4 +137,10 @@ public class HistoryDetail extends Activity {
     private void showMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mHandler.removeCallbacks(mDisplayGraph);
+    }
 }
