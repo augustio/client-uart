@@ -14,8 +14,8 @@ public class EcgThreeChannelsPacket {
 
     public EcgThreeChannelsPacket(int[] dataPacketArray){
         if(dataPacketArray.length == 7) {
-            packetNumber = dataPacketArray[0];
-            data = Arrays.copyOfRange(dataPacketArray, 1, dataPacketArray.length);
+            packetNumber = dataPacketArray[6];
+            data = Arrays.copyOfRange(dataPacketArray, 0, dataPacketArray.length - 1);
         }
     }
 
@@ -23,12 +23,12 @@ public class EcgThreeChannelsPacket {
         return data;
     }
 
-    public void setData(int[] data){
-        this.data = Arrays.copyOf(data, data.length);
-    }
-
-    public String toJason(){
+    public String toJson(){
         Gson gson = new Gson();
         return gson.toJson(this);
+    }
+
+    public long getPacketNumber(){
+        return packetNumber;
     }
 }

@@ -9,12 +9,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.achartengine.GraphicalView;
 import org.apache.http.HttpEntity;
@@ -30,7 +34,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 
+import electria.electriahrm.dataPackets.EcgThreeChannelsPacket;
+import electria.electriahrm.fragments.Channel1Fragment;
+import electria.electriahrm.fragments.Channel2Fragment;
+import electria.electriahrm.fragments.Channel3Fragment;
 import electria.electriahrm.utils.LineGraphView;
 import electria.electriahrm.R;
 import electria.electriahrm.measurements.ECGMeasurement;
@@ -43,20 +53,20 @@ public class HistoryDetail extends Activity {
     private static final String NO_NETWORK_CONNECTION = "Not Connected to Network";
     private static final String CONNECTION_ERROR= "Server Not Reachable, Check Internet Connection";
     private static final String SERVER_URL = "http://52.18.112.240:3000/records";
-    private static final int X_RANGE = 500;
     private static final int MIN_Y = 0;//Minimum ECG data value
     private static final int MAX_Y = 1023;//Maximum ECG data value
-    private static final int MIN_X = 0;
-    private static final int MAX_X = 20000;
-    private GraphicalView mGraphView;
-    private LineGraphView mLineGraph;
-    private ViewGroup mHistLayout;
     private Button btnSendEmail, btnSendCloud;
     private TextView accessStatus;
     private String mFPath;
+    private int mIndex;
     private File mFile;
     private ECGMeasurement ecgM;
-    private int minY, maxY;
+    private Handler mHandler;
+    private ArrayList<EcgThreeChannelsPacket> mDataCollection;
+
+    private Channel1Fragment ecgChannelOne;
+    private Channel2Fragment ecgChannelTwo;
+    private Channel3Fragment ecgChannelThree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,18 +78,27 @@ public class HistoryDetail extends Activity {
         btnSendEmail.setEnabled(false);
         btnSendCloud.setEnabled(false);
         mFile = null;
+        mIndex = 0;
         ecgM = new ECGMeasurement();
-        minY = MAX_Y;
-        maxY = MIN_Y;
+        mHandler = new Handler();
+
+        ecgChannelOne = (Channel1Fragment)getFragmentManager()
+                .findFragmentById(R.id.channel1_fragment);
+        ecgChannelTwo = (Channel2Fragment)getFragmentManager()
+                .findFragmentById(R.id.channel2_fragment);
+        ecgChannelThree = (Channel3Fragment)getFragmentManager()
+                .findFragmentById(R.id.channel3_fragment);
+
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finish();
+        }else {
+            mFPath = extras.getString(Intent.EXTRA_TEXT);
         }
-        mFPath = extras.getString(Intent.EXTRA_TEXT);
         if(isExternalStorageReadable()){
             if((mFile = validateFile(mFPath))  != null){
-                setGraphView();
-                new DisplayECGTask().execute(mFile);
+                getData();
+                mDisplayGraph.run();
             }
             else{
                 finish();
@@ -94,7 +113,7 @@ public class HistoryDetail extends Activity {
             @Override
             public void onClick(View v) {
                 if(hasNetworkConnection())
-                    // call AsynTask to perform network operation on separate thread
+                    // Send data as email attachment
                     sendAttachment();
                 else
                     showMessage(NO_NETWORK_CONNECTION);
@@ -113,67 +132,36 @@ public class HistoryDetail extends Activity {
         });
     }
 
-    //Prepare the initial GUI for graph
-    private void setGraphView() {
-        mLineGraph = new LineGraphView("ECG");
-        mLineGraph.setYRange(MIN_Y, MAX_Y);
-        mLineGraph.setPanLimits(MIN_X, MAX_X, MIN_Y, MAX_Y);
-        mLineGraph.enableZoom();
-        mGraphView = mLineGraph.getView(this);
-        mHistLayout = (ViewGroup) findViewById(R.id.history_detail);
-        mHistLayout.addView(mGraphView);
+    private void getData(){
+        try {
+            BufferedReader buf = new BufferedReader(new FileReader(mFile));
+            ecgM.fromJson(buf.readLine());
+            buf.close();
+        }catch (Exception e) {
+            Log.e(TAG, e.toString());
+            showMessage("Problem accessing mFile");
+        }
+        Type type = new TypeToken<ArrayList<EcgThreeChannelsPacket>>() {}.getType();
+        mDataCollection = new Gson().fromJson(ecgM.getData(), type);
     }
 
-    private class DisplayECGTask extends AsyncTask<File, Integer, String> {
-
-        private Exception exception;
-        private int xValue = 0;
-
+    private Runnable mDisplayGraph = new Runnable() {
         @Override
-        protected String doInBackground(File... mFiles) {
-            try {
-                BufferedReader buf = new BufferedReader(new FileReader(mFiles[0]));
-                ecgM.fromJson(buf.readLine());
-                buf.close();
-                String data = ecgM.getData().substring(1);//Remove opening square bracket
-                data = data.substring(1).replace("]", "");//Remove closing square bracket
-                String[] dataArray = data.split(",");
-                for( int counter = 0; counter < dataArray.length; counter++){
-                    String ecgSample = dataArray[counter].trim();
-                    if(android.text.TextUtils.isDigitsOnly(ecgSample)) {
-                        publishProgress(Integer.parseInt(ecgSample));
-                    }
-                    counter++;
-                }
-            } catch (Exception e) {
-                exception = e;
-                return null;
-            }
-            return SUCCESS;
-        }
-
-        /*Displays ECG data on the graph*/
-        protected void onProgressUpdate(Integer... value) {
-            int yValue = value[0];
-            updateGraph(xValue, yValue);
-            xValue++;
-        }
-
-        /*Handles any exception and reports result of operation*/
-        @Override
-        protected void onPostExecute(String result) {
-            if(exception != null){
-                Log.e(TAG, exception.toString());
-                showMessage("Problem accessing mFile");
-                finish();
-            }
-            else {
-                Log.d(TAG, SUCCESS);
-                btnSendEmail.setEnabled(true);
-                btnSendCloud.setEnabled(true);
+        public void run() {
+            if(mIndex < mDataCollection.size()){
+                EcgThreeChannelsPacket pkt = mDataCollection.get(mIndex);
+                ecgChannelOne.updateGraph(pkt.getData()[0]);
+                ecgChannelOne.updateGraph(pkt.getData()[1]);
+                ecgChannelTwo.updateGraph(pkt.getData()[2]);
+                ecgChannelTwo.updateGraph(pkt.getData()[3]);
+                ecgChannelThree.updateGraph(pkt.getData()[4]);
+                ecgChannelThree.updateGraph(pkt.getData()[5]);
+                Log.w(TAG, "Sequence Number: " + pkt.getPacketNumber());
+                mIndex++;
+                mHandler.postDelayed(mDisplayGraph, 1);
             }
         }
-    }
+    };
 
     /* Checks if external storage is available to at least read */
     public boolean isExternalStorageReadable() {
@@ -183,18 +171,6 @@ public class HistoryDetail extends Activity {
             return true;
         }
         return false;
-    }
-
-    //Add a point to the graph
-    private void updateGraph(int x, int y){
-        double maxX = x;
-        double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-        minY = (y < minY)? y: minY;
-        maxY = (y > maxY)? y: maxY;
-        mLineGraph.setPanLimits(MIN_X, MAX_X,minY, maxY);
-        mLineGraph.setXRange(minX, maxX);
-        mLineGraph.addValue(new Point(x, y));
-        mGraphView.repaint();
     }
 
     public static String POST(String url, ECGMeasurement ecgM){

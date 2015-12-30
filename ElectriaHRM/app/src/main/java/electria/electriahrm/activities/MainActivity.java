@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +40,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import electria.electriahrm.dataPackets.EcgThreeChannelsPacket;
 import electria.electriahrm.fragments.Channel1Fragment;
 import electria.electriahrm.fragments.Channel2Fragment;
@@ -69,7 +73,7 @@ public class MainActivity extends Activity {
     private EditText editMessage;
     private LinearLayout.LayoutParams mParamEnable, mParamDisable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
-    private List<String> mRecordedData;
+    private List<EcgThreeChannelsPacket> mRecordedData;
     private List<Integer> mCollection;
     private int mRecTimerCounter, min, sec, hr;
     private BleService mService;
@@ -353,10 +357,8 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (ECGSamples != null && ECGSamples.length >= 6){
-                            if (mDataRecording) {
-                                mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)).
-                                        toJason());
-                            }
+                            if (mDataRecording)
+                                mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
                             if (mShowGraph) {
                                 ecgChannelOne.updateGraph(ECGSamples[0]);
                                 ecgChannelOne.updateGraph(ECGSamples[1]);
@@ -427,8 +429,8 @@ public class MainActivity extends Activity {
                     File file;
                     String fileName = ecgM.getSensor()+"_"+ecgM.getTimeStamp()+".txt";
                     file = new File(dir, fileName);
-                    ecgM.setData(Arrays.toString(mRecordedData.
-                            toArray(new String[mRecordedData.size()])));
+                    Type type = new TypeToken<ArrayList<EcgThreeChannelsPacket>>() {}.getType();
+                    ecgM.setData(new Gson().toJson(mRecordedData, type));
                     mRecordedData.clear();
                     try {
                         FileWriter fw = new FileWriter(file, true);
