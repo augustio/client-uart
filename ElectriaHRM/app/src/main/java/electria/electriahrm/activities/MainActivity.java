@@ -39,6 +39,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import electria.electriahrm.dataPackets.EcgThreeChannelsPacket;
 import electria.electriahrm.fragments.Channel1Fragment;
 import electria.electriahrm.fragments.Channel2Fragment;
 import electria.electriahrm.fragments.Channel3Fragment;
@@ -68,7 +69,7 @@ public class MainActivity extends Activity {
     private EditText editMessage;
     private LinearLayout.LayoutParams mParamEnable, mParamDisable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
-    private List<String> mData;
+    private List<String> mRecordedData;
     private List<Integer> mCollection;
     private int mRecTimerCounter, min, sec, hr;
     private BleService mService;
@@ -112,7 +113,7 @@ public class MainActivity extends Activity {
         mParamEnable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
         mParamDisable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
         mCollection = new ArrayList<>();
-        mData = new ArrayList<>();
+        mRecordedData = new ArrayList<>();
         ecgChannelOne = (Channel1Fragment)getFragmentManager()
                 .findFragmentById(R.id.channel1_fragment);
         ecgChannelTwo = (Channel2Fragment)getFragmentManager()
@@ -353,8 +354,8 @@ public class MainActivity extends Activity {
                     public void run(){
                         if (ECGSamples != null && ECGSamples.length >= 6){
                             if (mDataRecording) {
-                                mData.add(Integer.toString(ECGSamples[0]));
-                                mData.add(Integer.toString(ECGSamples[1]));
+                                mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)).
+                                        toJason());
                             }
                             if (mShowGraph) {
                                 ecgChannelOne.updateGraph(ECGSamples[0]);
@@ -394,7 +395,8 @@ public class MainActivity extends Activity {
         Intent bindIntent = new Intent(this, BleService.class);
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(BLEStatusChangeReceiver, makeGattUpdateIntentFilter());
+        LocalBroadcastManager.getInstance(this).
+                registerReceiver(BLEStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
     private void stopRecordingData(){
@@ -410,7 +412,7 @@ public class MainActivity extends Activity {
     }
 
     private void saveToDisk(){
-        if(mData.isEmpty()){
+        if(mRecordedData.isEmpty()){
             showMessage("No data recorded");
             return;
         }
@@ -425,8 +427,9 @@ public class MainActivity extends Activity {
                     File file;
                     String fileName = ecgM.getSensor()+"_"+ecgM.getTimeStamp()+".txt";
                     file = new File(dir, fileName);
-                    ecgM.setData(Arrays.toString(mData.toArray(new String[mData.size()])));
-                    mData.clear();
+                    ecgM.setData(Arrays.toString(mRecordedData.
+                            toArray(new String[mRecordedData.size()])));
+                    mRecordedData.clear();
                     try {
                         FileWriter fw = new FileWriter(file, true);
                         fw.append(ecgM.toJson());
@@ -453,7 +456,7 @@ public class MainActivity extends Activity {
     private Runnable mRecordTimer = new Runnable() {
         @Override
         public void run() {
-            if(!mData.isEmpty()) {
+            if(!mRecordedData.isEmpty()) {
                 if (mRecTimerCounter < SECONDS_IN_ONE_MINUTE) {
                     sec = mRecTimerCounter;
                 } else if (mRecTimerCounter < SECONDS_IN_ONE_HOUR) {
