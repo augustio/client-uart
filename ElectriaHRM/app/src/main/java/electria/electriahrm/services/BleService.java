@@ -440,6 +440,13 @@ public class BleService extends Service {
     }
 
     private void processRXData(byte[] data){
+        if(data.length < 16){
+            for(int i = 0; i < data.length; i++)
+                Log.w(TAG, "data[" + i + "]: " + (data[i] & 0xFF));
+
+            return;
+        }
+
         int header = (data[0] >> 5);
         int packetLost;
 
