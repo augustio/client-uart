@@ -447,7 +447,7 @@ public class BleService extends Service {
             return;
         }
 
-        int header = (data[0] >> 5);
+        int dataId = (data[0] >> 5);
         int packetLost;
 
         mPacketNumber = (((data[13] & 0X0000FF) << 16) | ((data[14] & 0X00FF) << 8) | (data[15] & 0XFF));
@@ -458,15 +458,15 @@ public class BleService extends Service {
 
         mPrevPacketNumber = mPacketNumber;
 
-        int[] ecgData =  {(((data[5] & 0X00FF) << 8) | (data[6] & 0X00FF)),
+        int[] ecgData =  {dataId, mPacketNumber,
+                (((data[5] & 0X00FF) << 8) | (data[6] & 0X00FF)),
                 (((data[11] & 0X00FF) << 8) | (data[12] & 0X00FF)),
                 (((data[3] & 0X00FF) << 8) | (data[4] & 0X00FF)),
                 (((data[9] & 0X00FF) << 8) | (data[10] & 0X00FF)),
                 (((data[1] & 0X00FF) << 8) | (data[2] & 0X00FF)),
-                (((data[7] & 0X00FF) << 8) | (data[8] & 0X00FF)),
-                (mPacketNumber)};
+                (((data[7] & 0X00FF) << 8) | (data[8] & 0X00FF))};
 
-        switch (header){
+        switch (dataId){
             case ECG_ONE_CHANNEL:
                 broadcastUpdate(ONE_CHANNEL_ECG, ecgData);
                 break;

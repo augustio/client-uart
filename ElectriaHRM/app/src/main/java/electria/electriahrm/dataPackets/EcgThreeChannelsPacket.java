@@ -10,12 +10,19 @@ import java.util.Arrays;
 public class EcgThreeChannelsPacket {
 
     private long packetNumber;
+    private int dataId;
     private int[] data;
 
     public EcgThreeChannelsPacket(int[] dataPacketArray){
-        if(dataPacketArray.length == 7) {
-            packetNumber = dataPacketArray[6];
-            data = Arrays.copyOfRange(dataPacketArray, 0, dataPacketArray.length - 1);
+        if(dataPacketArray.length == 8) {
+            packetNumber = dataPacketArray[1];
+            dataId = dataPacketArray[0];
+            data = Arrays.copyOfRange(dataPacketArray, 2, dataPacketArray.length);
+        }
+        else{
+            packetNumber = 0;
+            dataId = 0;
+            data = null;
         }
     }
 
@@ -23,12 +30,16 @@ public class EcgThreeChannelsPacket {
         return data;
     }
 
+    public long getPacketNumber(){
+        return packetNumber;
+    }
+
+    public int getDataId(){
+        return dataId;
+    }
+
     public String toJson(){
         Gson gson = new Gson();
         return gson.toJson(this);
-    }
-
-    public long getPacketNumber(){
-        return packetNumber;
     }
 }

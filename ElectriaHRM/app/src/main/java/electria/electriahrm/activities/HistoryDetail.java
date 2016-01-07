@@ -91,17 +91,23 @@ public class HistoryDetail extends Activity {
     private Runnable mDisplayGraph = new Runnable() {
         @Override
         public void run() {
-            if(mIndex < mDataCollection.size()){
-                EcgThreeChannelsPacket pkt = mDataCollection.get(mIndex);
-                ecgChannelOne.updateGraph(pkt.getData()[0]);
-                ecgChannelOne.updateGraph(pkt.getData()[1]);
-                ecgChannelTwo.updateGraph(pkt.getData()[2]);
-                ecgChannelTwo.updateGraph(pkt.getData()[3]);
-                ecgChannelThree.updateGraph(pkt.getData()[4]);
-                ecgChannelThree.updateGraph(pkt.getData()[5]);
-                Log.w(TAG, "Sequence Number: " + pkt.getPacketNumber());
-                mIndex++;
-                mHandler.postDelayed(mDisplayGraph, 1);
+            switch (mDataCollection.get(0).getDataId()) {
+                case 1:
+                    if (mIndex < mDataCollection.size()) {
+                        EcgThreeChannelsPacket pkt = mDataCollection.get(mIndex);
+                        ecgChannelOne.updateGraph(pkt.getData()[0]);
+                        ecgChannelOne.updateGraph(pkt.getData()[1]);
+                        ecgChannelTwo.updateGraph(pkt.getData()[2]);
+                        ecgChannelTwo.updateGraph(pkt.getData()[3]);
+                        ecgChannelThree.updateGraph(pkt.getData()[4]);
+                        ecgChannelThree.updateGraph(pkt.getData()[5]);
+                        Log.w(TAG, "Sequence Number: " + pkt.getPacketNumber());
+                        mIndex++;
+                        mHandler.postDelayed(mDisplayGraph, 1);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     };

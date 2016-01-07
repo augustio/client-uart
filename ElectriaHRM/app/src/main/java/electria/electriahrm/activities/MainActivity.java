@@ -356,17 +356,23 @@ public class MainActivity extends Activity {
                 final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
                 (new Runnable(){
                     public void run(){
-                        if (ECGSamples != null && ECGSamples.length >= 6){
-                            if (mDataRecording)
-                                mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
-                            if (mShowGraph) {
-                                ecgChannelOne.updateGraph(ECGSamples[0]);
-                                ecgChannelOne.updateGraph(ECGSamples[1]);
-                                ecgChannelTwo.updateGraph(ECGSamples[2]);
-                                ecgChannelTwo.updateGraph(ECGSamples[3]);
-                                ecgChannelThree.updateGraph(ECGSamples[4]);
-                                ecgChannelThree.updateGraph(ECGSamples[5]);
-                                Log.w(TAG, "Sequence Number: " + ECGSamples[6]);
+                        if (ECGSamples != null ){
+                            switch(ECGSamples[0]) {
+                                case 1:
+                                    if (mDataRecording)
+                                        mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                    if (mShowGraph) {
+                                        ecgChannelOne.updateGraph(ECGSamples[2]);
+                                        ecgChannelOne.updateGraph(ECGSamples[3]);
+                                        ecgChannelTwo.updateGraph(ECGSamples[4]);
+                                        ecgChannelTwo.updateGraph(ECGSamples[5]);
+                                        ecgChannelThree.updateGraph(ECGSamples[6]);
+                                        ecgChannelThree.updateGraph(ECGSamples[7]);
+                                        Log.w(TAG, "Sequence Number: " + ECGSamples[1]);
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
                         }
                     }
