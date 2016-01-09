@@ -68,8 +68,8 @@ public class BleService extends Service {
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
-    public static final int ECG_ONE_CHANNEL = 0;
-    public static final int ECG_THREE_CHANNEL = 1;
+    public static final int ECG_ONE_CHANNEL = 1;
+    public static final int ECG_THREE_CHANNEL = 0;
     public static final int PPG_ONE_CHANNEL = 2;
     public static final int PPG_TWO_CHANNEL = 3;
     public static final int ACCELERATION_THREE_CHANNEL = 4;
@@ -149,11 +149,12 @@ public class BleService extends Service {
                     if (service.getUuid().equals(UART_SERVICE_UUID)) {
                         mRXCharacteristic = service.getCharacteristic(RX_CHAR_UUID);
                         mTXCharacteristic = service.getCharacteristic(TX_CHAR_UUID);
+                        enableRXNotification();
                     } else if (service.getUuid().equals(HR_SERVICE_UUID)) {
                         mHRMCharacteristic = service.getCharacteristic(HRM_CHARACTERISTIC_UUID );
                         mHRLocationCharacteristic = service.getCharacteristic(ECG_SENSOR_LOCATION_CHARACTERISTIC_UUID);
                         //Read sensor location
-                        readECGSensorLocation();
+                        //readECGSensorLocation();
                     }
                 }
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
@@ -183,7 +184,7 @@ public class BleService extends Service {
                 //broadcastUpdate(ACTION_RX_DATA_AVAILABLE, characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0));
             }
             else if (characteristic.getUuid().equals(HRM_CHARACTERISTIC_UUID)) {
-                int hrValue = 0;
+                int hrValue;
                 if (isHeartRateInUINT16(characteristic.getValue()[0])) {
                     hrValue = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 1);
                 } else {
@@ -447,7 +448,7 @@ public class BleService extends Service {
             return;
         }
 
-        int dataId = (data[0] >> 5);
+        int dataId = ((data[0] & 0XFF) >> 5);
         int packetLost;
 
         mPacketNumber = (((data[13] & 0X0000FF) << 16) | ((data[14] & 0X00FF) << 8) | (data[15] & 0XFF));

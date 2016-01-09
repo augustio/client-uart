@@ -357,22 +357,16 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (ECGSamples != null ){
-                            switch(ECGSamples[0]) {
-                                case 1:
-                                    if (mDataRecording)
-                                        mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
-                                    if (mShowGraph) {
-                                        ecgChannelOne.updateGraph(ECGSamples[2]);
-                                        ecgChannelOne.updateGraph(ECGSamples[3]);
-                                        ecgChannelTwo.updateGraph(ECGSamples[4]);
-                                        ecgChannelTwo.updateGraph(ECGSamples[5]);
-                                        ecgChannelThree.updateGraph(ECGSamples[6]);
-                                        ecgChannelThree.updateGraph(ECGSamples[7]);
-                                        Log.w(TAG, "Sequence Number: " + ECGSamples[1]);
-                                    }
-                                    break;
-                                default:
-                                    break;
+                            if (mDataRecording)
+                                mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                            if (mShowGraph) {
+                                ecgChannelOne.updateGraph(ECGSamples[2]);
+                                ecgChannelOne.updateGraph(ECGSamples[3]);
+                                ecgChannelTwo.updateGraph(ECGSamples[4]);
+                                ecgChannelTwo.updateGraph(ECGSamples[5]);
+                                ecgChannelThree.updateGraph(ECGSamples[6]);
+                                ecgChannelThree.updateGraph(ECGSamples[7]);
+                                Log.w(TAG, "Sequence Number: " + ECGSamples[1]);
                             }
                         }
                     }
