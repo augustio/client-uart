@@ -68,9 +68,9 @@ public class BleService extends Service {
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
-    public static final int ECG_ONE_CHANNEL = 1;
-    public static final int ECG_THREE_CHANNEL = 0;
-    public static final int PPG_ONE_CHANNEL = 2;
+    public static final int ECG_ONE_CHANNEL = 0;
+    public static final int ECG_THREE_CHANNEL = 2;
+    public static final int PPG_ONE_CHANNEL = 1;
     public static final int PPG_TWO_CHANNEL = 3;
     public static final int ACCELERATION_THREE_CHANNEL = 4;
     public static final int IMPEDANCE_PNEUMOGRAPHY_ONE_CHANNEL = 5;
