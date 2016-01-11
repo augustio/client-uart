@@ -373,7 +373,97 @@ public class MainActivity extends Activity {
                     }
                 }).run();
             }
-
+            if (action.equals(BleService.ONE_CHANNEL_ECG)) {
+                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                (new Runnable(){
+                    public void run(){
+                        if (ECGSamples != null ){
+                            if (mDataRecording);
+                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                            if (mShowGraph) {
+                                ecgChannelOne.updateGraph(ECGSamples[2]);
+                                ecgChannelOne.updateGraph(ECGSamples[3]);
+                                ecgChannelTwo.updateGraph(ECGSamples[4]);
+                                ecgChannelTwo.updateGraph(ECGSamples[5]);
+                                Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
+                                        +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                            }
+                        }
+                    }
+                }).run();
+            }
+            if (action.equals(BleService.TWO_CHANNEL_PPG)) {
+                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                (new Runnable(){
+                    public void run(){
+                        if (ECGSamples != null ){
+                            if (mDataRecording);
+                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                if (mShowGraph) {
+                                    ecgChannelOne.updateGraph(ECGSamples[2]);
+                                    ecgChannelOne.updateGraph(ECGSamples[3]);
+                                    Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
+                                            +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                                }
+                        }
+                    }
+                }).run();
+            }
+            if (action.equals(BleService.THREE_CHANNEL_ACCELERATION)) {
+                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                (new Runnable(){
+                    public void run(){
+                        if (ECGSamples != null ){
+                            if (mDataRecording);
+                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                            if (mShowGraph) {
+                                ecgChannelOne.updateGraph(ECGSamples[2]);
+                                ecgChannelOne.updateGraph(ECGSamples[3]);
+                                ecgChannelTwo.updateGraph(ECGSamples[4]);
+                                ecgChannelTwo.updateGraph(ECGSamples[5]);
+                                ecgChannelThree.updateGraph(ECGSamples[6]);
+                                ecgChannelThree.updateGraph(ECGSamples[7]);
+                                Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
+                                        +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                            }
+                        }
+                    }
+                }).run();
+            }
+            if (action.equals(BleService.ONE_CHANNEL_PPG)) {
+                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                (new Runnable(){
+                    public void run(){
+                        if (ECGSamples != null ){
+                            if (mDataRecording);
+                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                if (mShowGraph) {
+                                    ecgChannelOne.updateGraph(ECGSamples[2]);
+                                    ecgChannelOne.updateGraph(ECGSamples[3]);
+                                    Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
+                                            +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                                }
+                        }
+                    }
+                }).run();
+            }
+            if (action.equals(BleService.ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY)) {
+                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                (new Runnable(){
+                    public void run(){
+                        if (ECGSamples != null ){
+                            if (mDataRecording);
+                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                if (mShowGraph) {
+                                    ecgChannelOne.updateGraph(ECGSamples[2]);
+                                    ecgChannelOne.updateGraph(ECGSamples[3]);
+                                    Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
+                                            +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                                }
+                        }
+                    }
+                }).run();
+            }
             if (action.equals(BleService.DEVICE_DOES_NOT_SUPPORT_UART)){
                 showMessage("Device doesn't support UART. Disconnecting");
                 mService.disconnect();
