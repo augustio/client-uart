@@ -14,7 +14,7 @@ import electria.electriahrm.utils.LineGraphView;
 public class Channel3Fragment extends Fragment {
 
     private static final int MIN_Y = 0;//Minimum ECG data value
-    private static final int MAX_Y = 1023;//Maximum ECG data value
+    private static final int MAX_Y = 4095;//Maximum ECG data value
     private static final int X_RANGE = 200;
 
     private LineGraphView mLineGraph;
