@@ -7,14 +7,14 @@ import java.util.Arrays;
 /**
  * Created by augustio on 28.12.2015.
  */
-public class EcgThreeChannelsPacket {
+public class DataPacket {
 
     private long packetNumber;
     private int dataId;
     private int[] data;
 
-    public EcgThreeChannelsPacket(int[] dataPacketArray){
-        if(dataPacketArray.length == 8) {
+    public DataPacket(int[] dataPacketArray){
+        if(dataPacketArray.length >= 3) {
             packetNumber = dataPacketArray[1];
             dataId = dataPacketArray[0];
             data = Arrays.copyOfRange(dataPacketArray, 2, dataPacketArray.length);

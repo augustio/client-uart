@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -43,7 +42,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import electria.electriahrm.dataPackets.EcgThreeChannelsPacket;
+import electria.electriahrm.dataPackets.DataPacket;
 import electria.electriahrm.fragments.Channel1Fragment;
 import electria.electriahrm.fragments.Channel2Fragment;
 import electria.electriahrm.fragments.Channel3Fragment;
@@ -73,7 +72,7 @@ public class MainActivity extends Activity {
     private EditText editMessage;
     private LinearLayout.LayoutParams mParamEnable, mParamDisable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
-    private List<EcgThreeChannelsPacket> mRecordedData;
+    private List<DataPacket> mRecordedData;
     private List<Integer> mCollection;
     private int mRecTimerCounter, min, sec, hr;
     private BleService mService;
@@ -86,9 +85,9 @@ public class MainActivity extends Activity {
     private ECGMeasurement ecgM;
     private BluetoothAdapter mBtAdapter = null;
 
-    private Channel1Fragment ecgChannelOne;
-    private Channel2Fragment ecgChannelTwo;
-    private Channel3Fragment ecgChannelThree;
+    private Channel1Fragment mChannelOne;
+    private Channel2Fragment mChannelTwo;
+    private Channel3Fragment mChannelThree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,11 +117,11 @@ public class MainActivity extends Activity {
         mParamDisable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
         mCollection = new ArrayList<>();
         mRecordedData = new ArrayList<>();
-        ecgChannelOne = (Channel1Fragment)getFragmentManager()
+        mChannelOne = (Channel1Fragment)getFragmentManager()
                 .findFragmentById(R.id.channel1_fragment);
-        ecgChannelTwo = (Channel2Fragment)getFragmentManager()
+        mChannelTwo = (Channel2Fragment)getFragmentManager()
                 .findFragmentById(R.id.channel2_fragment);
-        ecgChannelThree = (Channel3Fragment)getFragmentManager()
+        mChannelThree = (Channel3Fragment)getFragmentManager()
                 .findFragmentById(R.id.channel3_fragment);
 
         mDataRecording = false;
@@ -280,9 +279,9 @@ public class MainActivity extends Activity {
             mAvHeartRate = 0;
             mHeartRateCount = 0;
             mCollection.clear();
-            ecgChannelOne.clearGraph();
-            ecgChannelTwo.clearGraph();
-            ecgChannelThree.clearGraph();
+            mChannelOne.clearGraph();
+            mChannelTwo.clearGraph();
+            mChannelThree.clearGraph();
         }
     }
 
@@ -353,112 +352,112 @@ public class MainActivity extends Activity {
             }
 
             if (action.equals(BleService.THREE_CHANNEL_ECG)) {
-                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                final int[] samples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
                 (new Runnable(){
                     public void run(){
-                        if (ECGSamples != null ){
+                        if (samples != null ){
                             if (mDataRecording)
-                                mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                mRecordedData.add((new DataPacket(samples)));
                             if (mShowGraph) {
-                                ecgChannelOne.updateGraph(ECGSamples[2]);
-                                ecgChannelOne.updateGraph(ECGSamples[3]);
-                                ecgChannelTwo.updateGraph(ECGSamples[4]);
-                                ecgChannelTwo.updateGraph(ECGSamples[5]);
-                                ecgChannelThree.updateGraph(ECGSamples[6]);
-                                ecgChannelThree.updateGraph(ECGSamples[7]);
-                                Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
-                                        +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                                mChannelOne.updateGraph(samples[2]);
+                                mChannelOne.updateGraph(samples[3]);
+                                mChannelTwo.updateGraph(samples[4]);
+                                mChannelTwo.updateGraph(samples[5]);
+                                mChannelThree.updateGraph(samples[6]);
+                                mChannelThree.updateGraph(samples[7]);
+                                Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
+                                        +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
                             }
                         }
                     }
                 }).run();
             }
             if (action.equals(BleService.ONE_CHANNEL_ECG)) {
-                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                final int[] samples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
                 (new Runnable(){
                     public void run(){
-                        if (ECGSamples != null ){
+                        if (samples != null ){
                             if (mDataRecording);
-                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                mRecordedData.add((new DataPacket(samples)));
                             if (mShowGraph) {
-                                ecgChannelOne.updateGraph(ECGSamples[2]);
-                                ecgChannelOne.updateGraph(ECGSamples[3]);
-                                ecgChannelTwo.updateGraph(ECGSamples[4]);
-                                ecgChannelTwo.updateGraph(ECGSamples[5]);
-                                Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
-                                        +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                                mChannelOne.updateGraph(samples[2]);
+                                mChannelOne.updateGraph(samples[3]);
+                                Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
+                                        +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
                             }
                         }
                     }
                 }).run();
             }
             if (action.equals(BleService.TWO_CHANNEL_PPG)) {
-                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                final int[] samples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
                 (new Runnable(){
                     public void run(){
-                        if (ECGSamples != null ){
+                        if (samples != null ){
                             if (mDataRecording);
-                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
-                                    ecgChannelOne.updateGraph(ECGSamples[2]);
-                                    ecgChannelOne.updateGraph(ECGSamples[3]);
-                                    Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
-                                            +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                                    mChannelOne.updateGraph(samples[2]);
+                                    mChannelOne.updateGraph(samples[3]);
+                                    mChannelTwo.updateGraph(samples[4]);
+                                    mChannelTwo.updateGraph(samples[5]);
+                                    Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
+                                            +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
                                 }
                         }
                     }
                 }).run();
             }
             if (action.equals(BleService.THREE_CHANNEL_ACCELERATION)) {
-                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                final int[] samples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
                 (new Runnable(){
                     public void run(){
-                        if (ECGSamples != null ){
+                        if (samples != null ){
                             if (mDataRecording);
-                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                mRecordedData.add((new DataPacket(samples)));
                             if (mShowGraph) {
-                                ecgChannelOne.updateGraph(ECGSamples[2]);
-                                ecgChannelOne.updateGraph(ECGSamples[3]);
-                                ecgChannelTwo.updateGraph(ECGSamples[4]);
-                                ecgChannelTwo.updateGraph(ECGSamples[5]);
-                                ecgChannelThree.updateGraph(ECGSamples[6]);
-                                ecgChannelThree.updateGraph(ECGSamples[7]);
-                                Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
-                                        +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                                mChannelOne.updateGraph(samples[2]);
+                                mChannelOne.updateGraph(samples[3]);
+                                mChannelTwo.updateGraph(samples[4]);
+                                mChannelTwo.updateGraph(samples[5]);
+                                mChannelThree.updateGraph(samples[6]);
+                                mChannelThree.updateGraph(samples[7]);
+                                Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
+                                        +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
                             }
                         }
                     }
                 }).run();
             }
             if (action.equals(BleService.ONE_CHANNEL_PPG)) {
-                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                final int[] samples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
                 (new Runnable(){
                     public void run(){
-                        if (ECGSamples != null ){
+                        if (samples != null ){
                             if (mDataRecording);
-                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
-                                    ecgChannelOne.updateGraph(ECGSamples[2]);
-                                    ecgChannelOne.updateGraph(ECGSamples[3]);
-                                    Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
-                                            +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                                    mChannelOne.updateGraph(samples[2]);
+                                    mChannelOne.updateGraph(samples[3]);
+                                    Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
+                                            +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
                                 }
                         }
                     }
                 }).run();
             }
             if (action.equals(BleService.ONE_CHANNEL_IMPEDANCE_PNEUMOGRAPHY)) {
-                final int[] ECGSamples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
+                final int[] samples = intent.getIntArrayExtra(BleService.EXTRA_DATA) ;
                 (new Runnable(){
                     public void run(){
-                        if (ECGSamples != null ){
+                        if (samples != null ){
                             if (mDataRecording);
-                                //mRecordedData.add((new EcgThreeChannelsPacket(ECGSamples)));
+                                mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
-                                    ecgChannelOne.updateGraph(ECGSamples[2]);
-                                    ecgChannelOne.updateGraph(ECGSamples[3]);
-                                    Log.w(TAG, "Packet Number: " + ECGSamples[1]+" {Samples: "+ECGSamples[2]+"-"+ECGSamples[3]
-                                            +"-"+ECGSamples[4]+"-"+ECGSamples[5]+"-"+ECGSamples[6]+"-"+ECGSamples[7]+"}");
+                                    mChannelOne.updateGraph(samples[2]);
+                                    mChannelOne.updateGraph(samples[3]);
+                                    Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
+                                            +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
                                 }
                         }
                     }
@@ -520,7 +519,7 @@ public class MainActivity extends Activity {
                     File file;
                     String fileName = ecgM.getSensor()+"_"+ecgM.getTimeStamp()+".txt";
                     file = new File(dir, fileName);
-                    Type type = new TypeToken<ArrayList<EcgThreeChannelsPacket>>() {}.getType();
+                    Type type = new TypeToken<ArrayList<DataPacket>>() {}.getType();
                     ecgM.setData(new Gson().toJson(mRecordedData, type));
                     mRecordedData.clear();
                     try {

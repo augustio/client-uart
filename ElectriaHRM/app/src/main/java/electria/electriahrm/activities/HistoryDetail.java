@@ -17,7 +17,7 @@ import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-import electria.electriahrm.dataPackets.EcgThreeChannelsPacket;
+import electria.electriahrm.dataPackets.DataPacket;
 import electria.electriahrm.fragments.Channel1Fragment;
 import electria.electriahrm.fragments.Channel2Fragment;
 import electria.electriahrm.fragments.Channel3Fragment;
@@ -32,7 +32,7 @@ public class HistoryDetail extends Activity {
     private File mFile;
     private ECGMeasurement ecgM;
     private Handler mHandler;
-    private ArrayList<EcgThreeChannelsPacket> mDataCollection;
+    private ArrayList<DataPacket> mDataCollection;
 
     private Channel1Fragment ecgChannelOne;
     private Channel2Fragment ecgChannelTwo;
@@ -84,7 +84,7 @@ public class HistoryDetail extends Activity {
             Log.e(TAG, e.toString());
             showMessage("Problem accessing mFile");
         }
-        Type type = new TypeToken<ArrayList<EcgThreeChannelsPacket>>() {}.getType();
+        Type type = new TypeToken<ArrayList<DataPacket>>() {}.getType();
         mDataCollection = new Gson().fromJson(ecgM.getData(), type);
     }
 
@@ -94,7 +94,7 @@ public class HistoryDetail extends Activity {
             switch (mDataCollection.get(0).getDataId()) {
                 case 1:
                     if (mIndex < mDataCollection.size()) {
-                        EcgThreeChannelsPacket pkt = mDataCollection.get(mIndex);
+                        DataPacket pkt = mDataCollection.get(mIndex);
                         ecgChannelOne.updateGraph(pkt.getData()[0]);
                         ecgChannelOne.updateGraph(pkt.getData()[1]);
                         ecgChannelTwo.updateGraph(pkt.getData()[2]);

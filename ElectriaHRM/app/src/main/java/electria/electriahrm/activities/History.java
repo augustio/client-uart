@@ -21,9 +21,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -37,11 +34,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 
 import electria.electriahrm.R;
-import electria.electriahrm.dataPackets.EcgThreeChannelsPacket;
 import electria.electriahrm.measurements.ECGMeasurement;
 
 public class History extends Activity {
