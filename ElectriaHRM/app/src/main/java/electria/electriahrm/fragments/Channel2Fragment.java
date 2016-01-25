@@ -1,9 +1,6 @@
 package electria.electriahrm.fragments;
 
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,7 +9,6 @@ import android.view.ViewGroup;
 
 import org.achartengine.GraphicalView;
 
-import electria.electriahrm.R;
 import electria.electriahrm.utils.LineGraphView;
 
 public class Channel2Fragment extends Fragment {

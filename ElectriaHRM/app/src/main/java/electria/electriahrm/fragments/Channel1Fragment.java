@@ -1,6 +1,5 @@
 package electria.electriahrm.fragments;
 
-import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.app.Fragment;

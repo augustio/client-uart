@@ -48,8 +48,6 @@ public class BleService extends Service {
     private final static String TAG = BleService.class.getSimpleName();
     private static final int FIRST_BITMASK = 0x01;
 
-    private static final byte[] TEST_DATA = {32, 0X02, 0X58, 0X01, 0X7C, 0X01, 0X58, 0X02, 0X7C,
-                                            0X03, 0X7C, 0X02, 0X6C, 0, 0, 0, 0};
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -435,9 +433,7 @@ public class BleService extends Service {
      * This method will check if Heart rate value is in 8 bits or 16 bits
      */
     private boolean isHeartRateInUINT16(byte value) {
-        if ((value & FIRST_BITMASK) != 0)
-            return true;
-        return false;
+        return ((value & FIRST_BITMASK) != 0);
     }
 
     private void processRXData(byte[] data){

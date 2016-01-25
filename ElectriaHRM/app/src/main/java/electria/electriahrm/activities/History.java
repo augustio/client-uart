@@ -129,10 +129,8 @@ public class History extends Activity {
         if(isExternalStorageReadable()){
             File root = android.os.Environment.getExternalStorageDirectory();
             File dir = new File (root.getAbsolutePath() + dirName);
-            if(!dir.exists()) {
+            if(!dir.exists())
                 showMessage("No ECG file saved");
-                return;
-            }
             else{
                 for (File f : dir.listFiles()) {
                     if (f.isFile())
@@ -148,11 +146,8 @@ public class History extends Activity {
     /* Checks if external storage is available to at least read */
     public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
+        return (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
     }
 
     private String getFileSize(double len){
@@ -175,9 +170,8 @@ public class History extends Activity {
     private String getFilePath(int pos){
         String item = mListAdapter.getItem(pos);//Get item from list adapter
         String fn = item.substring(0, item.indexOf('\n'));//Get filename from item string
-        String path = android.os.Environment.getExternalStorageDirectory()+
-                mDirName+"/"+fn;
-        return path;
+        return (android.os.Environment.getExternalStorageDirectory()+
+                mDirName+"/"+fn);
     }
 
     private ECGMeasurement getECGMeasurement(int pos){
@@ -312,10 +306,7 @@ public class History extends Activity {
     public boolean hasNetworkConnection(){
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected())
-            return true;
-        else
-            return false;
+        return (networkInfo != null && networkInfo.isConnected());
     }
 
     private void showMessage(String msg) {

@@ -60,7 +60,6 @@ public class MainActivity extends Activity {
     private static final int CONNECTED = 20;
     private static final int DISCONNECTED = 21;
     private static final int MAX_DATA_RECORDING_TIME = 120;//Two minutes(60 seconds)
-    private static final int MAX_COLLECTION_SIZE = 12000;
     private static final int SECONDS_IN_ONE_MINUTE = 60;
     private static final int SECONDS_IN_ONE_HOUR = 3600;
     private static final int ONE_SECOND = 1000;// 1000 milliseconds in one second
@@ -73,7 +72,6 @@ public class MainActivity extends Activity {
     private LinearLayout.LayoutParams mParamEnable, mParamDisable;
     private Button btnConnectDisconnect,btnShow,btnSend,btnStore, btnHistory;
     private List<DataPacket> mRecordedData;
-    private List<Integer> mCollection;
     private int mRecTimerCounter, min, sec, hr;
     private BleService mService;
     private int mState;
@@ -115,7 +113,6 @@ public class MainActivity extends Activity {
         avHRView = (TextView) findViewById(R.id.av_heart_rate);
         mParamEnable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
         mParamDisable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
-        mCollection = new ArrayList<>();
         mRecordedData = new ArrayList<>();
         mChannelOne = (Channel1Fragment)getFragmentManager()
                 .findFragmentById(R.id.channel1_fragment);
@@ -126,8 +123,6 @@ public class MainActivity extends Activity {
 
         mDataRecording = false;
         mShowGraph = false;
-
-        mCollection = new ArrayList<>();
         mRecTimerCounter = 1;
         min = sec =  hr = 0;
         mAvHeartRate = 0;
@@ -278,7 +273,6 @@ public class MainActivity extends Activity {
             setHeartRateValue(0);
             mAvHeartRate = 0;
             mHeartRateCount = 0;
-            mCollection.clear();
             mChannelOne.clearGraph();
             mChannelTwo.clearGraph();
             mChannelThree.clearGraph();
@@ -377,7 +371,7 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
-                            if (mDataRecording);
+                            if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                             if (mShowGraph) {
                                 mChannelOne.updateGraph(samples[2]);
@@ -394,7 +388,7 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
-                            if (mDataRecording);
+                            if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
                                     mChannelOne.updateGraph(samples[2]);
@@ -413,7 +407,7 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
-                            if (mDataRecording);
+                            if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                             if (mShowGraph) {
                                 mChannelOne.updateGraph(samples[2]);
@@ -434,7 +428,7 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
-                            if (mDataRecording);
+                            if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
                                     mChannelOne.updateGraph(samples[2]);
@@ -451,7 +445,7 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
-                            if (mDataRecording);
+                            if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
                                     mChannelOne.updateGraph(samples[2]);

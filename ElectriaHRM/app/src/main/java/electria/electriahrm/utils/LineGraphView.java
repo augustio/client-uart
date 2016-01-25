@@ -76,8 +76,7 @@ public class LineGraphView {
      * return graph view to activity
      */
     public GraphicalView getView(Context context) {
-        final GraphicalView graphView = ChartFactory.getLineChartView(context, mDataset, mMultiRenderer);
-        return graphView;
+        return ChartFactory.getLineChartView(context, mDataset, mMultiRenderer);
     }
 
     /**

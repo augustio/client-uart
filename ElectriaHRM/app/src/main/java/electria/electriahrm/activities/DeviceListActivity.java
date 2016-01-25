@@ -103,7 +103,7 @@ public class DeviceListActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                if (mScanning==false) scanLeDevice(true);
+                if (!mScanning) scanLeDevice(true);
                 else finish();
             }
         });
@@ -113,9 +113,9 @@ public class DeviceListActivity extends Activity {
     private void populateList() {
         /* Initialize device list container */
         Log.d(TAG, "populateList");
-        mDeviceList = new ArrayList<BluetoothDevice>();
+        mDeviceList = new ArrayList<>();
         mDeviceAdapter = new DeviceAdapter(this, mDeviceList);
-        mDevRssiValues = new HashMap<String, Integer>();
+        mDevRssiValues = new HashMap<>();
 
         ListView newDevicesListView = (ListView) findViewById(R.id.new_devices);
         newDevicesListView.setAdapter(mDeviceAdapter);
