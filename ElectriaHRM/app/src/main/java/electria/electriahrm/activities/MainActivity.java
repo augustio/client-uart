@@ -14,6 +14,7 @@ import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
@@ -75,6 +76,7 @@ public class MainActivity extends Activity {
     private int mRecTimerCounter, min, sec, hr;
     private BleService mService;
     private int mState;
+    private int mDataType;
     private double mAvHeartRate, mHeartRateCount;
     private String mTimerString;
     private String mSensorPos;
@@ -114,16 +116,15 @@ public class MainActivity extends Activity {
         mParamEnable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 2.0f);
         mParamDisable = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT, 0.0f);
         mRecordedData = new ArrayList<>();
-        mChannelOne = (Channel1Fragment)getFragmentManager()
-                .findFragmentById(R.id.channel1_fragment);
-        mChannelTwo = (Channel2Fragment)getFragmentManager()
-                .findFragmentById(R.id.channel2_fragment);
-        mChannelThree = (Channel3Fragment)getFragmentManager()
-                .findFragmentById(R.id.channel3_fragment);
+
+        mChannelOne = new Channel1Fragment();
+        mChannelTwo = new Channel2Fragment();
+        mChannelThree = new Channel3Fragment();
 
         mDataRecording = false;
         mShowGraph = false;
         mRecTimerCounter = 1;
+        mDataType = -1;
         min = sec =  hr = 0;
         mAvHeartRate = 0;
         mHeartRateCount = 0;
@@ -198,7 +199,9 @@ public class MainActivity extends Activity {
                 if (mState == CONNECTED) {
                     if (mShowGraph) {
                         stopGraph();
+                        clearGraphLayout();
                     }else{
+                        setGraphLayout();
                         startGraph();
                     }
                 }
@@ -273,9 +276,6 @@ public class MainActivity extends Activity {
             setHeartRateValue(0);
             mAvHeartRate = 0;
             mHeartRateCount = 0;
-            mChannelOne.clearGraph();
-            mChannelTwo.clearGraph();
-            mChannelThree.clearGraph();
         }
     }
 
@@ -337,6 +337,7 @@ public class MainActivity extends Activity {
                         Log.d(TAG, "DISCONNECT_MSG");
                         mService.close();
                         clearGraph();
+                        clearGraphLayout();
                         resetGUIComponents();
                         if (mDataRecording)
                             stopRecordingData();
@@ -350,6 +351,8 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
+                            if(mDataType < 0)
+                                mDataType = samples[0];
                             if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                             if (mShowGraph) {
@@ -371,6 +374,8 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
+                            if(mDataType < 0)
+                                mDataType = samples[0];
                             if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                             if (mShowGraph) {
@@ -388,6 +393,8 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
+                            if(mDataType < 0)
+                                mDataType = samples[0];
                             if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
@@ -407,6 +414,8 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
+                            if(mDataType < 0)
+                                mDataType = samples[0];
                             if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                             if (mShowGraph) {
@@ -428,6 +437,8 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
+                            if(mDataType < 0)
+                                mDataType = samples[0];
                             if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
@@ -445,6 +456,8 @@ public class MainActivity extends Activity {
                 (new Runnable(){
                     public void run(){
                         if (samples != null ){
+                            if(mDataType < 0)
+                                mDataType = samples[0];
                             if (mDataRecording)
                                 mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
@@ -494,6 +507,7 @@ public class MainActivity extends Activity {
             ((TextView) findViewById(R.id.timer_view)).setText("");
             refreshTimer();
             stopGraph();
+            clearGraphLayout();
         }
     }
 
@@ -717,6 +731,111 @@ public class MainActivity extends Activity {
                     .setNegativeButton(R.string.popup_no, null)
                     .show();
         }
+    }
+
+    private void setGraphLayout(){
+        FragmentManager fm = getFragmentManager();
+        switch (mDataType){
+            case 0:
+                if(fm.findFragmentByTag("chOne") == null) {
+                    fm.beginTransaction()
+                            .add(R.id.channel1_fragment, mChannelOne, "chOne")
+                            .commit();
+                }
+                break;
+            case 1:
+                if(fm.findFragmentByTag("chOne") == null) {
+                    fm.beginTransaction()
+                            .add(R.id.channel1_fragment, mChannelOne, "chOne")
+                            .commit();
+                }
+                if(fm.findFragmentByTag("chTwo") == null) {
+                    fm.beginTransaction()
+                            .add(R.id.channel2_fragment, mChannelTwo, "chTwo")
+                            .commit();
+                }
+                if(fm.findFragmentByTag("chThree") == null) {
+                    fm.beginTransaction()
+                            .add(R.id.channel3_fragment, mChannelThree, "chThree")
+                            .commit();
+                }
+                break;
+            case 2:
+                if(fm.findFragmentByTag("chOne") == null) {
+                    fm.beginTransaction()
+                            .add(R.id.channel1_fragment, mChannelOne, "chOne")
+                            .commit();
+                }
+                break;
+            case 3:
+                if(fm.findFragmentByTag("chOne") == null) {
+                    fm.beginTransaction()
+                            .add(R.id.channel1_fragment, mChannelOne, "chOne")
+                            .commit();
+                }
+                if(fm.findFragmentByTag("chTwo") == null) {
+                    fm.beginTransaction()
+                            .add(R.id.channel2_fragment, mChannelTwo, "chTwo")
+                            .commit();
+                }
+                break;
+        }
+    }
+    private void clearGraphLayout(){
+        FragmentManager fm = getFragmentManager();
+        switch (mDataType) {
+            case 0:
+                mChannelOne.clearGraph();
+                if(fm.findFragmentByTag("chOne") != null) {
+                    fm.beginTransaction()
+                            .remove(mChannelOne)
+                            .commit();
+                }
+                break;
+            case 1:
+                mChannelOne.clearGraph();
+                mChannelTwo.clearGraph();
+                mChannelThree.clearGraph();
+                if(fm.findFragmentByTag("chOne") != null) {
+                    fm.beginTransaction()
+                            .remove(mChannelOne)
+                            .commit();
+                }
+                if(fm.findFragmentByTag("chTwo") != null) {
+                    fm.beginTransaction()
+                            .remove(mChannelTwo)
+                            .commit();
+                }
+                if(fm.findFragmentByTag("chThree") != null) {
+                    fm.beginTransaction()
+                            .remove(mChannelThree)
+                            .commit();
+                }
+                break;
+            case 2:
+                mChannelOne.clearGraph();
+                if(fm.findFragmentByTag("chOne") != null) {
+                    fm.beginTransaction()
+                            .remove(mChannelOne)
+                            .commit();
+                }
+                break;
+            case 3:
+                mChannelOne.clearGraph();
+                mChannelTwo.clearGraph();
+                if(fm.findFragmentByTag("chOne") != null) {
+                    fm.beginTransaction()
+                            .remove(mChannelOne)
+                            .commit();
+                }
+                if(fm.findFragmentByTag("chTwo") != null) {
+                    fm.beginTransaction()
+                            .remove(mChannelTwo)
+                            .commit();
+                }
+                break;
+        }
+        mDataType = -1;
     }
 
     private void showMessage(final String msg) {

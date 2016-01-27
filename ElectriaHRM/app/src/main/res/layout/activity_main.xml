@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_connect"
@@ -46,6 +45,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/sensor_labels"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
@@ -71,86 +71,84 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/graph_layout"
+        android:id="@+id/channel1_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical">
-
-        <fragment
-            android:name="electria.electriahrm.fragments.Channel1Fragment"
-            android:id="@+id/channel1_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-
-        <fragment
-            android:name="electria.electriahrm.fragments.Channel2Fragment"
-            android:id="@+id/channel2_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-
-        <fragment
-            android:name="electria.electriahrm.fragments.Channel3Fragment"
-            android:id="@+id/channel3_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/channel2_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/channel3_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
     </LinearLayout>
 
-    <RelativeLayout android:id="@+id/send_message_layout"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="5dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="0dp">
 
-        <EditText android:id="@+id/sendText"
-            android:layout_width="102dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/sendButton"
-            android:ems="10" android:enabled="false"
-            android:fontFamily="1" android:lines="1"
-            android:maxLength="20" android:maxLines="1"
-            android:inputType="text"
-            android:shadowRadius="1"/>
+        <RelativeLayout android:id="@+id/send_message_layout"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
 
-        <Button android:id="@+id/sendButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:enabled="false"
-            android:text="@string/send"/>
+            <EditText android:id="@+id/sendText"
+                android:layout_width="102dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/sendButton"
+                android:ems="10" android:enabled="false"
+                android:fontFamily="1" android:lines="1"
+                android:maxLength="20" android:maxLines="1"
+                android:inputType="text"
+                android:shadowRadius="1"/>
 
-    </RelativeLayout>
+            <Button android:id="@+id/sendButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:enabled="false"
+                android:text="@string/send"/>
 
-    <RelativeLayout
-        android:id="@+id/footer_layout"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:orientation="vertical" >
+        </RelativeLayout>
 
-        <TextView
-            android:id="@+id/deviceName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:text="@string/no_device"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <RelativeLayout
+            android:id="@+id/footer_layout"
+            android:layout_width="match_parent"
+            android:layout_height="30dp">
 
-        <TextView
-            android:id="@+id/timer_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:textColor="@color/red"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/deviceName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:text="@string/no_device"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/timer_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:textColor="@color/red"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
