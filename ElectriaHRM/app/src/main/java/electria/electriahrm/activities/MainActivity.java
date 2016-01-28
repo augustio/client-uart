@@ -353,17 +353,19 @@ public class MainActivity extends Activity {
                         if (samples != null ){
                             if(mDataType < 0)
                                 mDataType = samples[0];
-                            if (mDataRecording)
-                                mRecordedData.add((new DataPacket(samples)));
-                            if (mShowGraph) {
-                                mChannelOne.updateGraph(samples[2]);
-                                mChannelOne.updateGraph(samples[3]);
-                                mChannelTwo.updateGraph(samples[4]);
-                                mChannelTwo.updateGraph(samples[5]);
-                                mChannelThree.updateGraph(samples[6]);
-                                mChannelThree.updateGraph(samples[7]);
-                                Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
-                                        +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
+                            else {
+                                if (mDataRecording)
+                                    mRecordedData.add((new DataPacket(samples)));
+                                if (mShowGraph) {
+                                    mChannelOne.updateGraph(samples[2]);
+                                    mChannelOne.updateGraph(samples[3]);
+                                    mChannelTwo.updateGraph(samples[4]);
+                                    mChannelTwo.updateGraph(samples[5]);
+                                    mChannelThree.updateGraph(samples[6]);
+                                    mChannelThree.updateGraph(samples[7]);
+                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
+                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
+                                }
                             }
                         }
                     }
@@ -376,13 +378,15 @@ public class MainActivity extends Activity {
                         if (samples != null ){
                             if(mDataType < 0)
                                 mDataType = samples[0];
-                            if (mDataRecording)
-                                mRecordedData.add((new DataPacket(samples)));
-                            if (mShowGraph) {
-                                mChannelOne.updateGraph(samples[2]);
-                                mChannelOne.updateGraph(samples[3]);
-                                Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
-                                        +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
+                            else {
+                                if (mDataRecording)
+                                    mRecordedData.add((new DataPacket(samples)));
+                                if (mShowGraph) {
+                                    mChannelOne.updateGraph(samples[2]);
+                                    mChannelOne.updateGraph(samples[3]);
+                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
+                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
+                                }
                             }
                         }
                     }
@@ -395,16 +399,18 @@ public class MainActivity extends Activity {
                         if (samples != null ){
                             if(mDataType < 0)
                                 mDataType = samples[0];
-                            if (mDataRecording)
-                                mRecordedData.add((new DataPacket(samples)));
+                            else {
+                                if (mDataRecording)
+                                    mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
                                     mChannelOne.updateGraph(samples[2]);
                                     mChannelOne.updateGraph(samples[3]);
                                     mChannelTwo.updateGraph(samples[4]);
                                     mChannelTwo.updateGraph(samples[5]);
-                                    Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
-                                            +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
+                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
+                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
                                 }
+                            }
                         }
                     }
                 }).run();
@@ -416,17 +422,19 @@ public class MainActivity extends Activity {
                         if (samples != null ){
                             if(mDataType < 0)
                                 mDataType = samples[0];
-                            if (mDataRecording)
-                                mRecordedData.add((new DataPacket(samples)));
-                            if (mShowGraph) {
-                                mChannelOne.updateGraph(samples[2]);
-                                mChannelOne.updateGraph(samples[3]);
-                                mChannelTwo.updateGraph(samples[4]);
-                                mChannelTwo.updateGraph(samples[5]);
-                                mChannelThree.updateGraph(samples[6]);
-                                mChannelThree.updateGraph(samples[7]);
-                                Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
-                                        +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
+                            else {
+                                if (mDataRecording)
+                                    mRecordedData.add((new DataPacket(samples)));
+                                if (mShowGraph) {
+                                    mChannelOne.updateGraph(samples[2]);
+                                    mChannelOne.updateGraph(samples[3]);
+                                    mChannelTwo.updateGraph(samples[4]);
+                                    mChannelTwo.updateGraph(samples[5]);
+                                    mChannelThree.updateGraph(samples[6]);
+                                    mChannelThree.updateGraph(samples[7]);
+                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
+                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
+                                }
                             }
                         }
                     }
@@ -439,14 +447,16 @@ public class MainActivity extends Activity {
                         if (samples != null ){
                             if(mDataType < 0)
                                 mDataType = samples[0];
-                            if (mDataRecording)
-                                mRecordedData.add((new DataPacket(samples)));
+                            else {
+                                if (mDataRecording)
+                                    mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
                                     mChannelOne.updateGraph(samples[2]);
                                     mChannelOne.updateGraph(samples[3]);
-                                    Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
-                                            +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
+                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
+                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
                                 }
+                            }
                         }
                     }
                 }).run();
@@ -458,14 +468,16 @@ public class MainActivity extends Activity {
                         if (samples != null ){
                             if(mDataType < 0)
                                 mDataType = samples[0];
-                            if (mDataRecording)
-                                mRecordedData.add((new DataPacket(samples)));
+                            else {
+                                if (mDataRecording)
+                                    mRecordedData.add((new DataPacket(samples)));
                                 if (mShowGraph) {
                                     mChannelOne.updateGraph(samples[2]);
                                     mChannelOne.updateGraph(samples[3]);
-                                    Log.w(TAG, "Packet Number: " + samples[1]+" {Samples: "+samples[2]+"-"+samples[3]
-                                            +"-"+samples[4]+"-"+samples[5]+"-"+samples[6]+"-"+samples[7]+"}");
+                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
+                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
                                 }
+                            }
                         }
                     }
                 }).run();
@@ -737,6 +749,8 @@ public class MainActivity extends Activity {
         FragmentManager fm = getFragmentManager();
         switch (mDataType){
             case 0:
+            case 2:
+            case 5:
                 if(fm.findFragmentByTag("chOne") == null) {
                     fm.beginTransaction()
                             .add(R.id.channel1_fragment, mChannelOne, "chOne")
@@ -744,6 +758,7 @@ public class MainActivity extends Activity {
                 }
                 break;
             case 1:
+            case 4:
                 if(fm.findFragmentByTag("chOne") == null) {
                     fm.beginTransaction()
                             .add(R.id.channel1_fragment, mChannelOne, "chOne")
@@ -757,13 +772,6 @@ public class MainActivity extends Activity {
                 if(fm.findFragmentByTag("chThree") == null) {
                     fm.beginTransaction()
                             .add(R.id.channel3_fragment, mChannelThree, "chThree")
-                            .commit();
-                }
-                break;
-            case 2:
-                if(fm.findFragmentByTag("chOne") == null) {
-                    fm.beginTransaction()
-                            .add(R.id.channel1_fragment, mChannelOne, "chOne")
                             .commit();
                 }
                 break;
@@ -785,6 +793,8 @@ public class MainActivity extends Activity {
         FragmentManager fm = getFragmentManager();
         switch (mDataType) {
             case 0:
+            case 2:
+            case 5:
                 mChannelOne.clearGraph();
                 if(fm.findFragmentByTag("chOne") != null) {
                     fm.beginTransaction()
@@ -812,15 +822,8 @@ public class MainActivity extends Activity {
                             .commit();
                 }
                 break;
-            case 2:
-                mChannelOne.clearGraph();
-                if(fm.findFragmentByTag("chOne") != null) {
-                    fm.beginTransaction()
-                            .remove(mChannelOne)
-                            .commit();
-                }
-                break;
             case 3:
+            case 4:
                 mChannelOne.clearGraph();
                 mChannelTwo.clearGraph();
                 if(fm.findFragmentByTag("chOne") != null) {
