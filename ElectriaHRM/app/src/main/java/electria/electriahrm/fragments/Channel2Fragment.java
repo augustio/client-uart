@@ -44,14 +44,15 @@ public class Channel2Fragment extends Fragment {
     }
 
     public void updateGraph(int value) {
-        double maxX = xValueCounter;
-        double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
-        mLineGraph.setXRange(minX, maxX);
-        mLineGraph.addValue(new Point(xValueCounter, value));
-        xValueCounter++;
-        mGraphView.repaint();
+        if(mLineGraph != null && mGraphView != null) {
+            double maxX = xValueCounter;
+            double minX = (maxX < X_RANGE) ? 0 : (maxX - X_RANGE);
+            mLineGraph.setXRange(minX, maxX);
+            mLineGraph.addValue(new Point(xValueCounter, value));
+            xValueCounter++;
+            mGraphView.repaint();
+        }
     }
-
     public void clearGraph(){
         mGraphView.repaint();
         mLineGraph.clearGraph();

@@ -199,9 +199,7 @@ public class MainActivity extends Activity {
                 if (mState == CONNECTED) {
                     if (mShowGraph) {
                         stopGraph();
-                        clearGraphLayout();
                     }else{
-                        setGraphLayout();
                         startGraph();
                     }
                 }
@@ -241,13 +239,16 @@ public class MainActivity extends Activity {
     }
 
     private void startGraph(){
+        setGraphLayout();
         mShowGraph = true;
         btnShow.setText("Close");
     }
 
     private void stopGraph(){
-        clearGraph();
+        mShowGraph = false;
+        clearGraphLayout();
         btnShow.setText("View");
+        resetDisplayedSensorValues();
     }
 
     private void setSensorPosition(final String position) {
@@ -269,14 +270,11 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void clearGraph() {
-        if(mShowGraph) {
-            mShowGraph = false;
-            setSensorPosition(null);
-            setHeartRateValue(0);
-            mAvHeartRate = 0;
-            mHeartRateCount = 0;
-        }
+    private void resetDisplayedSensorValues() {
+        setSensorPosition(null);
+        setHeartRateValue(0);
+        mAvHeartRate = 0;
+        mHeartRateCount = 0;
     }
 
     private void resetGUIComponents(){
@@ -336,8 +334,8 @@ public class MainActivity extends Activity {
                     public void run() {
                         Log.d(TAG, "DISCONNECT_MSG");
                         mService.close();
-                        clearGraph();
-                        clearGraphLayout();
+                        if(mShowGraph)
+                            stopGraph();
                         resetGUIComponents();
                         if (mDataRecording)
                             stopRecordingData();
@@ -518,8 +516,8 @@ public class MainActivity extends Activity {
             mHandler.removeCallbacks(mRecordTimer);
             ((TextView) findViewById(R.id.timer_view)).setText("");
             refreshTimer();
-            stopGraph();
-            clearGraphLayout();
+            if(mShowGraph)
+                stopGraph();
         }
     }
 
