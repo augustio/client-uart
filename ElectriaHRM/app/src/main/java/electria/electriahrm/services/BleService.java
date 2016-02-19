@@ -206,7 +206,7 @@ public class BleService extends Service {
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
             if(status == BluetoothGatt.GATT_SUCCESS){
                 if(descriptor.getCharacteristic().getUuid().equals(RX_CHAR_UUID)) {
-                    enableHRNotification();
+                    //enableHRNotification();
                 }
             }
         }

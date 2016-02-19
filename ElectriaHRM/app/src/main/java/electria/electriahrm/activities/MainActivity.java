@@ -239,9 +239,10 @@ public class MainActivity extends Activity {
     }
 
     private void startGraph(){
-        setGraphLayout();
-        mShowGraph = true;
-        btnShow.setText("Close");
+        if(setGraphLayout()) {
+            mShowGraph = true;
+            btnShow.setText("Close");
+        }
     }
 
     private void stopGraph(){
@@ -361,8 +362,9 @@ public class MainActivity extends Activity {
                                     mChannelTwo.updateGraph(samples[5]);
                                     mChannelThree.updateGraph(samples[6]);
                                     mChannelThree.updateGraph(samples[7]);
-                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
-                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
+                                    Log.w(TAG, "Data Type: " + samples[0] + "Packet Number: " + samples[1] +
+                                            " {Samples: " + samples[2] + "-" + samples[3] + "-" + samples[4] +
+                                            "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
                                 }
                             }
                         }
@@ -382,8 +384,9 @@ public class MainActivity extends Activity {
                                 if (mShowGraph) {
                                     mChannelOne.updateGraph(samples[2]);
                                     mChannelOne.updateGraph(samples[3]);
-                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
-                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
+                                    Log.w(TAG, "Data Type: " + samples[0] + "Packet Number: " + samples[1] +
+                                            " {Samples: " + samples[2] + "-" + samples[3] + "-" + samples[4] +
+                                            "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
                                 }
                             }
                         }
@@ -405,8 +408,9 @@ public class MainActivity extends Activity {
                                     mChannelOne.updateGraph(samples[3]);
                                     mChannelTwo.updateGraph(samples[4]);
                                     mChannelTwo.updateGraph(samples[5]);
-                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
-                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
+                                    Log.w(TAG, "Data Type: " + samples[0] + "Packet Number: " + samples[1] +
+                                            " {Samples: " + samples[2] + "-" + samples[3] + "-" + samples[4] +
+                                            "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
                                 }
                             }
                         }
@@ -430,8 +434,9 @@ public class MainActivity extends Activity {
                                     mChannelTwo.updateGraph(samples[5]);
                                     mChannelThree.updateGraph(samples[6]);
                                     mChannelThree.updateGraph(samples[7]);
-                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
-                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
+                                    Log.w(TAG, "Data Type: " + samples[0] + "Packet Number: " + samples[1] +
+                                            " {Samples: " + samples[2] + "-" + samples[3] + "-" + samples[4] +
+                                            "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
                                 }
                             }
                         }
@@ -451,8 +456,9 @@ public class MainActivity extends Activity {
                                 if (mShowGraph) {
                                     mChannelOne.updateGraph(samples[2]);
                                     mChannelOne.updateGraph(samples[3]);
-                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
-                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
+                                    Log.w(TAG, "Data Type: " + samples[0] + "Packet Number: " + samples[1] +
+                                            " {Samples: " + samples[2] + "-" + samples[3] + "-" + samples[4] +
+                                            "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
                                 }
                             }
                         }
@@ -472,8 +478,9 @@ public class MainActivity extends Activity {
                                 if (mShowGraph) {
                                     mChannelOne.updateGraph(samples[2]);
                                     mChannelOne.updateGraph(samples[3]);
-                                    Log.w(TAG, "Packet Number: " + samples[1] + " {Samples: " + samples[2] + "-" + samples[3]
-                                            + "-" + samples[4] + "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
+                                    Log.w(TAG, "Data Type: " + samples[0] + "Packet Number: " + samples[1] +
+                                            " {Samples: " + samples[2] + "-" + samples[3] + "-" + samples[4] +
+                                            "-" + samples[5] + "-" + samples[6] + "-" + samples[7] + "}");
                                 }
                             }
                         }
@@ -743,7 +750,9 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void setGraphLayout(){
+    private boolean setGraphLayout(){
+        if(mDataType < 0 || mDataType > 5)
+            return false;
         FragmentManager fm = getFragmentManager();
         switch (mDataType){
             case 0:
@@ -786,6 +795,7 @@ public class MainActivity extends Activity {
                 }
                 break;
         }
+        return true;
     }
     private void clearGraphLayout(){
         FragmentManager fm = getFragmentManager();
